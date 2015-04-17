@@ -41,12 +41,10 @@ License)`. Tato licence nejenže umožňuje software použít k libovolným
 upravovat ho a tyto změny či opravy šířit dál.
 
 .. important:: Školení je zaměřeno na aktuální verzi `GRASS 7.0
-               <http://grass.osgeo.org/download/software/#g70x>`_. Ve
-               starší verzi GRASS 6.4 není zaručena funkčnost
-               uvedených příkladů, případné rozdíly mezi těmito
-               verzemi jsou vždy explicitně zdůrazněny. Dále
-               předpokládáme zapnutou *anglickou lokalizaci*, viz
-               :ref:`volba lokalizace <volba-lokalizace>`.
+               <http://grass.osgeo.org/download/software/#g70x>`_ a do
+               jisté míry navazuje na školení `GRASS GIS pro
+               začátečníky
+               <http://training.gismentors.eu/grass-gis-zacatecnik/>`_.
 
 .. warning:: :red:`Toto je pracovní verze školení, která je aktuálně ve vývoji!`
 
@@ -66,8 +64,10 @@ Autoři
 
 Za `GISMentors <http://www.gismentors.cz/>`_:
 
-* Martin Landa ``<martin.landa opengeolabs.cz>``
-* Jáchym Čepický ``<jachym.cepicky opengeolabs.cz>``
+* `Martin Landa <http://www.gismentors.cz/mentors/landa>`_
+  ``<martin.landa opengeolabs.cz>``
+* `Jáchym Čepický <http://www.gismentors.cz/mentors/cepicky>`_
+  ``<jachym.cepicky opengeolabs.cz>``
 
 Text dokumentu
 ^^^^^^^^^^^^^^
@@ -76,8 +76,8 @@ Text dokumentu
 
    Online HTML verze textu školení je dostupná na adrese:
 
-   * http://training.gismentors.eu/grass-gis-zacatecnik/
+   * http://training.gismentors.eu/grass-gis-pokrocily
 
 Zdrojové texty školení jsou dostupné na adrese:
 
-* https://github.com/GISMentors/grass-gis-zacatecnik
+* https://github.com/GISMentors/grass-gis-pokrocily
