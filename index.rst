@@ -48,14 +48,7 @@ upravovat ho a tyto změny či opravy šířit dál.
                předpokládáme zapnutou *anglickou lokalizaci*, viz
                :ref:`volba lokalizace <volba-lokalizace>`.
 
-.. only:: html
-
-   .. tip::
-
-      Text školení je dostupný i v tisknutelné formě `PDF
-      <./skoleni-grass-gis-zacatecnik.pdf>`_.
-   
-.. warning:: Toto je pracovní verze školení, která je aktuálně ve vývoji!
+.. warning:: :red:`Toto je pracovní verze školení, která je aktuálně ve vývoji!`
 
 O dokumentu
 -----------
