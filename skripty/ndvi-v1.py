@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from grass.pygrass.modules import Module
+from subprocess import PIPE
 
 # pridat mapset do vyhledavaci cesty
 Module('g.mapsets', mapset='landsat', operation='add', quiet=True)
@@ -33,7 +34,7 @@ Module('r.recode', input=ndvi, output=r_ndvi,
 # popisky
 labels = """
 1:bez vegetace, vodni plochy
-2:plochy pokryte vegetaci
+2:plochy s minimalni vegetaci
 3:plochy pokryte vegetaci
 """
 Module('r.category', map=r_ndvi,
@@ -50,7 +51,11 @@ Module('r.colors', map=r_ndvi,
 
 # vypsat vysledek
 print ("Generuji report...")
-Module('r.report', map=r_ndvi,
-       units='h')
+report = Module('r.stats', flags='pl', input=r_ndvi, separator=':', stdout_=PIPE)
+
+print ('-' * 80)
+for trida, label, procento in map(lambda x: x.split(':'), report.outputs.stdout.splitlines()):
+    print ("Trida {0} ({1:28s}): {2:>7}".format(trida, label, procento))
+print ('-' * 80)
 
 print ("Hotovo!")

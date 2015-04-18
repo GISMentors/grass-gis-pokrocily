@@ -26,7 +26,7 @@ EOF
 # popisky
 r.category map=r_$ndvi sep=':' rules=- <<EOF
 1:bez vegetace, vodni plochy
-2:plochy pokryte vegetaci
+2:plochy s minimalni vegetaci
 3:plochy pokryte vegetaci
 EOF
 
@@ -39,6 +39,6 @@ EOF
 
 # vypsat vysledek
 echo "Generuji report..."
-r.report map=r_$ndvi units=h
+r.stats -pl input=r_$ndvi
 
 echo "Hotovo!"
