@@ -10,9 +10,13 @@
 #%option
 #% key: output_postfix
 #% type: string
-#% description: Postfix pro vystupni vrstvu (vychozi: ndvi)
+#% description: Postfix for output maps
 #% answer: ndvi
 #%end 
+#%option G_OPT_F_INPUT
+#% key: classes
+#% required: no
+#%end
 
 if [ "$1" != "@ARGS_PARSED@" ] ; then
     exec g.parser "$0" "$@"
@@ -37,11 +41,15 @@ r.mapcalc exp="$ndvi = float($nir - $vis) / ($nir + $vis)" --o
 echo "Reklasifikuji..."
 # r.reclass umi reklasifikovat pouze celociselne rastry, proto pouzime
 # r.recode
-r.recode input=$ndvi output=r_$ndvi rules=- --o <<EOF
+if test -z $GIS_OPT_CLASSES ; then
+    r.recode input=$ndvi output=r_$ndvi rules=- --o <<EOF
  -1:0.05:1 
  0.05:0.35:2 
  0.35:1:3
 EOF
+else
+    r.recode input=$ndvi output=r_$ndvi rules="$GIS_OPT_CLASSES" --o 
+fi
 
 # popisky
 r.category map=r_$ndvi sep=':' rules=- <<EOF

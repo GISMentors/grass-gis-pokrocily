@@ -16,7 +16,7 @@ r_ndvi= "r_{}".format(ndvi)
 # vypocet NDIV
 print ("VIS: {0} ; NIR: {1}".format(vis, nir))
 Module('r.mapcalc',
-       expression="$ndvi = float({nir} - {vis}) / ({nir} + {vis})".format(vis=vis, nir=nir),
+       expression="{o} = float({n} - {v}) / ({n} + {v})".format(o=ndvi, v=vis, n=nir),
        overwrite=True)
 
 # reklasifikace (1,2,3)
