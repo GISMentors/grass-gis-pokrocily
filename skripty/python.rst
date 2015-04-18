@@ -17,6 +17,8 @@ další.
    :linenos:
    :emphasize-lines: 3, 7, 10-14, 18-20, 31-32, 40-41, 49-50, 54
 
+.. _pygrass-module:
+      
 Poznámky k volání modulů
 ^^^^^^^^^^^^^^^^^^^^^^^^                     
 
@@ -51,7 +53,19 @@ parametr s hodnotou ``True``, v tomto případě tedy ``quiet=True``.
 
    Podobné zkracování názvů parametrů **není** při použití třídy
    :pygrass-modules:`Module` z knihovny :doc:`../pygrass/index` možné.
-   
+
+.. note:: **Shortcuts**
+
+   PyGRASS umožňuje emulovat způsob volání podobně jako :doc:`bash`
+   přes tzv. "shortcuts". Příklad volání modulu :grasscmd:`g.mapsets`
+   (řádek :lcode:`7`)
+
+   .. code-block:: python
+
+      from grass.pygrass.modules.shortcuts import general as g
+
+      g.mapsets(mapset=mapset, operation='add', quiet=True)
+
 Vstup
 ~~~~~
 
@@ -229,4 +243,3 @@ podobné ostatním modulům systému GRASS.
    .. code-block:: bash
                 
       ndvi-v2.py map=landsat classes=classes.txt
-                    

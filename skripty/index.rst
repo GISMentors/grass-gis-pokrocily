@@ -7,17 +7,22 @@ skriptovacím jazyce, ze kterého můžete volat nástroje systému GRASS,
 tzv. :skoleni:`moduly <grass-gis-zacatecnik/intro/moduly>`. Může to
 být např. :wikipedia:`Perl`, :wikipedia:`Ruby <Ruby (programovací
 jazyk)>`, :wikipedia:`Java <Java (programovací jazyk)>` či typicky
-:wikipedia:`Bash` a :wikipedia:`Python`. Prvně uvedený jazyk
-:program:`Bash` je jeden z unixových shellů, který interpretuje
-příkazový řádek. V Bashi se píše rychle a efektivně, na druhou stranu
-nejsou skripty psané pro Bash přenositelné a budou fungovat pouze v
-prostředí Bash. Pod Windows tak bude potřebovat prostředí, které bude
-Bash emulovat, např. :wikipedia-en:`msys`. Z tohoto pohledu se jeví
-jako lepší volba rozšířený a zároveň multiplatformní jazyk
-:program:`Python` s širokou škálou knihoven z oblasti GIS, více
-informací najdete ve školení :skoleni:`GeoPython`. Kromě toho je
-Python šíroce podporován nejen systémem GRASS (:doc:`../pygrass/index`,
-ale i QGISem (`pyQGIS
+:wikipedia:`POSIX` a :wikipedia:`Python`. Cílem prvně uvedeného
+standardu :wikipedia:`POSIX` bylo vytvořit jednotné rozhraní, které
+mělo zajistit přenositelnost programů mezi jednotlivými unixovými
+operačními systémy. V POSIX se píše rychle a efektivně, na druhou
+stranu nejsou skripty přenositelné např. na Windows a budou fungovat
+pouze v prostředí POSIX. Pod Windows tak bude potřebovat prostředí,
+které bude POSIX emulovat, např. :wikipedia-en:`MinGW` či
+:wikipedia-en:`Cygwin`. Z tohoto pohledu se jeví jako lepší volba
+rozšířený a zároveň multiplatformní jazyk :program:`Python` s širokou
+škálou knihoven z oblasti GIS.
+
+.. tip:: Více informací k tomuto tématu najdete
+   ve školení :skoleni:`GeoPython <geopython>`.
+
+Kromě toho je Python šíroce podporován nejen systémem GRASS
+(:doc:`../pygrass/index`, ale i QGISem (`pyQGIS
 <http://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/>`_)
 či proprietárním Esri :wikipedia:`ArcGIS` (`arcpy
 <http://resources.arcgis.com/en/help/main/10.2/index.html#//000v000000v7000000>`_).
@@ -75,4 +80,4 @@ infračerveného kanálu satelitních dat.
    :maxdepth: 2
 
    python
-   bash
+   posix

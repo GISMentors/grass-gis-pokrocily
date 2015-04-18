@@ -1,5 +1,5 @@
-Bash
-====
+POSIX
+=====
 
 Základní verze skriptu
 ----------------------
