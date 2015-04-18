@@ -22,9 +22,16 @@ ale i QGISem (`pyQGIS
 či proprietárním Esri :wikipedia:`ArcGIS` (`arcpy
 <http://resources.arcgis.com/en/help/main/10.2/index.html#//000v000000v7000000>`_).
 
-V následujícím ukázce implementuje skript pro výpočet
-:wikipedia-en:`normalizovaného vegetačního diferečního indexu
-<NDVI>`. NDVI lze určit na základě viditelného červeného a blízkého
+Nejprve si na jednoduchém skriptu ukážeme možnosti spuštění:
+
+.. toctree::
+   :maxdepth: 2
+
+   spusteni
+
+Poté si zkusíme naimplementovat mírně pokročilejší skript pro výpočet
+:wikipedia-en:`normalizovaného vegetačního diferečního indexu <NDVI>`.
+NDVI lze určit na základě viditelného červeného a blízkého
 infračerveného kanálu satelitních dat.
 
     .. math::
@@ -38,8 +45,8 @@ infračerveného kanálu satelitních dat.
           *čtvrtý*, blízký infračernený *pátý*, viz
           :wikipedia-en:`wikipedia <Landsat_8#Operational_Land_Imager>`.
 
-Postup výpočtu
-==============
+**Postup výpočtu**
+
 
 #. Mapset *landsat* vložíme do :skoleni:`vyhledávací cesty
    <grass-gis-zacatecnik/intro/struktura-dat.html#vyhledavaci-cesta>`
@@ -61,10 +68,11 @@ Postup výpočtu
    :grasscmd:`r.colors`.
 #. Nakonec vypíšeme pro jednotlivé kategorie NDVI jejich výměru v
    hektarech a to pomocí modulu :grasscmd:`r.report`
-                
+
+**Implementace**
+   
 .. toctree::
    :maxdepth: 2
 
-   bash
    python
-   spusteni
+   bash
