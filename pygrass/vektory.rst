@@ -29,9 +29,19 @@ mapsetu :mapset:`ruian` spolu s jejich názvy.
 
 .. todo:: přidat atributový filter
           
+Přístup k topologii
+-------------------
+
 Nalezení nejbližších prvků
 --------------------------
 
-Přístup k topologii
--------------------
+K nalezení nejbližších prvků je vyžadován přístup k topologii. V
+následujícím příkladě budeme hledat nejbližší ulici k dané
+záchrance. Dále zkontrolujeme, zda je záchrance přiřazen korektní kód
+ulice.
+
+.. literalinclude:: zachranka_ulice.py
+   :language: python
+   :linenos:
+
 
