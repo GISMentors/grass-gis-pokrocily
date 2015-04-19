@@ -6,6 +6,9 @@ Více informací najdete v :grasscmd:`dokumentaci
 <temporalintro>`. Nástroje určené pro časoprostorové analýzy začínají
 na :grasscmd:`prefix t.* <temporal>`.
 
+Testovací GRASS lokace ke stažení `zde
+<http://training.gismentors.eu/geodata/grass/modis.zip>`_.
+
 .. note:: Podpora pro časoprostorové analýzy je dostupná pouze ve
    verzi **GRASS 7 a vyšší**.
 
@@ -35,11 +38,12 @@ dataset pomocí modulu :grasscmd:`t.create`.
    t.create output=modis title="MODIS 2002" desc="Ukazkovy casoprostorovy dataset MODIS"
 
 Do kterého posléze modulem :grasscmd:`t.register` nahrajeme vstupní
-data, v našem případě rastrové data z projektu :wikipedia:`MODIS`.
+data, v našem případě rastrové data z projektu :wikipedia-en:`MODIS`.
 
 .. code-block:: bash
-               
-   t.register input=modis file=maps.txt
+
+   g.list type=raster mapset=. sep='newline' out=maps.txt
+   t.register input=modis file=maps.txt sep='newline'
 
 Základní metadata
 -----------------
@@ -170,7 +174,7 @@ Mezi další užitečné nástroje patří :grasscmd:`g.gui.mapswipe`
                 
    t.rast.list modis_m where="start_time < '2002-03-01'"
 
-   g.gui.mapswipe first=ag_0 second=ag_1
+   g.gui.mapswipe first=ag_01 second=ag_02
 
 .. figure:: images/g-gui-mapswipe.png
 
