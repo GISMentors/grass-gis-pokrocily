@@ -27,4 +27,7 @@ for row in dmt:
                     max = value
         count += 1
 
+dmt.close()
+
 print ("min={:.2f} max={:.2f} count={} (no-data: {})".format(min, max, count, ncount))
+

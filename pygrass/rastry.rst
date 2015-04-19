@@ -40,4 +40,17 @@ V následující ukázce vypíšeme statistiku převzorkovaného rastru:
 Dotazování na rastrová data
 ---------------------------
 
-xxx
+Skript vypisuje pro definiční body obcí v ČR jejich nadmořské výšky
+odvozené z digitálního modelu terénu (rastrová mapa :map:`dmt`).
+
+* Před načtením rastrových dat na řádku :lcode:`11` je podle nich
+  nastaven výpočetní region
+* Rastrová mapa :map:`dmt` je načtena třídou
+  :pygrass-raster:`RasterRow` (řádka :lcode:`15-16`)
+* Souřadnice definičních bodů obcí jsou převedeny na souřadnice rastru
+  funkcí ``coor2pixel`` (řádek :lcode:`22`)
+
+.. literalinclude:: obce_dmt.py
+   :language: python
+   :linenos:
+   :emphasize-lines: 11, 15-16, 22
