@@ -57,6 +57,9 @@ Obsah
 
    skripty/index
    pygrass/index
+   tgrass/index
+   formaty/index
+   data3d/index
               
 ###########
 O dokumentu
