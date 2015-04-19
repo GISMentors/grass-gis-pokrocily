@@ -11,6 +11,8 @@ K vektorovým datům lze přistupovat ve dvou režimech:
 Další informace v `dokumentaci PyGRASS
 <http://grass.osgeo.org/grass70/manuals/libpython/pygrass_vector.html>`_.
 
+.. todo:: pridat priklad pro vytvoreni nove vrstvy
+
 Jednoduchý příklad
 ------------------
 

@@ -16,5 +16,5 @@ vektorovým datům.
 .. toctree::
    :maxdepth: 2
 
-   rastry
    vektory
+   rastry
