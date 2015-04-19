@@ -7,7 +7,7 @@ Více informací najdete v :grasscmd:`dokumentaci
 na :grasscmd:`prefix t.* <temporal>`.
 
 Testovací GRASS lokace ke stažení `zde
-<http://training.gismentors.eu/geodata/grass/modis.zip>`_.
+<http://training.gismentors.eu/geodata/grass/modis.zip>`_ (240MB).
 
 .. note:: Podpora pro časoprostorové analýzy je dostupná pouze ve
    verzi **GRASS 7 a vyšší**.

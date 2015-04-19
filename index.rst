@@ -59,7 +59,7 @@ Obsah
    pygrass/index
    tgrass/index
    formaty/index
-   data3d/index
+   3d/index
               
 ###########
 O dokumentu
