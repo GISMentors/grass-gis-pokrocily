@@ -57,8 +57,16 @@ následujícím příkladě budeme hledat nejbližší ulici k dané
 záchrance. Dále zkontrolujeme, zda je záchrance přiřazen korektní kód
 ulice.
 
+Záchranky jsou společně s nejbližšími ulicemi zapsány do nové
+vektorové mapy :map:`zachranka_ulice` (řádky
+:lcode:`10,15,24,26`). Atributová tabulka pro výstupní vektorovou mapu
+je definována na řádcích :lcode:`11-14`.
+
 .. literalinclude:: zachranka_ulice.py
    :language: python
    :linenos:
+   :emphasize-lines: 10-15, 24, 26, 29
 
-
+.. warning:: Velmi důležitý řádek je :lcode:`29`, kde dochází k zápisu
+             atributů do atributové tabulky. Bez jejího volání by se
+             nezapsaly do výstupní vektorové mapy žádné atributy!
