@@ -32,6 +32,21 @@ mapsetu :mapset:`ruian` spolu s jejich názvy.
 Přístup k topologii
 -------------------
 
+Přístup k topologii vektorových prvků zajišťuje třída
+:pygrass-vector:`VectorTopo`.
+
+.. tip:: Základní informace o :skoleni:`topologickém formátu
+         <grass-gis-zacatecnik/vector/index.html#topologicky-model>`.
+
+V nasledující ukázce vypíšeme pro každý okres jeho počet sousedním
+okresů.
+         
+.. literalinclude:: okresy.py
+   :language: python
+   :linenos:
+
+.. warning:: Tento skript je funkční na verzi GRASS 7.0.1 a vyšší
+                   
 Nalezení nejbližších prvků
 --------------------------
 
