@@ -13,8 +13,8 @@ Další informace v `dokumentaci PyGRASS
 
 .. todo:: pridat priklad pro vytvoreni nove vrstvy
 
-Jednoduchý příklad
-------------------
+Průchod prvky bez topologie
+---------------------------
 
 Skript vypisuje souřadnice definičních bodů z mapy :map:`obce_bod` z
 mapsetu :mapset:`ruian` spolu s jejich názvy.
@@ -49,8 +49,8 @@ okresů.
 
 .. warning:: Tento skript je funkční na verzi GRASS 7.0.1 a vyšší
                    
-Nalezení nejbližších prvků
---------------------------
+Nalezení nejbližších prvků, zápis nových prvků
+----------------------------------------------
 
 K nalezení nejbližších prvků je vyžadován přístup k topologii. V
 následujícím příkladě budeme hledat nejbližší ulici k dané

@@ -18,8 +18,8 @@ Další informace v `dokumentaci PyGRASS
              aktuálního výpočetního regionu. Manipulaci s regionem má
              v PyGRASS na starots třída :pygrass-gis:`Region <region.Region>`.
    
-Jednoduchý příklad
-------------------
+Statistika rastrových dat, převzorkování
+----------------------------------------
 
 V následující ukázce vypíšeme statistiku převzorkovaného rastru:
 
