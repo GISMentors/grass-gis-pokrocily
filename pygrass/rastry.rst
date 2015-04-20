@@ -16,7 +16,9 @@ Další informace v `dokumentaci PyGRASS
 
 .. warning:: GRASS při čtení rastrových dat vždy data převzorkuje do
              aktuálního výpočetního regionu. Manipulaci s regionem má
-             v PyGRASS na starots třída :pygrass-gis:`Region <region.Region>`.
+             v PyGRASS na starost třída :pygrass-gis:`Region
+             <region.Region>` anebo lze přímo použít modul
+             :grasscmd:`g.region`.
    
 Statistika rastrových dat, převzorkování
 ----------------------------------------

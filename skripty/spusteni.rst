@@ -15,14 +15,14 @@ Spuštění z GUI
 --------------
 
 Nejjednodušší cestou je spustit skript z grafického uživatelského
-rozhraní a to z menu *správce vrstev* menu :menuselection:`File -->
+rozhraní a to z menu *správce vrstev* :menuselection:`File -->
 Launch script` anebo z nástrojové lišty.
 
 .. figure:: images/lmgr-launch-script.png
 
-Po výběru skriptu se zkontroluje zda je skript *spustitelný* a zda je ve
+Po výběru skriptu si GRASS zkontroluje, zda je skript *spustitelný* a zda je tzv. v
 *spouštěcí cestě*. V připadě, že tomu tak není, tak se objeví příslušný
-dialog, který potvrdíme.
+dialog(y), který(é) potvrdíme.
 
 .. figure:: images/launch-permission.png
    :class: small
@@ -38,7 +38,7 @@ Skript se poté spustí, výpis je přesměrován do okna *správce vrstev*.
 
 .. figure:: images/launch-output.png
 
-Skript můžete spustit zadáním úplné cesty do přikazové konzole
+Skript můžete také spustit zadáním úplné cesty do přikazové konzole
 *správce vrstev*.
 
 .. figure:: images/lmgr-launch-cmd.png
@@ -65,7 +65,7 @@ skript spustíme.
 .. note:: Pro přidání adresáře do spouštěcí cesty můžete použít
           :grasscmd:`proměnnou prostředí <variables>`
           :envvar:`GRASS_ADDON_PATH`. Pokud je tato proměnná
-          definována před spuštěním GRASSu, tak je její obsah přidán
+          definována před spuštěním systému GRASS, tak je její obsah přidán
           do spouštěcí cesty. Proměnné prostředí systému GRASS by měly
           být uloženy v soubor ``bashrc`` (v případě Windows jde o
           soubor ``env.bat``) v konfiguračním adresáři systému
@@ -78,7 +78,7 @@ skript spustíme.
 
              export GRASS_ADDON_PATH=/opt/bin:$HOME/grassbin
 
-          bude mít za následek, že se při spuštění GRASS přidají do
+          bude mít za následek, že se při spuštění systému GRASS přidají do
           spouštěcí cesty dva adresáře -- ``/opt/bin`` a ``grassbin``
           z domovského adresáře aktivního uživatele.
 

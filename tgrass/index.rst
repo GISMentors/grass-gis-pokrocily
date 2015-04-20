@@ -20,17 +20,17 @@ a vektorových map. Podle vstupních dat rozlišujeme tři základní typy
 datasetů:
 
 
-* **strds** - časoprostorový dataset pro 2D rastrová data, obsluhují
+* **strds** - časoprostorový dataset pro 2D rastrová data, obsluhují ho
   moduly s prefixem ``t.rast``
-* **str3ds** - časoprostorový dataset pro 3D rastrová data, obsluhují
+* **str3ds** - časoprostorový dataset pro 3D rastrová data, obsluhují ho
   moduly s prefixem ``t.rast3d``
-* **stvds** - časoprostorový dataset pro 2D/3D vektorová data, obsluhují
+* **stvds** - časoprostorový dataset pro 2D/3D vektorová data, obsluhují ho
   moduly s prefixem ``t.vect``
 
 Vytvoření datasetu
 ------------------
 
-Dataset vytvoříme v několika krocích, nejrpve vytvoříme prázdný
+Dataset vytvoříme v několika krocích, nejprve vytvoříme prázdný
 dataset pomocí modulu :grasscmd:`t.create`.
 
 .. code-block:: bash
@@ -101,7 +101,7 @@ Vytvoří se dvanáct rastrových map v měsíční periodě, viz
 
    t.rast.list modis_m order=start_time
 
-Statistiku pro všechny měsíce získáme pomocí :grasscmd:`t.rast.univar`
+Statistiku pro všechny měsíce získáme pomocí :grasscmd:`t.rast.univar`.
 
 .. code-block:: bash
                 
@@ -121,10 +121,14 @@ Vytvořit na základě výběru nový časoprostorový dataset umožňuje přík
 
 .. code-block:: bash
           
-   t.rast.extract input=modis where="start_time > '2002-03-01' and start_time < '2002-06-01'" output=modis_spring
-   t.rast.extract input=modis where="start_time > '2002-06-01' and start_time < '2002-09-01'" output=modis_summer
-   t.rast.extract input=modis where="start_time > '2002-09-01' and start_time < '2002-12-01'" output=modis_autumn
-   t.rast.extract input=modis where="start_time > '2002-12-01' or start_time < '2002-03-01'" output=modis_winter
+   t.rast.extract input=modis where="start_time > '2002-03-01' and start_time < '2002-06-01'" \
+   output=modis_spring
+   t.rast.extract input=modis where="start_time > '2002-06-01' and start_time < '2002-09-01'" \
+   output=modis_summer
+   t.rast.extract input=modis where="start_time > '2002-09-01' and start_time < '2002-12-01'" \
+   output=modis_autumn
+   t.rast.extract input=modis where="start_time > '2002-12-01' or start_time < '2002-03-01'" \
+   output=modis_winter
 
 V následujících příkazech budeme sledovat trend změny teploty v
 jednotlivých ročních obdobích. K tomu použijeme modul :grasscmd:`t.rast.series`.

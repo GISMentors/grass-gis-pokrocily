@@ -22,12 +22,12 @@ rozšířený a zároveň multiplatformní jazyk :program:`Python` s širokou
    ve školení :skoleni:`GeoPython <geopython>`.
 
 Kromě toho je Python šíroce podporován nejen systémem GRASS
-(:doc:`../pygrass/index`, ale i QGISem (`pyQGIS
+(:doc:`../pygrass/index`), ale i QGISem (`pyQGIS
 <http://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/>`_)
 či proprietárním Esri :wikipedia:`ArcGIS` (`arcpy
 <http://resources.arcgis.com/en/help/main/10.2/index.html#//000v000000v7000000>`_).
 
-Nejprve si na jednoduchém skriptu ukážeme možnosti spuštění:
+Nejprve si na ukážeme možnosti *spuštění uživatelského skriptu*:
 
 .. toctree::
    :maxdepth: 2
@@ -67,12 +67,12 @@ infračerveného kanálu satelitních dat.
    jinak by bylo vhodnější použít přímo :grasscmd:`r.reclass`).
 #. Dále nastavíme :skoleni:`popisky
    <grass-gis-zacatecnik/raster/reklasifikace#r-recode>` jednotlivých
-   kategorii pomocí modulu :grasscmd:`r.category`.
+   kategorií pomocí modulu :grasscmd:`r.category`
 #. Nastavíme vhodnou :skoleni:`tabulku barev
    <grass-gis-zacatecnik/raster/tabulka-barev>` pro reklasifikovaná data
-   :grasscmd:`r.colors`.
-#. Nakonec vypíšeme pro jednotlivé kategorie NDVI jejich výměru v
-   hektarech a to pomocí modulu :grasscmd:`r.report`
+   :grasscmd:`r.colors`
+#. Nakonec vypíšeme pro jednotlivé kategorie NDVI jejich percentuální pokrytí
+   a to pomocí modulu :grasscmd:`r.stats`
 
 **Implementace**
    

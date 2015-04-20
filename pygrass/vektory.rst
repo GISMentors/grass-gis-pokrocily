@@ -11,25 +11,21 @@ K vektorovým datům lze přistupovat ve dvou režimech:
 Další informace v `dokumentaci PyGRASS
 <http://grass.osgeo.org/grass70/manuals/libpython/pygrass_vector.html>`_.
 
-.. todo:: pridat priklad pro vytvoreni nove vrstvy
+Průchod vektorovými prvky bez topologie
+---------------------------------------
 
-Průchod prvky bez topologie
----------------------------
-
-Skript vypisuje souřadnice definičních bodů z mapy :map:`obce_bod` z
+Skript vypisuje souřadnice definičních bodů z mapy :map:`obce_bod` 
 mapsetu :mapset:`ruian` spolu s jejich názvy.
 
 #. Nejprve na řádku :lcode:`5` vytvoříme instaci třídy
    :pygrass-vector:`Vector` odkazující na zvolenou vektorovou mapu,
    kterou na následujícím řádku otevřeme v režimu čtení
-#. Jednotlivé prvky procházíme sekvenčne v cyklu na řádku :lcode:`8`
+#. Jednotlivé prvky procházíme sekvenčne v cyklu ``for`` na řádku :lcode:`8`
      
 .. literalinclude:: obce_body.py
    :language: python
    :linenos:
    :emphasize-lines: 5-6, 8
-
-.. todo:: přidat atributový filter
           
 Přístup k topologii
 -------------------
@@ -47,7 +43,7 @@ okresů.
    :language: python
    :linenos:
 
-.. warning:: Tento skript je funkční na verzi GRASS 7.0.1 a vyšší
+.. warning:: Tento skript je funkční pouze na verzi GRASS 7.0.1 a vyšší.
                    
 Nalezení nejbližších prvků, zápis nových prvků
 ----------------------------------------------
@@ -68,5 +64,5 @@ je definována na řádcích :lcode:`11-14`.
    :emphasize-lines: 10-15, 24, 26, 29
 
 .. warning:: Velmi důležitý řádek je :lcode:`29`, kde dochází k zápisu
-             atributů do atributové tabulky. Bez jejího volání by se
-             nezapsaly do výstupní vektorové mapy žádné atributy!
+             atributů do atributové tabulky. Bez jeho volání by se
+             **nezapsaly** do výstupní vektorové mapy žádné atributy!

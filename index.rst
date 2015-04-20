@@ -36,7 +36,7 @@ grafických výstupů, časoprostorové modelování a vizualizaci dat.
 
 GRASS GIS (http://grass.osgeo.org) je *free software* a *open source*
 publikovaný pod všeobecnou licencí GNU :abbr:`GPL (General Public
-License)`. Tato licence nejenže umožňuje software použít k libovolným
+License)`.  Tato licence nejenže umožňuje software použít k libovolným
 účelům včetně komerčních, dovoluje také studovat jeho zdrojový kód,
 upravovat ho a tyto změny či opravy šířit dál.
 

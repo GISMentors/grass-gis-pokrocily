@@ -9,7 +9,7 @@ GRASS umožňuje pracovat jak 2D tak 3D rastrovými a vektorovými daty.
 * 3D vektorová data - pouze :grasscmd:`několik modulů <keywords.html#3D>`
   umožňuje práci s 3D vektorovými daty
 
-.. poznamka:: Topologie vektorovývh dat je pouze 2D, pro 3D vektorová
+.. note:: Topologie vektorovývh dat je pouze 2D, pro 3D vektorová
    data je sestavena topologie průmětu do roviny XY.
 
 Vizualizace ve 3D
@@ -27,7 +27,7 @@ tzv. :grasscmd:`3D viewer <wxGUI.nviz>` (aka NVIZ).
    <grass-gis-zacatecnik/intro/region.html#nastaveni-vypocetniho-regionu>`
    podle vybrané rastrové mapy.
 
-.. note:: Vzhledem k poměrně velkého prostorového rozlišení rastrové
+.. note:: Vzhledem k poměrně velkému prostorovému rozlišení rastrové
    mapy :map:`dmt` v lokaci pro školení (25m) nastavíme před načtením
    prostorové rozlišení na rozlišení menší, např. 100m.
 
@@ -42,7 +42,6 @@ tzv. :grasscmd:`3D viewer <wxGUI.nviz>` (aka NVIZ).
 
 .. tip:: Vizualizovat data ve 3D umožňuje z příkazové řádky modul
    :grasscmd:`m.nviz.image`.
-             
 
 3D rastrová data
 ================

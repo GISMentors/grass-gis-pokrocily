@@ -5,19 +5,19 @@ Práce s externími formáty
 GRASS používá nativně vlastní souborově orientovaný rastrový a
 vektorový formát.
 
-Od verze GRASS 7 nicméně umožňuje pracovat s daty v externím
-rastrových a vektorových formátech přímo bez nutnosti konverze dat do
+Od verze GRASS 7 nicméně umožňuje pracovat s daty v externích
+rastrových a vektorových formátech *přímo* bez nutnosti konverze dat do
 nativního formátu.
 
 Data v externích formátech systém GRASS čte pomocí knihovny `GDAL
 <http://gdal.org>`_. Z toho vyplívá, že v systému GRASS lze načíst
 všechny datové formáty, které tato knihovna podporuje v režimu čtení.
 
-Odbobně lze systém GRASS ukládal nově vytvořená data v jiném formátu
+Odbobně lze systém GRASS nastavit, aby ukládal nově vytvořená data v jiném formátu
 než vlastním, tj. nativním. V tomto případě lze data zapisovat do
 jakéholiv formátu, který knihovna GDAL podporuje v režimu zápisu.
 
-Další informace lze najít na `wiki
+Další informace lze najít na `wiki stránce o externích formátech
 <http://grasswiki.osgeo.org/wiki/Working_with_external_data_in_GRASS_7>`_
 projektu GRASS.
 
@@ -29,7 +29,7 @@ jsou dostupné z menu správce vrstev
 
 .. figure:: images/link-menu.png
 
-anebo z toolbaru
+anebo z nástrojové lišty
             
 .. figure:: images/link-tooltip.png
    :class: small
@@ -69,9 +69,9 @@ Příklad nastavení výstupního formátu na GeoTIFF
 Vektorová data
 ==============
 
-.. warning:: Práci s externími formáty pro vektorová data, lze
+.. warning:: Práci s externími formáty pro vektorová data lze
    doporučit pouze při čtení pro účely vizualizace a jednorázovém
-   zápisu mimo GRASS. Zcela zásadní je v datových modelech, které jsou
+   zápisu mimo GRASS. Zcela zásadní rozdíl je v datových modelech, které jsou
    použity. GRASS používá striktně topologický formát, GDAL je
    postaven na OGC standardu Simple Features, tj. netopologickém
    datovém modelu. GRASS pro takováto data sestavuje

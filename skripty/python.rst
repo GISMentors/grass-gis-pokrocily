@@ -8,8 +8,8 @@ Začneme verzí skriptu *bez vstupní parametrů*, názvy vstupních a
 výstupních rastrových map jsou uvedeny na řádcích :lcode:`10-14`.
 
 Na řádku :lcode:`3` importuje z knihovny :doc:`../pygrass/index` třídu
-:pygrass-modules:`Module`, která nám umožní z prostředí jazyka Python spouštěn
-moduly GRASS jako je :grasscmd:`g.mapsets` (viz řádek :lcode:`7`) a
+:pygrass-modules:`Module`, která nám umožní z prostředí jazyka Python spouštět
+moduly systému GRASS jako je např. :grasscmd:`g.mapsets` (viz řádek :lcode:`7`) a
 další.
 
 .. literalinclude:: ndvi-v1.py
@@ -22,7 +22,7 @@ další.
 Poznámky k volání modulů
 ^^^^^^^^^^^^^^^^^^^^^^^^                     
 
-Moduly systému GRASS se volají se stejnými parametry jako z příkazové
+Moduly systému GRASS se volají ve skriptech se stejnými parametry jako z příkazové
 řádky. Například pro volání na řádku :lcode:`7`:
 
 .. literalinclude:: ndvi-v1.py
@@ -38,12 +38,12 @@ by korespondující zápis pro příkazovou řádku vypadal následovně:
 Jednotlivé parametry modulu se zadávaní jako argumenty třídy
 :pygrass-modules:`Module`. Vyjímkou jsou globální přepínače jako je
 :option:`--quiet`, :option:`--overwrite` a další, ty se zadávají jako
-parametr s hodnotou ``True``, v tomto případě tedy ``quiet=True``.
+parametr s hodnotou ``True``. V tomto případě tedy ``quiet=True``.
 
 .. note:: **Zkracování názvů parametrů**
 
    Při volání modulů z příkazové řádky lze názvy parametrů libovolně
-   zkracovat, pouze z tou podmínkou aby byly jednoznačné, ve výše
+   zkracovat, pouze s tou podmínkou, aby byly jednoznačné. Ve níže
    uvedeném případě bude následnující volání v pořádku i když méně
    čitelné.
 
@@ -56,7 +56,7 @@ parametr s hodnotou ``True``, v tomto případě tedy ``quiet=True``.
 
 .. note:: **Shortcuts**
 
-   PyGRASS umožňuje emulovat způsob volání podobně jako :doc:`bash`
+   PyGRASS umožňuje emulovat způsob volání modulů podobně jako :doc:`posix`
    přes tzv. "shortcuts". Příklad volání modulu :grasscmd:`g.mapsets`
    (řádek :lcode:`7`)
 
@@ -85,7 +85,7 @@ Zpracování výstupu
 
 U modulů, které svůj výstup zapisují na *standardní výstup*, lze
 jejich výstup zachytit přes argument ``stdout_=PIPE``. Obsah výstupu
-je potom uložen jako řetězec v atributu třídy :pygrass-modules:`Module``
+je potom uložen jako řetězec v atributu třídy :pygrass-modules:`Module`
 ``outputs.stdout``, viz řádek :lcode:`54,57`.
 
 .. literalinclude:: ndvi-v1.py
@@ -141,8 +141,7 @@ doplníme výchozí volbu (mapset :mapset:`landsat`).
    :lines: 6-9
 
 Ve výsledku se skript chová jako standardní modul, přepínačem
-:option:`--help` obdržíme informace o syntaxi uživatelského rozhrani
-skriptu.
+:option:`--help` obdržíme informace o jeho syntaxi.
 
 .. code-block:: bash
 
@@ -176,7 +175,7 @@ Poznámky k vypisování informačních zpráv
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Nahradili jsme funkci ``print()`` pro vypisování zpráv o průběhu
-funkci ``message()`` z balíčku ``grass.script``. 
+funkcí ``message()`` z balíčku ``grass.script``. 
 
 .. literalinclude:: ndvi-v1.py
    :language: python
@@ -188,7 +187,7 @@ funkci ``message()`` z balíčku ``grass.script``.
    :language: python
    :lines: 50
 
-Díky tomu bude fungovat globální přepínače :option:`--quiet` a
+Díky tomu budou fungovat globální přepínače :option:`--quiet` a
 :option:`--verbose` pro tichý, resp. upovídaný mód.  Např. při použítí
 volby :option:`--quiet` se vypíše pouze výsledný report, ostatní
 zprávy o průběhu výpočtu budou skryty.
@@ -217,8 +216,8 @@ Pro nalezení rastrových map končící na *B4* a *B5* použijeme funkci
    :language: python
    :lines: 27, 36-40
 
-.. note:: Blokem ``try/except`` zachytíme chybu v případě, že vrstvy
-          nebudou nalezeny. Potom zavoláme funkce ``fatal()`` z
+.. note:: Blokem ``try/except`` zachytíme chybu v případě, že rastrové mapy
+          nebudou nalezeny. Potom zavoláme funkci ``fatal()`` z
           knihovny ``grass.script``, která skript ukončí.
       
 Poznámky ke spuštění modulu
