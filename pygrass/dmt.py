@@ -4,7 +4,7 @@ import numpy as np
 from grass.pygrass.raster import RasterRow
 from grass.pygrass.modules import Module
 
-rast = 'dmt'
+rast = 'dmt@PERMANENT'
 
 Module('g.region', raster=rast, res=100)
 

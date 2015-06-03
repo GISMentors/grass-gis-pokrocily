@@ -6,7 +6,7 @@ from grass.pygrass.gis.region import Region
 from grass.pygrass.utils import coor2pixel
 from grass.pygrass.modules import Module
 
-rast = 'dmt'
+rast = 'dmt@PERMANENT'
 
 Module('g.region', raster=rast)
 
