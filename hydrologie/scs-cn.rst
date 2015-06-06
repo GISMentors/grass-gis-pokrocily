@@ -127,3 +127,98 @@ Obsah souboru :file:`colors.txt`:
 .. figure:: images/hydrosk-color.png
 
    Výsledná vizualizace
+
+Do atributové tabulky vrstvy přidáme data o využití území jednotlivých
+ploch, to vyřešíme průnikem vrstev (`intersection`). Tuto operaci
+provedeme modulem :grasscmd:`v.overlay`. Zájmové území tak bylo
+rozděleno na více elemenrárních ploch.
+
+.. code-block:: bash
+                
+   v.overlay ainput=hpj_kpp binput=land_use operator=and output=hpj_kpp_land
+
+
+Tuto operaci lze provést pomocí :skoleni:`správce atributových dat
+<grass-gis-zacatecnik/vector/atributy.html>` (`Field Calculator`) anebo
+pomocí modulu :grasscmd:`v.db.addcolumn` v kombinaci s
+:grasscmd:`db.execute` (SQL příkaz).
+
+.. code-block:: bash
+                
+   v.db.addcolumn map=hpj_kpp_land columns="LU_HydrSk text"
+
+.. code-block:: bash
+
+   db.execute sql="update hpj_kpp_land_1 set LU_HydrSk = b_LandUse || '_' || a_HydrSk"
+
+Pomocí jednoduchého SQL dotazu (modul :grasscmd:`db.select` anebo
+:skoleni:`správce atributových dat
+<grass-gis-zacatecnik/vector/atributy.html>`) byly zjištěny vzniklé
+kombinace :dbcolumn:`LU_HydrSk`.
+
+.. code-block:: bash
+
+   db.select sql="select LU_HydrSk from hpj_kpp_land_1 group by LU_HydrSk"
+
+Pro každou hodnotu určíme odpovídající hodnota CN, nejprve tabulku CN
+hodnot naimportujeme (:grasscmd:`db.in.ogr`) a poté připojíme k naší
+atributové tabulce (:grasscmd:`v.db.join`).
+
+.. code-block:: bash
+              
+   db.in.ogr input=LU_CN.xls output=lu_cn               
+   v.db.join map=hpj_kpp_land column=LU_HydrSk other_table=lu_cn other_column=LU_HydrSk
+
+.. todo:: Hodnoty návrhových sráţek s různou dobou opakování byly do
+          vrstvy přidány pomocí nástroje UNION, čímţ opět došlo k
+          rozdělení území povodí na menší elementární plochy.
+          
+Pro každou elementární plochu vypočteme její výměru buď pomocí
+:skoleni:`správce atributových dat
+<grass-gis-zacatecnik/vector/atributy.html>` anebo modulu
+:grasscmd:`v.to.db`.
+
+.. code-block:: bash
+      
+   v.db.addcolumn map=hpj_kpp_land columns="vymera double"                  
+   v.to.db map=hpj_kpp_land option=area columns=vymera                  
+
+V dalším kroku vypočteme z hodnot CN potenciální retenci :dbcolumn:`A`
+
+.. math::
+      
+   A = 25.4 \times (\frac{1000}{CN} - 10)
+
+.. code-block:: bash
+
+   v.db.addcolumn map=hpj_kpp_land columns="A double"
+   v.db.update map=hpj_kpp_land column=A value="24.5 * (1000 / CN - 10)"
+
+Následně vypočteme počáteční ztráta :dbcolumn:`I_a`:
+   
+.. math::
+                   
+   I_a = 0.2 \times A
+
+.. code-block:: bash
+
+   v.db.addcolumn map=hpj_kpp_land columns="I_a double"
+   v.db.update map=hpj_kpp_land column=I_a value="0.2 * A"
+
+.. todo:: Poté došlo k ověření, zda je návrhová sráţka větší neţ
+          počáteční ztráta, pokud tomu tak není, znamená to, ţe výsledný objem
+          přímého odtoku bude nulový.
+
+V následujícím kroku vypočteme výšku přímého odtoku :dbcolumn:`H_O` v mm:
+
+.. math::
+   
+   H_O = \frac{(H_S − 0.2 \times A)^2}{H_S + 0.8 \times A}
+
+Objem přímého odtoku vypočteme dle následujícího vztahu:
+
+.. math::
+   
+   O_P = P_P \times \frac{H_O}{1000}
+
+kde P_P je výměra pozemku v metrech čtverečních.

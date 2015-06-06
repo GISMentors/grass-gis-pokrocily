@@ -25,6 +25,7 @@ from addons`).
    :maxdepth: 2
 
    scs-cn
+   usle
 
 Užitečné odkazy
 ===============
