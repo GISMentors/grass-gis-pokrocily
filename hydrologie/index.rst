@@ -31,3 +31,4 @@ Užitečné odkazy
 ===============
 
 * http://grasswiki.osgeo.org/wiki/Hydrological_Sciences
+* `Portál FreeGIS <http://freegis.fsv.cvut.cz/gwiki/GRASS_GIS_/_Tutori%C3%A1l_/_GIS_2_/_6._cvi%C4%8Den%C3%AD>`_

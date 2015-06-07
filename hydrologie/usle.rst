@@ -29,4 +29,199 @@ nastavit :skoleni:`výpočetní region
 
 .. figure:: images/dmt_svah.png
 
-      DMT a míra svahu
+   DMT a míra svahu
+
+Pomocí nástroje :grasscmd:`r.terraflow` vytvoříme rastrovou mapu směru
+odtoku do sousední buňky s největším sklonem (:option:`direction`),
+dále vyhlazený DMT (:option:`filled`) a rastrovou mapu znázorňující
+akumulaci toku v každé buňce (:option:`accumulation`).
+
+.. note:: Pro vytvoření vyhlazeného DMT lze doporučit Addons modul
+          :grasscmdaddons:`r.hydrodem`. Pro výpočet směru odtoku lze
+          použít alternativně modul :grasscmd:`r.fill.dir`, pro
+          akumulaci odtoku :grasscmd:`r.watershed`.
+          
+Před výpočtem si nastavíme masku podle zájmového území, modul
+:grasscmd:`r.mask`.
+
+.. code-block:: bash
+
+   r.mask raster=dmt
+   r.terraflow elevation=dmt filled=dmt_fill direction=dir swatershed=sink accumulation=accu tci=tci
+
+.. figure:: images/flow-dir.png
+
+   Směr odtoku vytvořený modulem :grasscmd:`r.terraflow`
+
+.. figure:: images/flow-accu.png
+
+   Akumuluce odtoku vytvořená modulem :grasscmd:`r.terraflow`
+
+LS faktor
+^^^^^^^^^
+
+LS faktor lze vypočíst podle vzorečku:
+
+.. math::
+   
+   LS = 1.5 \times (accu ∗ \frac{10.0}{22.13})^{0.5} \times (abs(\frac{sin(slope \times \frac{pi}{180})}{0.09})^1
+
+.. todo:: vzorec je špatně, opravit
+   
+Pro tyto účely využijeme nástroj :grasscmd:`r.mapcalc` jako hlavní
+nástroj :skoleni:`mapové algebry
+<grass-gis-zacatecnik/raster/rastrova-algebra.html>` v systému GRASS.
+
+V zápisu pro tento nástroj bude rovnice vypadat následovně:
+
+.. code-block:: bash
+
+   r.mapcalc expr="ls = 1.5 * pow(accu ∗ (10.0 / 22.13), 0.5) * pow(abs(sin(svah * (3.1415926/180)) / 0.09), 1)"
+
+K faktor, C faktor
+^^^^^^^^^^^^^^^^^^   
+
+Hodnota K faktoru byla určena primárně dle HPJ z kódu BPEJ. Na
+plochách bez kódu BPEJ byly hodnoty K faktoru určeny na základě
+půdních typů a subtypů dle KPP.
+
+Hodnota C faktoru zemědělsky využívaných oblastí byla zvolena na
+základě průměrných hodnot pro jednotlivé plodiny.
+
+Převodní tabulky nejprve naimportujeme module :grasscmd:`db.in.ogr`:
+
+.. code-block:: bash
+                
+   db.in.ogr in=KPP_K.xls out=kpp_k
+   db.in.ogr in=HPJ_K.xls out=hpj_k
+   db.in.ogr in=LU_C.xls out=lu_c
+
+Do atributové tabulky vektorové mapy :map:`hpj_kpp` (viz :ref:`návod
+<hpj_kpp_lu>` na její vytvoření) přídáme dva nové sloupečky :dbcolumn:`K`
+a :dbcolumn:`C`. To provedeme pomocí :skoleni:`správce atributových
+dat <grass-gis-zacatecnik/vector/atributy.html>` anebo modulu
+:grasscmd:`v.db.addcolumn`.
+
+.. code-block:: bash
+                
+   v.db.addcolumn map=hpj_kpp_land columns="K double"
+   v.db.addcolumn map=hpj_kpp_land columns="C double" 
+
+K atributové tabulce vektorové mapy :map:`hpj_kpp` připojíme pomocí
+modulu :grasscmd:`v.db.join` informace z tabulky :dbtable:`hpj_k`.
+
+.. code-block:: bash
+                
+   v.db.join map=hpj_kpp_land column=a_HPJ_key other_table=hpj_k other_column=HPJ  
+
+Chybějící informace dle KPP doplníme SQL dotazem, který provedeme
+modulem :grasscmd:`db.execute`.
+
+.. code-block:: sql
+   
+   UPDATE hpj_kpp_land SET K = (
+   SELECT b.K FROM hpj_kpp_land AS a JOIN kpp_k aS b ON a.a_b_KPP = b.KPP)
+   WHERE K IS NULL
+
+V dalším kroku doplníme hodnoty C faktoru z tabulky
+:dbtable:`lu_c`.
+
+.. code-block:: bash
+                
+   v.db.join map=hpj_kpp_land column=b_LandUse other_table=lu_c other_column=LU      
+
+Dále do atributové tabulky přidáme nový atribut :dbcolumn:`KC` do
+kterého uložíme ``K * C``. To můžeme provést pomocí :skoleni:`správce
+atributových dat <grass-gis-zacatecnik/vector/atributy.html>` anebo
+modulu :grasscmd:`v.db.addcolumn` v kombinaci s
+:grasscmd:`v.db.update`.
+
+.. code-block:: bash
+
+   v.db.addcolumn map=hpj_kpp_land columns="KC double"
+   v.db.update map=hpj_kpp_land column=KC value="K * C"
+
+V dalším kroku vektorovou mapu převedeme do rastrové reprezentace
+(:grasscmd:`v.to.rast`), pro zachování informae použijeme prostorové
+rozlišení 1m (:grasscmd:`g.region`, viz :skoleni:`výpočetní region
+<grass-gis-zacatecnik/intro/region.html>`).
+
+.. code-block:: bash
+   
+   g.region raster=dmt res=1                                             
+   v.to.rast input=hpj_kpp_land output=hpj_kpp_kc use=attr attribute_column=KC
+
+Pomocí modulu x poté provedeme převzorkování na prostorové rozlišení
+DMT 10 m a to na základě průměru hodnot vypočteného z hodnot okolních
+buněk. Tímto postupem zamezíme ztrátě informací, ke kterém by došlo
+při přímém převodu na rastr s rozlišením 10 m (při rasterizace se
+hodnota buňky rastru volí na základě polygonu, který prochází středem
+buňky nebo na základě polygonu, který zabírá největší část plochy
+buňky).
+
+Tuto operaci provedeme změnou prostorového rozlišení a samotné
+převzorkovaní poté modulem :grasscmd:`r.resamp.stats`.
+
+.. code-block:: bash
+
+   g.region raster=dmt     
+   r.resamp.stats input=hpj_kpp_kc output=hpj_kpp_kc10                        
+
+Pro účely vizualizace nastavíme vhodnou :skoleni:`tabulku barev
+<grass-gis-zacatecnik/raster/tabulka-barev.html>`
+
+.. code-block:: bash
+                
+   r.colors map=hpj_kpp_kc10 color=wave                                       
+
+.. figure:: images/hpj_kpp_kc.png
+
+   Výsledek rasterizace faktoru KC
+
+R faktor, P faktor
+^^^^^^^^^^^^^^^^^^   
+
+Použijeme průměrnou hodnota R a P faktoru pro Českou republiku
+
+.. math::
+
+   R = 40 MJ.ha^{-1} .cm.h^{-1}
+   
+   P = 1
+
+Výpočet průměrné dlouhodobé ztráty půdy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ztráta půdy `G` vypočteme jako:
+
+.. math::
+   
+   G = R \times K \times L \times S \times C \times P
+
+kde:
+
+* G průměrná dlouhodobá ztráta půdy (t.ha -1 .rok -1 )
+* R faktor erozní účinnosti deště (MJ.ha -1 .cm.h -1 )
+* K faktor erodovatelnosti půdy (t.h.MJ -1 .cm -1 .rok -1 )
+* L faktor délky svahu (-)
+* S faktor sklonu svahu (-)
+* C faktor ochranného vlivu vegetačního pokryvu (-)
+* P faktor účinnosti protierozních opatření (-)
+
+  .. todo:: jednotky, math
+
+Přepis pro :grasscmd:`r.mapcalc`:
+
+.. code-block:: bash
+                
+   r.mapcalc expr="g = 40 ∗ ls ∗ hpj_kpp_kc ∗ 1"
+
+.. todo:: V posledním kroku byl pouţit nástroj ZONAL STATISTIC AS
+          TABLE, který vytváří statistické výstupy v podobě tabulek. Pomocí
+          tohoto nástroje byla vypočtena průměrná hodnota a suma ztráty půdy pro
+          každé dílčí podpovodí.
+
+Zahrnutí prvků přerušujících odtok
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. todo::

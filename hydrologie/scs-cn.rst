@@ -26,6 +26,8 @@ Spojíme (union) vektorové mapy :map:`hpj` a :map:`kpp` tak, aby došlo
 k rozdělení řešeného území na menší elementární plochy. K tomu
 použíjeme modul :grasscmd:`v.overlay`.
 
+.. _hpj_kpp:
+
 .. code-block:: bash
    
    v.overlay ainput=hpj@PERMANENT binput=kpp@PERMANENT operator=or output=hpj_kpp        
@@ -133,10 +135,11 @@ ploch, to vyřešíme průnikem vrstev (`intersection`). Tuto operaci
 provedeme modulem :grasscmd:`v.overlay`. Zájmové území tak bylo
 rozděleno na více elemenrárních ploch.
 
+.. _hpj_kpp_lu:
+
 .. code-block:: bash
                 
    v.overlay ainput=hpj_kpp binput=land_use operator=and output=hpj_kpp_land
-
 
 Tuto operaci lze provést pomocí :skoleni:`správce atributových dat
 <grass-gis-zacatecnik/vector/atributy.html>` (`Field Calculator`) anebo
