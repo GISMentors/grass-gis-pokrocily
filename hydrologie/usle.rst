@@ -60,13 +60,11 @@ Před výpočtem si nastavíme masku podle zájmového území, modul
 LS faktor
 ^^^^^^^^^
 
-LS faktor lze vypočíst podle vzorečku:
+LS faktor lze vypočíst podle vzorce:
 
 .. math::
    
-   LS = 1.5 \times (accu ∗ \frac{10.0}{22.13})^{0.5} \times (abs(\frac{sin(slope \times \frac{pi}{180})}{0.09})^1
-
-.. todo:: vzorec je špatně, opravit
+   LS = (accu \times \frac{10.0}{22.13})^{0.6} \times (\frac{sin(slope \times \frac{pi}{180})}{0.09})^{1.3}
    
 Pro tyto účely využijeme nástroj :grasscmd:`r.mapcalc` jako hlavní
 nástroj :skoleni:`mapové algebry
@@ -76,7 +74,7 @@ V zápisu pro tento nástroj bude rovnice vypadat následovně:
 
 .. code-block:: bash
 
-   r.mapcalc expr="ls = 1.5 * pow(accu ∗ (10.0 / 22.13), 0.5) * pow(abs(sin(svah * (3.1415926/180)) / 0.09), 1)"
+   r.mapcalc expr="ls = pow(accu ∗ (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)"
 
 K faktor, C faktor
 ^^^^^^^^^^^^^^^^^^   
