@@ -17,6 +17,8 @@ Vstupní data
 Postup
 ------
 
+.. _hydrsk:
+
 Odvození hydrologických skupin půd
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -30,7 +32,7 @@ použíjeme modul :grasscmd:`v.overlay`.
 
 .. code-block:: bash
    
-   v.overlay ainput=hpj@PERMANENT binput=kpp@PERMANENT operator=or output=hpj_kpp        
+   v.overlay ainput=hpj binput=kpp operator=or output=hpj_kpp        
 
 Naimportujeme pomocné číselníky s hydrologickými skupinami půd
 (:grasscmd:`db.in.ogr` dostupný z menu :menuselection:`File --> Import
@@ -52,16 +54,15 @@ poté uložíme pomocí :grasscmd:`db.execute` přetypované hodnoty.
 
 .. code-block:: bash
    
-   db.execute sql="alter table hpj_hydrsk add column HPP_key int"
-   db.execute sql="update hpj_hydrsk set HPP_key = cast(HPP as int)"
+   db.execute sql="alter table hpj_hydrsk add column HPJ_key int"
+   db.execute sql="update hpj_hydrsk set HPJ_key = cast(HPJ as int)"
 
 Po upravě tabulky :dbtable:`hpj_hydrsk` již můžeme tuto tabulku
 připojit k atributům vektorové mapy :map:`hpj_kpp`.
 
 .. code-block:: bash
                 
-   v.db.join map=hpj_kpp column=a_HPJ_key other_table=hpj_hydrsk
-   other_column=HPJ_key
+   v.db.join map=hpj_kpp column=a_HPJ other_table=hpj_hydrsk other_column=HPJ_key
 
 Pro prvky, které nemají informaci o HPJ odvodíme hydrologickou skupinu
 z tabulky :dbtable:`kpp_hydrosk`, k tomu požijeme SQL příkaz
@@ -69,9 +70,11 @@ aplikovaný module :grasscmd:`db.execute`.
    
 .. code-block:: sql
 
+
    UPDATE hpj_kpp_1 SET HydrSk = (
-   SELECT b.First_hydr FROM hpj_kpp_1 AS a JOIN sum_kpp2hydrsk_dbf aS b ON a.b_KPP = b.KPP)
-   WHERE HydrSk IS NULL
+   SELECT b.First_hydr FROM hpj_kpp_1 AS a JOIN kpp_hydrsk as b ON a.b_KPP = b.KPP
+   ) WHERE HydrSk IS NULL
+
 
 Výsledek může vypadat následovně.
 
@@ -122,7 +125,7 @@ Obsah souboru :file:`colors.txt`:
    2 green
    3 yellow
    4 blue
-   5 grey
+   5 brown
    6 orange
    7 purple
 
@@ -131,15 +134,20 @@ Obsah souboru :file:`colors.txt`:
    Výsledná vizualizace
 
 Do atributové tabulky vrstvy přidáme data o využití území jednotlivých
-ploch, to vyřešíme průnikem vrstev (`intersection`). Tuto operaci
-provedeme modulem :grasscmd:`v.overlay`. Zájmové území tak bylo
-rozděleno na více elemenrárních ploch.
+ploch, to vyřešíme průnikem (`intersection`) s vrstvou
+:map:`land_use`. Tuto operaci provedeme modulem
+:grasscmd:`v.overlay`. Zájmové území tak bylo rozděleno na více
+elemenrárních ploch.
 
 .. _hpj_kpp_lu:
 
 .. code-block:: bash
                 
    v.overlay ainput=hpj_kpp binput=land_use operator=and output=hpj_kpp_land
+
+V dalším kroku přidáme sloupec obsahující údaje o využití území a o
+hydrologické skupině půdy dané elementární plochy ve tvaru ``využití
+území_hydrologická skupina`` ve zkratce :dbcolumn:`LU_HyrdSk`.
 
 Tuto operaci lze provést pomocí :skoleni:`správce atributových dat
 <grass-gis-zacatecnik/vector/atributy.html>` (`Field Calculator`) anebo
