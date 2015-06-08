@@ -249,8 +249,8 @@ Do atributové tabulky přidáme nové sloupce pomocí
 .. code-block:: bash
 
    v.db.addcolumn map=hpj_kpp_land columns="HO double, OP double"
-   v.db.update map=hpj_kpp_land column=HO value="pow(32 - 0.2 * A, 2) / (32 + 0.8 * A)"
-   v.db.update map=hpj_kpp_land column=OP value"vymera * (HO / 1000)"
+   v.db.update map=hpj_kpp_land column=HO value="((32 - 0.2 * A) * (32 - 0.2 * A)) / (32 + 0.8 * A)"
+   v.db.update map=hpj_kpp_land column=OP value="vymera * (HO / 1000)"
 
 
 Průměrná hodnota objemu přímého odtoku pro povodí
@@ -260,9 +260,28 @@ Pro tuto operaci použijeme modul :grasscmd:`v.rast.stats`, pomocí
 kterého vypočteme průměrné hodnoty a sumu objemu přímého odtoku pro
 každé dílčí povodí. Před touto operací musí informaci o objemu přímého
 odtoku převést do rastrové reprezentace pomocí modulu
-:grasscmd:`v.rast.stats`.
+:grasscmd:`v.rast.stats`. Před rasterizací nastavíme
+:skoleni:`výpočetní region <grass-gis-zacatecnik/intro/region.html>` s
+rozlišením 10 m (:grasscmd:`g.region`).
 
 .. code-block:: bash
+             
+   g.region vector=kpp res=10
+   v.to.rast input=hpj_kpp_land output=ho use=attr attribute_column=HO
+   v.rast.stats map=povodi_4 raster=ho column_prefix=ho
 
-   v.to.rast input=hpj_kpp_land output=ho use=attr column=HO
-   v.rast.stats map=povodi_4 raster=ho column_prefix=ho_
+.. figure:: images/ho.png
+
+   Objem přímého odtoku pro elementární plochy
+
+Pro účely vizualizace nastavíme vhodnou tabulku barev:
+
+.. code-block:: bash
+                
+   v.colors map=povodi_4 use=attr column=ho_average color=rainbow
+
+.. figure:: images/povodi_ho.png
+
+   Objem přímého odtoku pro povodí čtvrtého řádu
+
+   

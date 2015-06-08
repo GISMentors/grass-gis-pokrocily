@@ -298,6 +298,8 @@ S využitím masky vypočteme nově LS faktor a ztrátu půdy G.
    r.mapcalc expr="ls2 = pow(accu2 * (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)"
    r.mapcalc expr="g2 = 40 ∗ ls2 ∗ hpj_kpp_kc ∗ 1"
 
+.. todo:: doplnit porovnání, LS faktor vychází divně
+             
 ::
 
    .. figure:: images/porovnani_ls.png
