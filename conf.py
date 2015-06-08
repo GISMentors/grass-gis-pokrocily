@@ -17,7 +17,7 @@ copyright = u'2014-%d, Martin Landa a Jáchym Čepický (GISMentors)' % get_year
 # built documents.
 #
 # The short X.Y version.
-version = '0.1alpha'
+version = '0.2alpha'
 # The full version, including alpha/beta/rc tags.
 release = '%s' % version
 

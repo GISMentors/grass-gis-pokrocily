@@ -274,11 +274,12 @@ rozlišením 10 m (:grasscmd:`g.region`).
 
    Objem přímého odtoku pro elementární plochy
 
-Pro účely vizualizace nastavíme vhodnou tabulku barev:
+Pro účely vizualizace nastavíme vhodnou :skoleni:`tabulku barev
+<grass-gis-zacatecnik/raster/tabulka-barev.html>`:
 
 .. code-block:: bash
                 
-   v.colors map=povodi_4 use=attr column=ho_average color=rainbow
+   v.colors map=povodi_4 use=attr column=ho_average color=blues
 
 .. figure:: images/povodi_ho.png
 
