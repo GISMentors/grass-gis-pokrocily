@@ -83,7 +83,15 @@ Nastavíme vhodně tabulku barev:
 
 .. code-block:: bash
 
-   r.colors -e map=ls color=reds
+   r.colors -e map=ls color=colors.txt
+
+::
+      
+   0 128:64:64
+   1 255:128:64
+   10 0:255:0
+   20 0:128:128
+   50 0:128:255
    
 K faktor, C faktor
 ^^^^^^^^^^^^^^^^^^   
@@ -225,9 +233,12 @@ Přepis pro :grasscmd:`r.mapcalc`:
                 
    r.mapcalc expr="g = 40 ∗ ls ∗ hpj_kpp_kc ∗ 1"
 
-V posledním kroku byl použit x , který vytváří statistické výstupy v
-podobě tabulek. Pomocí tohoto nástroje byla vypočtena průměrná hodnota
-a suma ztráty půdy pro každé dílčí podpovodí.
+Průměrná hodnota ztráty pro povodí
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   
+   
+Pro tuto operaci použijeme modul :grasscmd:`v.rast.stats`, pomocí
+kterého vypočteme průměrné hodnoty a sumu ztráty půdy pro každé dílčí
+povodí.
 
 .. code-block:: bash
                 
@@ -254,4 +265,53 @@ Pro účely vizualizace nastavíme vhodnou tabulku barev pomocí modulu
 Zahrnutí prvků přerušujících odtok
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. todo::
+Pro výpočet uvedený výše vychází ztráta půdy v některých místech
+enormně vysoká. To je způsobeno tím, že ve výpočtu nejsou zahrnuty
+liniové a plošné prvky přerušující povrchový odtok. Těmito prvky jsou
+zejména budovy, příkopy silnic a cest, železniční tratě nebo zdi
+lemující pozemky.
+
+Pro zjištění přesnějších hodnot je tedy nutné tyto prvky do výpočtu
+zahrnout. Proto byla na základě vybraných prvků vytvořena maska prvků
+přerušujících odtok.
+
+Masku liniových a plošných prvků spojíme pomocí modulu
+:grasscmd:`v.patch`. Před spojením vektorových map rozšíříme liniové
+prvky z důvodu nastavení masky pomocí modulu :grasscmd:`v.buffer`.
+
+.. code-block:: bash
+
+   v.buffer input=maska_linie output=maska_linie5 distance=5
+   v.patch input=maska_linie5,maska_plochy output=maska
+                          
+Masku pro další analýzu nastavíme pomocí modulu :grasscmd:`r.mask`.
+
+.. code-block:: bash
+
+   r.mask -i vector=maska
+
+S využitím masky vypočteme nově LS faktor a ztrátu půdy G.
+
+.. code-block:: bash
+
+   r.terraflow elevation=dmt filled=dmt_fill2 direction=dir2 swatershed=sink2 accumulation=accu2 tci=tci2
+   r.mapcalc expr="ls2 = pow(accu2 * (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)"
+   r.mapcalc expr="g2 = 40 ∗ ls2 ∗ hpj_kpp_kc ∗ 1"
+
+::
+
+   .. figure:: images/porovnani_ls.png
+               
+               Porovnání hodnot LS faktoru bez zohlednění prvků přerušujících
+               odtok (vlelvo) a s prvky přerušujícími odtok (vpravo)
+
+   .. figure:: images/porovnani_g.png
+
+               Porovnání výsledků USLE bez zohlednění prvků přerušujících odtok
+               (vlelvo) a s prvky přerušujícími odtok (vpravo)
+
+Poznámky
+--------
+
+GRASS nabízí pro výpočet USLE dva užitečné moduly :grasscmd:`r.uslek`
+a :grasscmd:`r.usler`.

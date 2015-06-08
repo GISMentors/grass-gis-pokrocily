@@ -183,7 +183,10 @@ atributové tabulce (:grasscmd:`v.db.join`).
 .. todo:: Hodnoty návrhových sráţek s různou dobou opakování byly do
           vrstvy přidány pomocí nástroje UNION, čímţ opět došlo k
           rozdělení území povodí na menší elementární plochy.
-          
+
+Výpočet výšky a objemu přímého odtoku
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Pro každou elementární plochu vypočteme její výměru buď pomocí
 :skoleni:`správce atributových dat
 <grass-gis-zacatecnik/vector/atributy.html>` anebo modulu
@@ -216,20 +219,50 @@ Následně vypočteme počáteční ztráta :dbcolumn:`I_a`:
    v.db.addcolumn map=hpj_kpp_land columns="I_a double"
    v.db.update map=hpj_kpp_land column=I_a value="0.2 * A"
 
-.. todo:: Poté došlo k ověření, zda je návrhová sráţka větší neţ
-          počáteční ztráta, pokud tomu tak není, znamená to, ţe výsledný objem
-          přímého odtoku bude nulový.
+.. todo:: Poté došlo k ověření, zda je návrhová srážka větší než
+          počáteční ztráta, pokud tomu tak není, znamená to, že
+          výsledný objem přímého odtoku bude nulový.
 
-V následujícím kroku vypočteme výšku přímého odtoku :dbcolumn:`H_O` v mm:
+V následujícím kroku vypočteme *výšku přímého odtoku* :dbcolumn:`H_O` v mm:
 
 .. math::
    
    H_O = \frac{(H_S − 0.2 \times A)^2}{H_S + 0.8 \times A}
 
-Objem přímého odtoku vypočteme dle následujícího vztahu:
+kde :math:`H_S` je úhrn návrhové srážky (mm).
+
+.. note:: V našem případě použijeme konstantní úhrn návrhové srážky
+          :math:`H_S` pro celé území 32 mm.
+  
+*Objem přímého odtoku* vypočteme dle následujícího vztahu:
 
 .. math::
    
    O_P = P_P \times \frac{H_O}{1000}
 
-kde P_P je výměra pozemku v metrech čtverečních.
+kde :math:`P_P` je výměra pozemku v metrech čtverečních.
+
+Do atributové tabulky přidáme nové sloupce pomocí
+:grasscmd:`v.db.addcolumn`, hodnoty vypočteme pomocí
+:grasscmd:`v.db.update`.
+
+.. code-block:: bash
+
+   v.db.addcolumn map=hpj_kpp_land columns="HO double, OP double"
+   v.db.update map=hpj_kpp_land column=HO value="pow(32 - 0.2 * A, 2) / (32 + 0.8 * A)"
+   v.db.update map=hpj_kpp_land column=OP value"vymera * (HO / 1000)"
+
+
+Průměrná hodnota objemu přímého odtoku pro povodí
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   
+
+Pro tuto operaci použijeme modul :grasscmd:`v.rast.stats`, pomocí
+kterého vypočteme průměrné hodnoty a sumu objemu přímého odtoku pro
+každé dílčí povodí. Před touto operací musí informaci o objemu přímého
+odtoku převést do rastrové reprezentace pomocí modulu
+:grasscmd:`v.rast.stats`.
+
+.. code-block:: bash
+
+   v.to.rast input=hpj_kpp_land output=ho use=attr column=HO
+   v.rast.stats map=povodi_4 raster=ho column_prefix=ho_
