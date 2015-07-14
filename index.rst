@@ -1,10 +1,13 @@
 .. only:: latex
-                         
+   #####                      
    Obsah
-   =====
-####
-Úvod
-####
+   #####
+
+.. only:: html
+
+   ****
+   Úvod
+   ****
 
 .. only:: html
 
@@ -48,9 +51,11 @@ upravovat ho a tyto změny či opravy šířit dál.
 
 .. warning:: :red:`Toto je pracovní verze školení, která je aktuálně ve vývoji!`
 
-#####
-Obsah
-#####
+.. only:: html
+                
+   #####
+   Obsah
+   #####
 
 .. toctree::
    :maxdepth: 2
@@ -62,9 +67,17 @@ Obsah
    3d/index
    hydrologie/index
 
-###########
+*******
+Dodatky
+*******
+
+Související materiály
+=====================
+
+* https://github.com/wenzeslaus/python-grass-addon
+
 O dokumentu
-###########
+===========
 
 Text dokumentu je licencován pod `Creative Commons Attribution-ShareAlike 4.0 International License <http://creativecommons.org/licenses/by-sa/4.0/>`_.
 
@@ -74,9 +87,8 @@ Text dokumentu je licencován pod `Creative Commons Attribution-ShareAlike 4.0 I
               
 *Verze textu dokumentu:* |release| (sestaveno |today|)
 
-******
 Autoři
-******
+------
 
 Za `GISMentors <http://www.gismentors.cz/>`_:
 
@@ -85,9 +97,8 @@ Za `GISMentors <http://www.gismentors.cz/>`_:
 * `Jáchym Čepický <http://www.gismentors.cz/mentors/cepicky>`_
   ``<jachym.cepicky opengeolabs.cz>``
 
-**************
 Text dokumentu
-**************
+--------------
 
 .. only:: latex
 
