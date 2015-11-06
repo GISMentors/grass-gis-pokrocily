@@ -50,10 +50,10 @@ Postup spracovania v GRASS GIS
 
 .. _hydrsk:
 
-1.
-^^
+Krok 1
+^^^^^^
 
-Zjednotíme vrstvu hlavných pôdnych jednotiek a komplexného prieskumu pôd  (union).
+V prvom kroku zjednotíme vrstvu hlavných pôdnych jednotiek a komplexného prieskumu pôd. Použijeme union).
 
 .. code-block:: bash
    
@@ -202,12 +202,6 @@ Následne vytvoríme rastrovú vrstvu s kódmi CN.
 
    Kódy CN pre každú elementárnu plochu krajinnej pokrývky v záujmovom území 
 
-Kódy porovnáme s existujúcimi údajmi *CN* pomocou histogramu.
-
-.. figure:: images/4a.png
-
-   Histogram existujúcej a vytvorenej rastrovej vrstvy s kódmi CN
-
 Atribútová tabuľka vrstvy povodí obsahuje údaje o návrhových zrážkach s dobou opakovania 5, 10, 20, 50 a 100 rokov. Je potrebné pridať tieto informácie ku každej elementárnej ploche.
 
 .. figure:: images/5a.png
@@ -233,8 +227,8 @@ Po zjednotení vidíme, že došlo k rozdeleniu územia na menšie plochy (87 23
 
    Počet elementárnych plôch pred a po zjednotení s vrstvou povodí
 
-2. a 3.
-^^^^^^^
+Kroky 2 a 3
+^^^^^^^^^^^
 
 Pre každú elementárnu plochu vypočítame jej výmeru, parameter :math:`A` (maximálna strata) a parameter :math:`I_{a}` (počiatočná strata, čo je 5 % z :math:`A`)
 
@@ -255,18 +249,14 @@ Do atribútovej tabuľky `hpj_kpp_land_pov` pridáme nové stĺpce :dbcolumn:`vy
    v.db.update map=hpj_kpp_land_pov column=A value="24.5 * (1000 / a_CN - 10)"
    v.db.update map=hpj_kpp_land_pov column=I_a value="0.2 * A"
 
-4. a 5.
-^^^^^^^
+Kroky 4 a 5
+^^^^^^^^^^^
 
 .. note:: V ďalších krokoch budeme uvažovať priemerný úhrn návrhovej zrážky :math:`H_{s}` = 32 mm. Pri úhrne s dobou opakovania 2 roky (atribút :dbcolumn:`H_002_120`) či dobou 5, 10, 20, 50 alebo 100 rokov by bol postup obdobný.  
 
-Je potrebné overiť či každá návrhová výška zrážky :math:`H_{s}` je väčšia ako počiatočná strata :math:`I_{a}`. Výsledok dotazu by mal byť rovný nule. Inak bude výsledný objem odtoku pre povodie nulový.
-
 .. code-block::bash
 
-   db.select sql="select count(*) as pocet from hpj_kpp_land_pov_1 where ((32 < I_a) or (b_H_002_120 < I_a))"
-
-**???**
+   db.select sql="select count(*) as pocet from hpj_kpp_land_pov_1 where ((32 < I_a) or (b_H_002_120 < I_a))" 
 
 Následne pridáme ďalšie nové stĺpce do atribútovej tabuľky pre :math:`H_{o}` a :math:`O_{p}` a vypočítame ich pomocou :grasscmd:`v.db.update`.
 
@@ -331,20 +321,16 @@ Výstupné dáta:
 * :map:`HO`, resp. :map:`HO_pov` - raster s výškou odtoku pre elementárne plochy, resp. pre povodia v mm,
 * :map:`OP`, resp. :map:`OP_pov` - raster s hodnotami objemu odtoku v :math:`m^{3}` pre elementárne plochy, resp. povodia.
 
-Postup spracovania v Quantum GIS, verzia 2.10:
-----------------------------------------------
-
-
-
-
-
 Použité zdroje:
 ---------------
 
-* [Školení GRASS GIS pro pokročilé](http://training.gismentors.eu/grass-gis-pokrocily/hydrologie/scs-cn.html)
-* [Index of /~landa/gis-zp-skoleni](http://geo102.fsv.cvut.cz/~landa/gis-zp-skoleni/)
-* Wikipédia : [Metóda CN kriviek](https://cs.wikipedia.org/wiki/Metoda_CN_k%C5%99ivek)
-* [HYDRO.upol.cz](http://hydro.upol.cz/?page_id=15)
+[1] `Školení GRASS GIS pro pokročilé <http://training.gismentors.eu/grass-gis-pokrocily/hydrologie/scs-cn.html>`_
+
+[2] `Index of /~landa/gis-zp-skoleni <http://geo102.fsv.cvut.cz/~landa/gis-zp-skoleni>`_
+
+[3] Wikipédia : `Metóda CN kriviek <https://cs.wikipedia.org/wiki/Metoda_CN_k%C5%99ivek>`_
+
+[4] `HYDRO.upol.cz <http://hydro.upol.cz/?page_id=15>`_
 
 
 
