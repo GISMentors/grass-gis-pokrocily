@@ -4,13 +4,13 @@
 Teoretické východiská
 ---------------------
 
-Ide o výpočet odtokovej straty z povodia. Metóda bola vypracovaná *Soil Conservation Service* (:wikipedia:`SCS CN <Metoda CN křivek>`) v USA. Objem zrážok je na objem odtoku prevedený podľa čísel odtokových kriviek *CN*, ktoré sú tabelizované na základe hydrologických vlastností pôd *HydrSk*. Metóda zohľadňuje závislosť retencie od hydrologických vlastností pôd, počiatočné nasýtenie a spôsob využívania pôdy. Číslo *CN* krivky reprezentuje teda vlastnosť povodia. Obvykle nadobúda hodnoty :math:`30`, t.j. veľké straty až :math:`100`.
+Ide o výpočet odtokovej straty z povodia. Metóda bola vypracovaná službou na ochranu pôd *Soil Conservation Service* (:wikipedia:`SCS CN <Metoda CN křivek>`) v USA. Objem zrážok je na objem odtoku prevedený podľa čísel odtokových kriviek *CN*, ktoré sú tabelizované na základe hydrologických vlastností pôd *HydrSk*. Metóda zohľadňuje závislosť retencie (zadržiavanie vody) od hydrologických vlastností pôd, počiatočné nasýtenie a spôsob využívania pôdy. Číslo *CN* krivky reprezentuje teda vlastnosť povodia. Obvykle nadobúda hodnoty :item:`30`, t.j. veľké straty až :item:`100`, t.j. malé straty.
 
 Základné symboly:
 ----------------
 
  * :math:`CN` ... číslo odtokovej krivky
- * :math:`A`  ... maximálna potenciálna strata z povodia, t.j. retencia
+ * :math:`A`  ... maximálna potenciálna strata z povodia
  * :math:`I_a` ... počiatočná strata z povodia, keď ešte nedochádza k odtoku
  * :math:`H_s` ... návrhová výška zrážky v mm
  * :math:`H_o` ... výška priameho odtoku
@@ -35,25 +35,27 @@ Vstupné dáta
 Navrhovaný postup:
 ------------------
 
- 1. príprava potrebných dát pre výpočet v prostredí GIS (:math:`CN`, :math:`H_s`, výmera :math:`P_p` pre elementárne plochy v :math:`m^2`),
+ 1. príprava potrebných dát pre výpočet v prostredí GIS (rastrová vrstva s kódmi CN, raster s hodnotami :math:`H_s` a raster s výmerou :math:`P_p` pre elementárne plochy v :math:`m^2`),
  2. výpočet parametra :math:`A`, ktorý je funkciou CN,
  3. výpočet parametra :math:`I_a`, ktorý je funkciou :math:`A`,
  4. výpočet parametra :math:`H_o`, ktorý je funkciou :math:`H_s` a :math:`A`,
  5. výpočet parametra :math:`O_p`, ktorý je funkciou :math:`P_p` a :math:`H_o`.
- 
-.. figure:: images/schema_a.PNG
 
-  Grafická schéma postupu 
- 
+    .. _schema:
+
+    .. figure:: images/schema_a.PNG
+
+        Grafická schéma postupu 
+
+.. note:: Ako vyplýva z :num:`obr. #schema`, príprave rastrovej vrstvy s kódmi CN predchádza odvodenie hydrologických skupín pôd *HydrSk* a jej priestorové prekrytie s vrstvou využitia krajinnej pokrývky *land*, čím sa získa jedinečná kombinácia *HydrSk_land*.
+
 Postup spracovania v GRASS GIS
 ------------------------------
-
-.. _hydrsk:
 
 Krok 1
 ^^^^^^
 
-V prvom kroku zjednotíme vrstvu hlavných pôdnych jednotiek a komplexného prieskumu pôd. Použijeme union).
+V prvom kroku zjednotíme vrstvu hlavných pôdnych jednotiek a komplexného prieskumu pôd. Použijeme modul :grasscmd:`v.overlay` a operáciu prekrývania *union*.
 
 .. code-block:: bash
    
@@ -139,8 +141,7 @@ Do textového súboru :file:`colors.txt` vložíme pravidlá pre vlastnú farebn
    6 orange
    7 purple
 
-Nastavíme výpočtový región (napr. :map:`hpj_kpp`), konvertujeme 
-vektorovú vrstvu na rastrovú, priradíme farebnú škálu a doplníme mimorámové údaje: legendu a mierku.
+MOdulom :grasscmd:`g.region` nastavíme výpočtový región (napr. :map:`hpj_kpp`), konvertujeme vektorovú vrstvu na rastrovú, priradíme farebnú škálu a doplníme mimorámové údaje: legendu a mierku.
 
 .. note:: Vektorovú vrstvu konvertujeme kvôli tomu, lebo zobraziť legendu je možné len pre rastrové dáta.
 
@@ -154,13 +155,13 @@ vektorovú vrstvu na rastrovú, priradíme farebnú škálu a doplníme mimorám
 
    Výsledná vizualizácia hydrologických skupín pôd (1: A, 2: AB, 3: B, 4: BC, 5: C, 6: CD a 7: D)
 
-Pridáme informácie o využití územia pre každú plochu pomocou prieniku (*intersection*) s dátovou vrstvou o krajinnej pokrývke :map:`Land_Use`. 
+Pridáme informácie o využití územia pre každú plochu pomocou operácie priniku *intersection* s dátovou vrstvou o krajinnej pokrývke :map:`Land_Use`. 
 
 .. code-block:: bash
 
    v.overlay ainput=hpj_kpp binput=Land_Use operator=and output=hpj_kpp_land
 
-Pridáme stĺpec :dbcolumn:`LU_HydrSk` s informáciami o využití územia a hydrologickej skupine pre každú elementárnu plochu. Hodnoty budú v tvare *VyužitieÚzemia_KodHydrologickejSkupiny*.
+Pridáme stĺpec :dbcolumn:`LU_HydrSk` s informáciami o využití územia a hydrologickej skupine pre každú elementárnu plochu. Hodnoty budú v tvare *VyužitieÚzemia_KodHydrologickejSkupiny*, t.j. *LU_HydrSk*.
 
 .. code-block::bash
 
@@ -258,7 +259,7 @@ Kroky 4 a 5
 
    db.select sql="select count(*) as pocet from hpj_kpp_land_pov_1 where ((32 < I_a) or (b_H_002_120 < I_a))" 
 
-Následne pridáme ďalšie nové stĺpce do atribútovej tabuľky pre :math:`H_{o}` a :math:`O_{p}` a vypočítame ich pomocou :grasscmd:`v.db.update`.
+Pridáme ďalšie nové stĺpce do atribútovej tabuľky pre parametre :math:`H_{o}` a :math:`O_{p}` a vypočítame ich hodnoty pomocou :grasscmd:`v.db.update`.
 
 .. math::
    
@@ -331,29 +332,4 @@ Použité zdroje:
 [3] Wikipédia : `Metóda CN kriviek <https://cs.wikipedia.org/wiki/Metoda_CN_k%C5%99ivek>`_
 
 [4] `HYDRO.upol.cz <http://hydro.upol.cz/?page_id=15>`_
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
