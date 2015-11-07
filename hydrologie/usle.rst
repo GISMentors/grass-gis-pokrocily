@@ -6,6 +6,8 @@ Teoretické východiská
 
 Pri výpočtoch priemernej dlhodobej straty pôdy sa proces vodnej erózie popisuje pomocou matematického modelu USLE, tzv. univerzálnej rovnice straty pôdy:
 
+.. _vzorec-G:
+
 .. math::
    
    G = R \times K \times L \times S \times C \times P
@@ -48,7 +50,7 @@ Z digitálneho modelu terénu (DMT) vytvoríme rastrovú mapu znázorňujúcu sk
 .. code-block:: bash
                 
    g.region raster=dmt
-   r.slope.aspect elevation=dmt slope=svah                           
+   r.slope.aspect elevation=dmt slope=svah
 
 .. figure:: images/1b.png
    :class: middle
@@ -110,14 +112,14 @@ Nastavíme vhodnú tabuľku farieb:
 .. figure:: images/3b.png
    :class: small
 
-   Topografický faktor LS zahrňujúci vplyv dĺžky a sklonu svahu    
+   Topografický faktor LS zahrňujúci vplyv dĺžky a sklonu svahu
    
 K a C faktor
-^^^^^^^^^^^^   
+^^^^^^^^^^^^
 
 Do aktuálneho mapsetu importujeme vektorovú vrstvu :map:`hpj_kpp_land` (viď. :ref:`návod <hydrsk>` na jej vytvorenie).
 
-.. tip:: V prípade, že mapa :map:`hpj_kpp_land` je len v inom mapsete, možno ju do aktuálneho mapsetu prekopírovať pomocou :grasscmd:`g.mapset`, tak, že najprv zmeníme mapset, pridáme mapu a potom sa vrátime do aktuálneho mapsetu. V správci vrstiev zvolíme  *Make a copy in the current mapset* (pravým tlačidlom myši).
+.. tip:: V prípade, že mapa :map:`hpj_kpp_land` je len v inom mapsete, možno ju do aktuálneho mapsetu prekopírovať pomocou :grasscmd:`g.mapset`, tak, že najprv zmeníme mapset, pridáme mapu a potom sa vrátime do aktuálneho mapsetu. V správcovi vrstiev zvolíme pravým tlačidlom myši *Make a copy in the current mapset*.
 
 Do jej atribútovej tabuľky pridáme dva nové stĺpce :dbcolumn:`K`
 a :dbcolumn:`C`. To vykonáme pomocou :skoleni:`správcu atribútových
@@ -129,7 +131,6 @@ dát <grass-gis-zacatecnik/vector/atributy.html>` alebo modulu
    v.db.addcolumn map=hpj_kpp_land columns="K double"
    v.db.addcolumn map=hpj_kpp_land columns="C double" 
 
-
 Hodnotu K faktora pre jednotlivé elementárne plochy priradíme pomocou tabuľky :dbtable:`HPJ_K.xls`. Pre plochy bez hodnoty K faktora doplníme údaje na základe pôdnych typov a subtypov podľa komplexného prieskumu pôd (tabuľka :dbtable:`KPP_K.xls`). Hodnotu C faktora poľnohospodársky využívaných oblastí zistíme z priemerných hodnôt pre jednotlivé plodiny z tabuľky :dbtable:`LU_C.xls`. Na spájanie tabuliek použijeme modul :grasscmd:`v.db.join`
 
 Prevodové tabuľky je potrebné najprv naimportovať do prostredia GRASS GIS. Použijeme modul :grasscmd:`db.in.ogr`:
@@ -139,116 +140,152 @@ Prevodové tabuľky je potrebné najprv naimportovať do prostredia GRASS GIS. P
    db.in.ogr in=KPP_K.xls out=kpp_k
    db.in.ogr in=HPJ_K.xls out=hpj_k
    db.in.ogr in=LU_C.xls out=lu_c
-                
-   v.db.join map=hpj_kpp_land column=a_HPJ_key other_table=hpj_k other_column=HPJ  
+ 
+Potom pristúpime k pripojeniu tabuľky :dbtable:`hpj_k` k atribútom vektorovej vrstvy :map:`hpj_kpp_land`, pričom spojítkom bude atribút :dbcolumn:`HPJ_key`.
 
-Chýbajúce informácie o hodnote faktora K doplníme z vrstvy KPP z tabuľky :dbtable:`kpp_k` SQL dotazom, ktorý vykonáme 
-modulomm :grasscmd:`db.execute`.
+.. code-block:: bash 
+            
+   v.db.join map=hpj_kpp_land column=a_HPJ_key other_table=hpj_k other_column=HPJ 
 
-.. code-block:: sql
+
+Chýbajúce informácie o hodnote faktora ``K`` doplníme z tabuľky :dbtable:`kpp_k` SQL dotazom prostredníctvom modulu :grasscmd:`db.execute`.
+
+.. code-block:: bash
    
-   UPDATE hpj_kpp_land_1 SET K = (
-   SELECT b.K FROM hpj_kpp_land_1 AS a JOIN kpp_k as b ON a.a_b_KPP = b.KPP)
-   WHERE K IS NULL
+   db.execute sql="UPDATE hpj_kpp_land SET K = (
+   SELECT b.K FROM hpj_kpp_land AS a JOIN kpp_k as b ON a.a_b_KPP = b.KPP)
+   WHERE K IS NULL"
 
-V dalšom kroku doplníme hodnoty C faktora z importovanej tabuľky
-:dbtable:`lu_c`.
+V dalšom kroku doplníme hodnoty ``C`` faktora z importovanej tabuľky :dbtable:`lu_c`.
 
 .. code-block:: bash
                 
-   v.db.join map=hpj_kpp_land column=b_LandUse other_table=lu_c other_column=LU      
+   v.db.join map=hpj_kpp_land column=b_LandUse other_table=lu_c other_column=LU 
 
-Ďalej do atribútovej tabuľky pridáme nový atribút :dbcolumn:`KC`, do
-ktorého uložíme súčin faktorov ``K * C``. To môžeme vykonať pomocou :skoleni:`správcu atribútových dát <grass-gis-zacatecnik/vector/atributy.html>` alebo modulom :grasscmd:`v.db.addcolumn` v kombinácii s :grasscmd:`v.db.update`.
+Údaje v atribútovej tabuľke si skontrolujeme, či sú vyplnené správne. Použijeme SQL dotaz :grasscmd:`db.select`, pričom vyberieme len prvé 3 záznamy.
+
+.. code-block:: bash
+
+   db.select sql="select cat,K,C from hpj_kpp_land where cat <= 5"
+
+Výsledok môže vyzerať napríklad aj takto:
+
+.. code-block:: bash
+
+   cat|K|C
+   1|0.13|0.19
+   2|0.13|0.19
+   3|0.13|0.19
+   ...
+
+Ďalej do atribútovej tabuľky pridáme nový atribút :dbcolumn:`KC`, do ktorého uložíme súčin faktorov ``K * C``. To môžeme vykonať pomocou :skoleni:`správcu atribútových dát <grass-gis-zacatecnik/vector/atributy.html>` alebo modulom :grasscmd:`v.db.addcolumn` v kombinácii s :grasscmd:`v.db.update`.
 
 .. code-block:: bash
 
    v.db.addcolumn map=hpj_kpp_land columns="KC double"
    v.db.update map=hpj_kpp_land column=KC value="K * C"
 
-Výsledok možno skontrolovať jednoduchým SQL dotazom pomocou modulu :grasscmd:`db.select`.
+Ukážkový výsledok pre prvé tri záznamy opäť skontrolujeme.
 
 .. code-block:: bash
 
-   db.select sql="select cat,K,C,KC from hpj_kpp_land_1 where cat < 10"
+   db.select sql="select cat,K,C,KC from hpj_kpp_land where cat <= 3"
 
+.. code-block:: bash
 
-V ďalšom kroku vektorovú mapu prevedieme na rastrovú reprezentáciu
-(:grasscmd:`v.to.rast`), pre zachovanie informácie použijeme priestorové
-rozlíšenie *1 m* (:grasscmd:`g.region`, viď. :skoleni:`výpočtový región
-<grass-gis-zacatecnik/intro/region.html>`).
+   cat|K|C|KC
+   1|0.13|0.19|0.0247
+   2|0.13|0.19|0.0247
+   3|0.13|0.19|0.0247
+   ...
+
+V ďalšom kroku vektorovú mapu prevedieme na rastrovú reprezentáciu modulom :grasscmd:`v.to.rast`. Pre zachovanie informácie použijeme priestorové rozlíšenie *1 m* (:grasscmd:`g.region`, viď. :skoleni:`výpočtový región <grass-gis-zacatecnik/intro/region.html>`).
+
+Pomocou modulu :grasscmd:`r.resamp.stats` potom vykonáme prevzorkovanie na priestorové rozlíšenie DMT *10 m* a to na základe priemeru hodnôt vypočítaného z hodnôt okolitých buniek. Týmto postupom zabránime strate informácií, ku ktorému by došlo pri priamom prevode na raster s rozlíšením *10 m*. Pri rasterizácii sa totiž hodnota bunky rastra volí na základe polygónu, ktorý prechádza stredom bunky alebo na základe polygónu, ktorý zaberá najväčiu čásť plochy bunky.
 
 .. code-block:: bash
    
-   g.region raster=dmt res=1                                             
-   v.to.rast input=hpj_kpp_land output=hpj_kpp_kc use=attr attribute_column=KC
+   g.region raster=dmt res=1 
+   v.to.rast input=hpj_kpp_land output=hpj_kpp_land_kc use=attr attribute_column=KC
 
-Pomocou modulu :grasscmd:`r.resamp.stats` potom vykonáme prevzorkovanie
-na priestorové rozlíšenie DMT 10 m a to na základe priemeru hodnôt
-vypočítaného z hodnôt okolitých buniek. Týmto postupom zabránime strate
-informácií, ku ktorému by došlo pri priamom prevode na raster s rozlíšením 10 m (pri rasterizácii sa hodnota bunky rastra volí na základe polygónu, ktorý prechádza stredom bunky alebo na základe polygónu, ktorý zaberá najväčiu čásť plochy bunky).
+   g.region raster=dmt
+   r.resamp.stats input=hpj_kpp_land_kc output=hpj_kpp_land_kc10 
 
-.. code-block:: bash
+Na obrázku :num:`obr. #porovkn` je znázornená časť záujmového územia, kde možno vidieť rastrovú vrstvu :map:`hpj_kpp_land_kc` pred (vľavo dole) a po použití modulu :grasscmd:`r.resamp`.
 
-   g.region raster=dmt     
-   r.resamp.stats input=hpj_kpp_kc output=hpj_kpp_kc10                        
+.. _porovkn:
 
-Kvôli vizualizácii nastavíme vhodnú :skoleni:`tabuľku farieb
-<grass-gis-zacatecnik/raster/tabulka-barev.html>`:
+.. figure:: images/10a.png
+   
+   Časť záujmového územia s faktorom *KC* pred a po prevzorkovaní
+                      
+Kvôli vizualizácii nastavíme vhodnú :skoleni:`tabuľku farieb <grass-gis-zacatecnik/raster/tabulka-barev.html>` a kvôli prehľadnosti mapu premenujeme na :map:`kc` modulom :grasscmd:`g.rename`. Výsledok je na :num:`obr. #kc`.
 
 .. code-block:: bash
                 
-   r.colors map=hpj_kpp_kc10 color=wave                                       
+   r.colors map=hpj_kpp_land_kc10 color=wave
+   g.rename raster=hpj_kpp_land_kc10,kc
 
-.. figure:: images/hpj_kpp_kc.png
+.. _kc:
 
-   Faktor KC zahrňujúci vplyv erodovateľnosti pôdy a vplyv ochranného vplyvu vegetačného krytu
+.. figure:: images/11.png
+   :class: small
+
+   Faktor *KC* zahrňujúci vplyv erodovateľnosti pôdy a vplyv ochranného vplyvu vegetačného krytu
 
 R a P faktor
-^^^^^^^^^^^^^^^^^^   
+^^^^^^^^^^^^
 
-Použijeme priemernú hodnotu R a P faktora pre Českú republiku
-
-.. math::
-
-   R = 40 \, MJ.ha^{-1} .cm.h^{-1}
-   
-   P = 1
+Hodnoty týchto parametrov nebudeme odvádzať ako tie predchádzajúce. V tomto prípade jednoducho použijeme priemernú hodnotu ``R`` a ``P`` faktora pre Českú republiku, t.j ``R = 40`` a ``P = 1``.
 
 Výpočet priemernej dlhodobej straty pôdy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Stratu pôdy `G` vypočítame modulom :grasscmd:`r.mapcalc`:
+Stratu pôdy `G` vypočítame modulom :grasscmd:`r.mapcalc`, pričom vychádzame zo vzťahu, ktorý bol uvedený v :ref:`teoretickej časti školenia <vzorec-G>`. 
+
+Výpočet vykonáme modulom :grasscmd:`r.mapcalc`. Výslednú vrstvu nazveme :map:`g`, zvolíme primeranú farebnú škálu, pridáme  legendu a mierku a  mapu zobrazíme (:num:`obr. #map-g`) 
 
 .. code-block:: bash
                 
-   r.mapcalc expr="g = 40 ∗ ls ∗ hpj_kpp_kc ∗ 1"
+   r.mapcalc expr="g = 40 ∗ ls ∗ kc ∗ 1"
+   r.colors -n -e map=g color=corine
+
+.. _map-g:
+
+.. figure:: images/12.png
+   :class: small
+
+   Rastrová vrstva s hodnotami predstavujúcimi priemernú dlhodobú stratu pôdy (v jednotkách t.ha^{-1} . rok^{-1})
+
+.. note:: Na :num:`obr. #map-g` je maximálna hodnota v legende *1*. Je to len z dôvodu, aby bol výsledok prehľadný a korešpondoval s farbami v mape. V skutočnosti parameter ``G`` nadobúda hodnotu až *230*, no pri takomto rozsahu by bola stupnica v legende jednofarebná (v našom prípade červená). 
+    Meniť rozsah intervalu v legende je možné príkazom :code:`d.legend raster=g range=0,1`.
 
 Priemerná hodnota straty pre povodie
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
    
-Na určenie priemernej hodnoty a sumu straty pre každé čiastkové povodie využijeme modul :grasscmd:`v.rast.stats`.
+Na určenie priemernej hodnoty a sumy straty pre každé čiastkové povodie využijeme modul :grasscmd:`v.rast.stats`. Kľúčovou vrstvou je vektorová mapa povodí :map:`A07_Povodi_IV`, kde nastavíme prefix :item:`g_` pre novovytvorený stĺpec. Z toho potom modulom :grasscmd:`v.db.univar` zobrazíme štatistiky priemerných hodnôt straty pôdy.
 
 .. code-block:: bash
                 
-   v.rast.stats map=A07_Povodi_IV raster=g column_prefix=g_
-
-Na zobrazenie štatistiky priemerných hodnôt straty pôdy slúži modul :grasscmd:`v.db.univar`.
-
-.. code-block:: bash
-
+   v.rast.stats map=A07_Povodi_IV raster=g column_prefix=g
    v.db.univar map=A07_Povodi_IV column=g_average
 
-Pro účely vizualizace nastavíme vhodnou tabulku barev pomocí modulu
-:grasscmd:`v.colors`.
+.. note:: Vektorová vrstva povodí musí byť v aktuálnom mapsete. Ak napríklad pracujeme v inom mapsete, stačí ak ju pridáme z mapsetu :mapset:`PERMANENT` a následne v menu pravým kliknutím na mapu zvolíme :item:`Make a copy in the current mapset`.
+
+Pre účely vizualizácie vektorovú vrstvu prevedieme na raster, pomocou modulu :grasscmd:`r.colors` nastavíme vhodnú tabuľku farieb a výsledok prezentujeme, viď. :num:`obr. #g-average`.
 
 .. code-block:: bash
-             
-   v.colors map=A07_Povodi_IV use=attr column=g_average color=blues
+   
+   v.to.rast input=A07_Povodi_IV@USLE output=pov_avg_G use=attr attribute_column=g_average
+   r.colors -e map=pov_avg_G color=bgyr
 
-.. figure:: images/povodi_g.png
+.. _g-average:
 
-   Povodia podľa straty pôdy
+.. figure:: images/13.png
+
+   Povodia s priemernými hodnotami straty pôdy
+
+.. note: Z dôvodu prehľadnosti je opäť interval v legende upravený. Maximálna hodnota priemernej straty pôdy na povodie je až *0.74* (v jednotkách t.ha^{-1} . rok^{-1})
 
 ---------------------------------------------------------------------
     
