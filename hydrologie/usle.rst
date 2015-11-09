@@ -33,11 +33,9 @@ Vstupné dáta
  * :map:`HPJ` - hlavné pôdne jednotky (atribút :dbcolumn:`K_value`)
  * :map:`KPP` - komplexný prieskum pôd (atribút :dbcolumn:`K_faktor`)
  * :dbtable:`HPJ_K.xls`, :dbtable:`KPP_K.xls`, :dbtable:`LU_C.xls` - tabuľky s kódmi K a C
-
-* :map:`hpj_kpp_land` - zjednotenie HPJ a KPP a ich prienik s LU (atribút :dbcolumn:`a_b_K_faktor`)
-* :map:`A07_Povodi_IV` - povodia IV. rádu
-* základná báza geografických dát - ZABAGED
-* ortofotomapa
+ * :map:`hpj_kpp_land` - zjednotenie HPJ a KPP a ich prienik s LU(atribút :dbcolumn:`a_b_K_faktor`)
+ * :map:`A07_Povodi_IV` - povodia IV. rádu
+ * :map:`maska.pack` - vrstva líniových a plošných prvkov prerušujúcich odtok
    
 Postup
 ------
@@ -255,7 +253,7 @@ Výpočet vykonáme modulom :grasscmd:`r.mapcalc`. Výslednú vrstvu nazveme :ma
 .. figure:: images/12.png
    :class: small
 
-   Rastrová vrstva s hodnotami predstavujúcimi priemernú dlhodobú stratu pôdy (v jednotkách t.ha^{-1} . rok^{-1})
+   Rastrová vrstva s hodnotami predstavujúcimi priemernú dlhodobú stratu pôdy (v jednotkách :math:`t.ha^{-1} . rok^{-1}`)
 
 .. note:: Na :num:`obr. #map-g` je maximálna hodnota v legende *1*. Je to len z dôvodu, aby bol výsledok prehľadný a korešpondoval s farbami v mape. V skutočnosti parameter ``G`` nadobúda hodnotu až *230*, no pri takomto rozsahu by bola stupnica v legende jednofarebná (v našom prípade červená). 
     Meniť rozsah intervalu v legende je možné príkazom :code:`d.legend raster=g range=0,1`.
@@ -285,59 +283,57 @@ Pre účely vizualizácie vektorovú vrstvu prevedieme na raster, pomocou modulu
 
    Povodia s priemernými hodnotami straty pôdy
 
-.. note: Z dôvodu prehľadnosti je opäť interval v legende upravený. Maximálna hodnota priemernej straty pôdy na povodie je až *0.74* (v jednotkách t.ha^{-1} . rok^{-1})
-
----------------------------------------------------------------------
+.. note:: Z dôvodu prehľadnosti je opäť interval v legende upravený. Maximálna hodnota priemernej straty pôdy na povodie je až *0.74* (v jednotkách :math:`t.ha^{-1} . rok^{-1}`)
     
-Zahrnutí prvků přerušujících odtok
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Zahrnutie prvkov prerušujúcich odtok
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Pro výpočet uvedený výše vychází ztráta půdy v některých místech
-enormně vysoká. To je způsobeno tím, že ve výpočtu nejsou zahrnuty
-liniové a plošné prvky přerušující povrchový odtok. Těmito prvky jsou
-zejména budovy, příkopy silnic a cest, železniční tratě nebo zdi
-lemující pozemky.
+Pre výpočet uvedený vyššie vychádza strata pôdy v niektorých miestach enormne vysoká. To je spôsobené tým, že vo výpočtoch nie sú zahrnuté líniové a plošné prvky prerušujúce povrchový odtok. Týmito prvkami sú najmä budovy, priekopy diaľnic a ciest, železničné trate alebo múry lemujúce pozemky. 
 
-Pro zjištění přesnějších hodnot je tedy nutné tyto prvky do výpočtu
-zahrnout. Proto byla na základě vybraných prvků vytvořena maska prvků
-přerušujících odtok.
+Aby sme zistili presnejšie hodnoty, je nutné tieto prvky do výpočtu zahrnúť. Pre tento účel použijeme masku líniových a plošných prvkov prerušujúcich odtok :map:`maska.patch` a vypočítame nové hodnoty LS faktora a straty pôdy. Vstupom bude :map:`dmt` bez prvkov prerušujúcich odtok (:num:`obr. #dmt-m`).
 
-Masku liniových a plošných prvků spojíme pomocí modulu
-:grasscmd:`v.patch`. Před spojením vektorových map rozšíříme liniové
-prvky z důvodu nastavení masky pomocí modulu :grasscmd:`v.buffer`.
+.. code-block:: bash
+   
+   r.unpack -o input= ... /MASK.pack output=mask
+   r.mask raster=mask
+   r.terraflow elevation=dmt filled=dmt_fill_m direction=dir_m swatershed=sink_m accumulation=accu_m tci=tci_m
+
+.. _dmt-m:
+
+.. figure:: images/14a.png
+   :class: small
+
+   Vrstva digitálneho modelu terénu vstupujúca do výpočtov bez prvkov prerušujúcich odtok
+
+
+Ďalej ........
 
 .. code-block:: bash
 
-   v.buffer input=maska_linie output=maska_linie5 distance=5
-   v.patch input=maska_linie5,maska_plochy output=maska
-                          
-Masku pro další analýzu nastavíme pomocí modulu :grasscmd:`r.mask`.
+   r.mapcalc expr="ls_m = pow(accu_m * (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)"
+   r.mapcalc expr="g_m = 40 ∗ ls_m ∗ kc ∗ 1"
+   
+   r.colors map=ls_m color=wave
+   r.colors -n -e map=g_m color=corine
 
-.. code-block:: bash
+V poslednom kroku vymažeme masku, výsledky zobrazíme a porovnáme (:num:`obr. #ls-porov` a :num:`obr. #g-porov`).
 
-   r.mask -i vector=maska
-
-S využitím masky vypočteme nově LS faktor a ztrátu půdy G.
-
-.. code-block:: bash
-
-   r.terraflow elevation=dmt filled=dmt_fill2 direction=dir2 swatershed=sink2 accumulation=accu2 tci=tci2
-   r.mapcalc expr="ls2 = pow(accu2 * (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)"
-   r.mapcalc expr="g2 = 40 ∗ ls2 ∗ hpj_kpp_kc ∗ 1"
 
 .. todo:: doplnit porovnání, LS faktor vychází divně
              
-::
+.. _ls-porov:
 
-   .. figure:: images/porovnani_ls.png
+.. figure:: images/16.png
+   :class: small
                
-               Porovnání hodnot LS faktoru bez zohlednění prvků přerušujících
-               odtok (vlelvo) a s prvky přerušujícími odtok (vpravo)
+   Porovnání hodnot LS faktoru bez zohlednění prvků přerušujících odtok (vlelvo) a s prvky přerušujícími odtok (vpravo)
 
-   .. figure:: images/porovnani_g.png
+.. _g-porov:
 
-               Porovnání výsledků USLE bez zohlednění prvků přerušujících odtok
-               (vlelvo) a s prvky přerušujícími odtok (vpravo)
+.. figure:: images/17.png
+   :class: small
+
+   Porovnání výsledků USLE bez zohlednění prvků přerušujících odtok (vlelvo) a s prvky přerušujícími odtok (vpravo)
 
 Poznámky
 --------
