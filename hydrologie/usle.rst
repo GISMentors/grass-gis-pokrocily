@@ -11,20 +11,16 @@ Pri výpočtoch priemernej dlhodobej straty pôdy sa proces vodnej erózie popis
 .. math::
    
    G = R \times K \times L \times S \times C \times P
-   
-.. math::
-   
-   (t.ha^{-1} . rok^{-1})=(MJ.ha^{-1} .cm.h^{-1}) \times (t.h.MJ^{-1} .cm^{-1} .rok^{-1}) \times ( ) \times ( ) \times ( ) \times ( )
 
 Základné symboly:
 
- * G ... priemerná dlhodobá strata pôdy
- * R ... faktor eróznej účinnosti dažďa
- * K ... faktor erodovateľnosti pôdy 
- * L ... faktor dĺžky svahu 
- * S ... faktor sklonu svahu 
- * C ... faktor ochranného vplyvu vegetačného krytu 
- * P ... faktor účinnosti protieróznych opatrení 
+ * G ... priemerná dlhodobá strata pôdy (:math:`t.ha^{-1} . rok^{-1}`)
+ * R ... faktor eróznej účinnosti dažďa (:math:`MJ.ha^{-1} .cm.h^{-1}`)
+ * K ... faktor erodovateľnosti pôdy (:math:`t.h.MJ^{-1} .cm^{-1} .rok^{-1}`) 
+ * L ... faktor dĺžky svahu ( )
+ * S ... faktor sklonu svahu ( ) 
+ * C ... faktor ochranného vplyvu vegetačného krytu ( )
+ * P ... faktor účinnosti protieróznych opatrení ( )
 
 Vstupné dáta
 ------------
@@ -317,26 +313,22 @@ Aby sme zistili presnejšie hodnoty, je nutné tieto prvky do výpočtu zahrnú�
    r.colors -n -e map=g_m color=corine
 
 V poslednom kroku vymažeme masku, výsledky zobrazíme a porovnáme (:num:`obr. #ls-porov` a :num:`obr. #g-porov`).
-
-
-.. todo:: doplnit porovnání, LS faktor vychází divně
              
 .. _ls-porov:
 
-.. figure:: images/16.png
-   :class: small
-               
-   Porovnání hodnot LS faktoru bez zohlednění prvků přerušujících odtok (vlelvo) a s prvky přerušujícími odtok (vpravo)
+.. figure:: images/ls_porov.png
+   :scale: 55%
+     
+   Porovnanie hodnôt faktora LS bez ohľadu na prvky prerušujúce odtok (vľavo) a s prvkami prerušujúcimi odtok (vpravo) 
 
 .. _g-porov:
 
-.. figure:: images/17.png
-   :class: small
+.. figure:: images/g_porov.png
+   :scale: 57%
 
-   Porovnání výsledků USLE bez zohlednění prvků přerušujících odtok (vlelvo) a s prvky přerušujícími odtok (vpravo)
+   Porovnanie výsledkov USLE bez ohľadu na prvky prerušujúce odtok (vľavo) a s prvkami prerušujúcimi odtok (vpravo) 
 
 Poznámky
 --------
 
-GRASS nabízí pro výpočet USLE dva užitečné moduly :grasscmd:`r.uslek`
-a :grasscmd:`r.usler`.
+GRASS ponúka na výpočet USLE dva užitočné moduly :grasscmd:`r.uslek` a :grasscmd:`r.usler`.
