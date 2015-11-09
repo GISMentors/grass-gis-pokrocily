@@ -235,9 +235,14 @@ Hodnoty týchto parametrov nebudeme odvádzať ako tie predchádzajúce. V tomto
 Výpočet priemernej dlhodobej straty pôdy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Stratu pôdy `G` vypočítame modulom :grasscmd:`r.mapcalc`, pričom vychádzame zo vzťahu, ktorý bol uvedený v :ref:`teoretickej časti školenia <vzorec-G>`. 
+Stratu pôdy `G` vypočítame modulom :grasscmd:`r.mapcalc` (:num:`obr. #rmapcalc`), pričom vychádzame zo vzťahu, ktorý bol uvedený v :ref:`teoretickej časti školenia <vzorec-G>`. 
 
-Výpočet vykonáme modulom :grasscmd:`r.mapcalc`. Výslednú vrstvu nazveme :map:`g`, zvolíme primeranú farebnú škálu, pridáme  legendu a mierku a  mapu zobrazíme (:num:`obr. #map-g`) 
+.. _rmapcalc:
+
+.. figure:: images/15.png
+   :class: small
+
+Pre výslednú vrstvu zvolíme primeranú farebnú škálu, pridáme legendu, mierku a  mapu zobrazíme (:num:`obr. #map-g`) 
 
 .. code-block:: bash
                 
@@ -302,7 +307,7 @@ Aby sme zistili presnejšie hodnoty, je nutné tieto prvky do výpočtu zahrnú�
    Vrstva digitálneho modelu terénu vstupujúca do výpočtov bez prvkov prerušujúcich odtok
 
 
-Ďalej ........
+Ďalej dopočítame faktor LS a následne G.
 
 .. code-block:: bash
 
