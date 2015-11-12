@@ -36,6 +36,14 @@ Vstupné dáta
 Postup
 ------
 
+Na :num:`obr. #schema-usle` je prehľadne znázornený navrhovaný postup. 
+
+    .. _schema-usle:
+
+    .. figure:: images/schema_b.png
+
+        Grafická schéma postupu 
+
 Z digitálneho modelu terénu (DMT) vytvoríme rastrovú mapu znázorňujúcu sklonové pomery v stupňoch (*slope*). Tá bude potrebná neskôr na výpočet :ref:`topografického faktora LS <ls-faktor>`. V prvom kroku nastavíme :skoleni:`výpočtový región
 <grass-gis-zacatecnik/intro/region.html>` na základe vstupného DMT a následne použijeme modul :grasscmd:`r.slope.aspect`, viď.
 :skoleni:`topografické analýzy
@@ -254,10 +262,10 @@ Pre výslednú vrstvu zvolíme primeranú farebnú škálu, pridáme legendu, mi
 .. figure:: images/12.png
    :class: small
 
-   Rastrová vrstva s hodnotami predstavujúcimi priemernú dlhodobú stratu pôdy (v jednotkách :math:`t.ha^{-1} . rok^{-1}`)
+   Vrstva s hodnotami predstavujúcimi priemernú dlhodobú stratu pôdy G v jednotkách :math:`t.ha^{-1} . rok^{-1}`)
 
 .. note:: Na :num:`obr. #map-g` je maximálna hodnota v legende *1*. Je to len z dôvodu, aby bol výsledok prehľadný a korešpondoval s farbami v mape. V skutočnosti parameter ``G`` nadobúda hodnotu až *230*, no pri takomto rozsahu by bola stupnica v legende jednofarebná (v našom prípade červená). 
-    Meniť rozsah intervalu v legende je možné príkazom :code:`d.legend raster=g range=0,1`.
+    Zmeniť rozsah intervalu v legende bolo možné nastavením parametra *range*, konkrétnejšie príkazom :code:`d.legend raster=g range=0,1`.
 
 Priemerná hodnota straty pre povodie
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
@@ -266,7 +274,7 @@ Na určenie priemernej hodnoty a sumy straty pre každé čiastkové povodie vyu
 
 .. code-block:: bash
                 
-   v.rast.stats map=A07_Povodi_IV raster=g column_prefix=g
+   v.rast.stats map=A07_Povodi_IV raster=g column_prefix=g method=average
    v.db.univar map=A07_Povodi_IV column=g_average
 
 .. note:: Vektorová vrstva povodí musí byť v aktuálnom mapsete. Ak napríklad pracujeme v inom mapsete, stačí ak ju pridáme z mapsetu :mapset:`PERMANENT` a následne v menu pravým kliknutím na mapu zvolíme :item:`Make a copy in the current mapset`.
@@ -275,7 +283,7 @@ Pre účely vizualizácie vektorovú vrstvu prevedieme na raster, pomocou modulu
 
 .. code-block:: bash
    
-   v.to.rast input=A07_Povodi_IV@USLE output=pov_avg_G use=attr attribute_column=g_average
+   v.to.rast input=A07_Povodi_IV output=pov_avg_G use=attr attribute_column=g_average
    r.colors -e map=pov_avg_G color=bgyr
 
 .. _g-average:
@@ -333,6 +341,47 @@ V poslednom kroku vymažeme masku, výsledky zobrazíme a porovnáme (:num:`obr.
 
    Porovnanie výsledkov USLE bez ohľadu na prvky prerušujúce odtok (vľavo) a s prvkami prerušujúcimi odtok (vpravo) 
 
+Priemerná hodnota straty pre povodie s prvkami prerušujúcimi odtok
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
+Opäť využijeme modul :grasscmd:`v.rast.stats`. Vektorovej mape povodí :map:`A07_Povodi_IV` nastavíme prefix :item:`g_m` pre novovytvorený stĺpec a potom modulom :grasscmd:`v.db.univar` zobrazíme štatistiky priemerných hodnôt straty pôdy. Výsledok v rastrovej podobe je na :num:`obr. #g-m-average`.
+
+.. code-block:: bash
+                
+   v.rast.stats map=A07_Povodi_IV raster=g_m column_prefix=g_m method=average
+   v.db.univar map=A07_Povodi_IV column=g_m_average
+   
+   v.to.rast input=A07_Povodi_IV output=pov_avg_G_m use=attr attribute_column=g_m_average
+   r.colors -e map=pov_avg_G_m color=bgyr
+
+.. _g-m-average:
+
+.. figure:: images/16.png
+
+   Povodia s priemernými hodnotami straty pôdy s uvážením prvkov, ktoré prerušujú odtok
+
+Na záver urobíme rozdiely (modul :grasscmd:`r.mapcalc`) výsledných vrstiev bez a s uvážením prvkov, ktoré prerušujú odtok pre faktor *LS*, hodnoty predstavujúce priemernú dlhodobú stratu pôdy *G* a povodia s priemernými hodnotami straty pôdy *G_pov*. Nazveme ich :map:`delta_ls`, :map:`delta_g` a :map:`delta_pov_avg` a každej nastavíme farbnú stupnicu :item:`differences`. Sú na :num:`obr. #diff`.
+
+.. code-block:: bash
+
+   r.mapcalc expression=delta_ls = ls - ls_m
+   r.mapcalc expression=delta_g = g - g_m
+   r.mapcalc expression=delta_pov_avg = pov_avg_G - pov_avg_G_m
+
+   r.colors map=delta_ls color=differences
+   r.colors map=delta_g color=differences
+   r.colors map=delta_pov_avg color=differences
+
+.. _diff:
+
+.. figure:: images/diff.png
+   :scale: 55%
+
+   Znázornenie rozdielov rastrových vrstiev LS, G a G_pov, ktoré vznikli bez uváženia a s uvážením prvkov, ktoré prerušujú odtok
+
+
+
+ 
 Poznámky
 --------
 
