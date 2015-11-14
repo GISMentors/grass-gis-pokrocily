@@ -49,6 +49,17 @@ upravovat ho a tyto změny či opravy šířit dál.
                začátečníky
                <http://training.gismentors.eu/grass-gis-zacatecnik/>`_.
 
+.. index::
+   pair: datové sady; ke stažení
+
+.. notedata::
+
+   *GRASS lokace GISMentors* je stažitelná jako `zip archiv
+   <http://training.gismentors.eu/geodata/grass/gismentors.zip>`_ (830
+   MB), družicové snímky `Landsat
+   <http://training.gismentors.eu/geodata/grass/gismentors-landsat.zip>`_
+   (985 MB).
+               
 .. warning:: :red:`Toto je pracovní verze školení, která je aktuálně ve vývoji!`
 
 .. only:: html
