@@ -57,19 +57,19 @@ infračerveného kanálu satelitních dat.
    <grass-gis-zacatecnik/intro/struktura-dat.html#vyhledavaci-cesta>`
    pomocí modulu :grasscmd:`g.mapsets`
 #. Rastr :map:`ndvi` vypočteme pomocí nástoje :skoleni:`mapové algebry
-   <grass-gis-zacatecnik/raster/rastrova-algebra>`
+   <grass-gis-zacatecnik/rastrova_data/rastrova-algebra>`
    :grasscmd:`r.mapcalc`
 #. :skoleni:`Reklasifikaci
-   <grass-gis-zacatecnik/raster/reklasifikace>` do třech tříd
+   <grass-gis-zacatecnik/rastrova_data/reklasifikace>` do třech tříd
    provedeme pomocí modulu :grasscmd:`r.recode` (jedná o data s
    :skoleni:`plovoucí desetinnou čárkou
-   <grass-gis-zacatecnik/raster/index.html#typy-rastrovych-map>`,
+   <grass-gis-zacatecnik/rastrova_data/index.html#typy-rastrovych-map>`,
    jinak by bylo vhodnější použít přímo :grasscmd:`r.reclass`).
 #. Dále nastavíme :skoleni:`popisky
-   <grass-gis-zacatecnik/raster/reklasifikace#r-recode>` jednotlivých
+   <grass-gis-zacatecnik/rastrova_data/reklasifikace#r-recode>` jednotlivých
    kategorií pomocí modulu :grasscmd:`r.category`
 #. Nastavíme vhodnou :skoleni:`tabulku barev
-   <grass-gis-zacatecnik/raster/tabulka-barev>` pro reklasifikovaná data
+   <grass-gis-zacatecnik/rastrova_data/tabulka-barev>` pro reklasifikovaná data
    :grasscmd:`r.colors`
 #. Nakonec vypíšeme pro jednotlivé kategorie NDVI jejich percentuální pokrytí
    a to pomocí modulu :grasscmd:`r.stats`

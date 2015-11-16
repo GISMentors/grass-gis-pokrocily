@@ -34,7 +34,7 @@ Přístup k topologii vektorových prvků zajišťuje třída
 :pygrass-vector:`VectorTopo`.
 
 .. tip:: Základní informace o :skoleni:`topologickém formátu
-         <grass-gis-zacatecnik/vector/index.html#topologicky-model>`.
+         <grass-gis-zacatecnik/vektorova_data/index.html#topologicky-model>`.
 
 V nasledující ukázce vypíšeme pro každý okres jeho počet sousedním
 okresů.

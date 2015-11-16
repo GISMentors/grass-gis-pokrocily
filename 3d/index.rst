@@ -61,7 +61,7 @@ Příklad
 
 Nejprve vstupní data převzorkujeme na prostorové rozlišení 100m. Z DMT
 vytvoříme mapu sklonu svahu, viz školení :skoleni:`GRASS GIS pro
-začátečníky <grass-gis-zacatecnik/raster/analyzy-povrchu>`.
+začátečníky <grass-gis-zacatecnik/rastrova_data/analyzy-povrchu>`.
 
 .. code-block:: bash
 
