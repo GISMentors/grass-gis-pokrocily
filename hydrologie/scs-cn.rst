@@ -47,7 +47,7 @@ Navrhovaný postup:
 
         Grafická schéma postupu 
 
-.. note:: Ako vyplýva z :num:`obr. #schema`, príprave rastrovej vrstvy s kódmi CN predchádza odvodenie hydrologických skupín pôd *HydrSk* a jej priestorové prekrytie s vrstvou využitia krajinnej pokrývky *land*, čím sa získa jedinečná kombinácia *HydrSk_land*.
+.. note:: Ako vyplýva z :num:`#schema`, príprave rastrovej vrstvy s kódmi CN predchádza odvodenie hydrologických skupín pôd *HydrSk* a jej priestorové prekrytie s vrstvou využitia krajinnej pokrývky *land*, čím sa získa jedinečná kombinácia *HydrSk_land*.
 
 Postup spracovania v GRASS GIS
 ------------------------------

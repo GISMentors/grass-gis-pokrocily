@@ -36,7 +36,7 @@ Vstupné dáta
 Postup
 ------
 
-Na :num:`obr. #schema-usle` je prehľadne znázornený navrhovaný postup. 
+Na :num:`#schema-usle` je prehľadne znázornený navrhovaný postup. 
 
     .. _schema-usle:
 
@@ -213,7 +213,7 @@ Pomocou modulu :grasscmd:`r.resamp.stats` potom vykonáme prevzorkovanie na prie
    g.region raster=dmt
    r.resamp.stats input=hpj_kpp_land_kc output=hpj_kpp_land_kc10 
 
-Na obrázku :num:`obr. #porovkn` je znázornená časť záujmového územia, kde možno vidieť rastrovú vrstvu :map:`hpj_kpp_land_kc` pred (vľavo dole) a po použití modulu :grasscmd:`r.resamp`.
+Na obrázku :num:`#porovkn` je znázornená časť záujmového územia, kde možno vidieť rastrovú vrstvu :map:`hpj_kpp_land_kc` pred (vľavo dole) a po použití modulu :grasscmd:`r.resamp`.
 
 .. _porovkn:
 
@@ -221,7 +221,7 @@ Na obrázku :num:`obr. #porovkn` je znázornená časť záujmového územia, kd
    
    Časť záujmového územia s faktorom *KC* pred a po prevzorkovaní
                       
-Kvôli vizualizácii nastavíme vhodnú :skoleni:`tabuľku farieb <grass-gis-zacatecnik/raster/tabulka-barev.html>` a kvôli prehľadnosti mapu premenujeme na :map:`kc` modulom :grasscmd:`g.rename`. Výsledok je na :num:`obr. #kc`.
+Kvôli vizualizácii nastavíme vhodnú :skoleni:`tabuľku farieb <grass-gis-zacatecnik/raster/tabulka-barev.html>` a kvôli prehľadnosti mapu premenujeme na :map:`kc` modulom :grasscmd:`g.rename`. Výsledok je na :num:`#kc`.
 
 .. code-block:: bash
                 
@@ -243,14 +243,14 @@ Hodnoty týchto parametrov nebudeme odvádzať ako tie predchádzajúce. V tomto
 Výpočet priemernej dlhodobej straty pôdy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Stratu pôdy `G` vypočítame modulom :grasscmd:`r.mapcalc` (:num:`obr. #rmapcalc`), pričom vychádzame zo vzťahu, ktorý bol uvedený v :ref:`teoretickej časti školenia <vzorec-G>`. 
+Stratu pôdy `G` vypočítame modulom :grasscmd:`r.mapcalc` (:num:`#rmapcalc`), pričom vychádzame zo vzťahu, ktorý bol uvedený v :ref:`teoretickej časti školenia <vzorec-G>`. 
 
 .. _rmapcalc:
 
 .. figure:: images/15.png
    :class: small
 
-Pre výslednú vrstvu zvolíme primeranú farebnú škálu, pridáme legendu, mierku a  mapu zobrazíme (:num:`obr. #map-g`) 
+Pre výslednú vrstvu zvolíme primeranú farebnú škálu, pridáme legendu, mierku a  mapu zobrazíme (:num:`#map-g`) 
 
 .. code-block:: bash
                 
@@ -264,7 +264,7 @@ Pre výslednú vrstvu zvolíme primeranú farebnú škálu, pridáme legendu, mi
 
    Vrstva s hodnotami predstavujúcimi priemernú dlhodobú stratu pôdy G v jednotkách :math:`t.ha^{-1} . rok^{-1}`)
 
-.. note:: Na :num:`obr. #map-g` je maximálna hodnota v legende *1*. Je to len z dôvodu, aby bol výsledok prehľadný a korešpondoval s farbami v mape. V skutočnosti parameter ``G`` nadobúda hodnotu až *230*, no pri takomto rozsahu by bola stupnica v legende jednofarebná (v našom prípade červená). 
+.. note:: Na :num:`#map-g` je maximálna hodnota v legende *1*. Je to len z dôvodu, aby bol výsledok prehľadný a korešpondoval s farbami v mape. V skutočnosti parameter ``G`` nadobúda hodnotu až *230*, no pri takomto rozsahu by bola stupnica v legende jednofarebná (v našom prípade červená). 
     Zmeniť rozsah intervalu v legende bolo možné nastavením parametra *range*, konkrétnejšie príkazom :code:`d.legend raster=g range=0,1`.
 
 Priemerná hodnota straty pre povodie
@@ -279,7 +279,7 @@ Na určenie priemernej hodnoty a sumy straty pre každé čiastkové povodie vyu
 
 .. note:: Vektorová vrstva povodí musí byť v aktuálnom mapsete. Ak napríklad pracujeme v inom mapsete, stačí ak ju pridáme z mapsetu :mapset:`PERMANENT` a následne v menu pravým kliknutím na mapu zvolíme :item:`Make a copy in the current mapset`.
 
-Pre účely vizualizácie vektorovú vrstvu prevedieme na raster, pomocou modulu :grasscmd:`r.colors` nastavíme vhodnú tabuľku farieb a výsledok prezentujeme, viď. :num:`obr. #g-average`.
+Pre účely vizualizácie vektorovú vrstvu prevedieme na raster, pomocou modulu :grasscmd:`r.colors` nastavíme vhodnú tabuľku farieb a výsledok prezentujeme, viď. :num:`#g-average`.
 
 .. code-block:: bash
    
@@ -299,7 +299,7 @@ Zahrnutie prvkov prerušujúcich odtok
 
 Pre výpočet uvedený vyššie vychádza strata pôdy v niektorých miestach enormne vysoká. To je spôsobené tým, že vo výpočtoch nie sú zahrnuté líniové a plošné prvky prerušujúce povrchový odtok. Týmito prvkami sú najmä budovy, priekopy diaľnic a ciest, železničné trate alebo múry lemujúce pozemky. 
 
-Aby sme zistili presnejšie hodnoty, je nutné tieto prvky do výpočtu zahrnúť. Pre tento účel použijeme masku líniových a plošných prvkov prerušujúcich odtok :map:`maska.patch` a vypočítame nové hodnoty LS faktora a straty pôdy. Vstupom bude :map:`dmt` bez prvkov prerušujúcich odtok (:num:`obr. #dmt-m`).
+Aby sme zistili presnejšie hodnoty, je nutné tieto prvky do výpočtu zahrnúť. Pre tento účel použijeme masku líniových a plošných prvkov prerušujúcich odtok :map:`maska.patch` a vypočítame nové hodnoty LS faktora a straty pôdy. Vstupom bude :map:`dmt` bez prvkov prerušujúcich odtok (:num:`#dmt-m`).
 
 .. code-block:: bash
    
@@ -325,7 +325,7 @@ Aby sme zistili presnejšie hodnoty, je nutné tieto prvky do výpočtu zahrnú�
    r.colors map=ls_m color=wave
    r.colors -n -e map=g_m color=corine
 
-V poslednom kroku vymažeme masku, výsledky zobrazíme a porovnáme (:num:`obr. #ls-porov` a :num:`obr. #g-porov`).
+V poslednom kroku vymažeme masku, výsledky zobrazíme a porovnáme (:num:`#ls-porov` a :num:`#g-porov`).
              
 .. _ls-porov:
 
@@ -344,7 +344,7 @@ V poslednom kroku vymažeme masku, výsledky zobrazíme a porovnáme (:num:`obr.
 Priemerná hodnota straty pre povodie s prvkami prerušujúcimi odtok
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-Opäť využijeme modul :grasscmd:`v.rast.stats`. Vektorovej mape povodí :map:`A07_Povodi_IV` nastavíme prefix :item:`g_m` pre novovytvorený stĺpec a potom modulom :grasscmd:`v.db.univar` zobrazíme štatistiky priemerných hodnôt straty pôdy. Výsledok v rastrovej podobe je na :num:`obr. #g-m-average`.
+Opäť využijeme modul :grasscmd:`v.rast.stats`. Vektorovej mape povodí :map:`A07_Povodi_IV` nastavíme prefix :item:`g_m` pre novovytvorený stĺpec a potom modulom :grasscmd:`v.db.univar` zobrazíme štatistiky priemerných hodnôt straty pôdy. Výsledok v rastrovej podobe je na :num:`#g-m-average`.
 
 .. code-block:: bash
                 
@@ -360,7 +360,7 @@ Opäť využijeme modul :grasscmd:`v.rast.stats`. Vektorovej mape povodí :map:`
 
    Povodia s priemernými hodnotami straty pôdy s uvážením prvkov, ktoré prerušujú odtok
 
-Na záver urobíme rozdiely (modul :grasscmd:`r.mapcalc`) výsledných vrstiev bez a s uvážením prvkov, ktoré prerušujú odtok pre faktor *LS*, hodnoty predstavujúce priemernú dlhodobú stratu pôdy *G* a povodia s priemernými hodnotami straty pôdy *G_pov*. Nazveme ich :map:`delta_ls`, :map:`delta_g` a :map:`delta_pov_avg` a každej nastavíme farbnú stupnicu :item:`differences`. Sú na :num:`obr. #diff`.
+Na záver urobíme rozdiely (modul :grasscmd:`r.mapcalc`) výsledných vrstiev bez a s uvážením prvkov, ktoré prerušujú odtok pre faktor *LS*, hodnoty predstavujúce priemernú dlhodobú stratu pôdy *G* a povodia s priemernými hodnotami straty pôdy *G_pov*. Nazveme ich :map:`delta_ls`, :map:`delta_g` a :map:`delta_pov_avg` a každej nastavíme farbnú stupnicu :item:`differences`. Sú na :num:`#diff`.
 
 .. code-block:: bash
 
