@@ -57,7 +57,7 @@ nastavíme :skoleni:`výpočtový región
 <grass-gis-zacatecnik/intro/region.html>` na základe vstupného DMT a
 následne použijeme modul :grasscmd:`r.slope.aspect`, viď. školení
 GRASS GIS pro začátečníky :skoleni:`topografické analýzy
-<grass-gis-zacatecnik/raster/analyzy-povrchu.html>`.
+<grass-gis-zacatecnik/rastrova_data/analyzy-povrchu.html>`.
 
 .. code-block:: bash
                 
@@ -108,7 +108,7 @@ LS faktor (topografický faktor) možno vypočítať podľa vzťahu:
    
 Pre tieto účely využijeme nástroj :grasscmd:`r.mapcalc` ako hlavný
 nástroj :skoleni:`mapovej algebry
-<grass-gis-zacatecnik/raster/rastrova-algebra.html>` v systéme GRASS.
+<grass-gis-zacatecnik/rastrova_data/rastrova-algebra.html>` v systéme GRASS.
 
 V zápise pre tento nástroj bude rovnica vyzerať nasledovne:
 
@@ -156,7 +156,7 @@ Do aktuálneho mapsetu importujeme vektorovú vrstvu :map:`hpj_kpp_land`
                    
 Do jej atribútovej tabuľky pridáme dva nové stĺpce :dbcolumn:`K` a
 :dbcolumn:`C`. To vykonáme pomocou :skoleni:`správcu atribútových dát
-<grass-gis-zacatecnik/vector/atributy.html>` alebo modulu
+<grass-gis-zacatecnik/vektorova_data/atributy.html>` alebo modulu
 :grasscmd:`v.db.addcolumn`.
 
 .. code-block:: bash
@@ -232,7 +232,7 @@ Výsledok môže vyzerať napríklad aj takto:
 Ďalej do atribútovej tabuľky pridáme nový atribút :dbcolumn:`KC`, do
 ktorého uložíme súčin faktorov ``K * C``. To môžeme vykonať pomocou
 :skoleni:`správcu atribútových dát
-<grass-gis-zacatecnik/vector/atributy.html>` alebo modulom
+<grass-gis-zacatecnik/vektorova_data/atributy.html>` alebo modulom
 :grasscmd:`v.db.addcolumn` v kombinácii s :grasscmd:`v.db.update`.
 
 .. code-block:: bash
@@ -287,7 +287,7 @@ a po použití modulu :grasscmd:`r.resamp.stats`.
    Časť záujmového územia s faktorom *KC* pred a po prevzorkovaní
                       
 Kvôli vizualizácii nastavíme vhodnú :skoleni:`tabuľku farieb
-<grass-gis-zacatecnik/raster/tabulka-barev.html>` a kvôli prehľadnosti
+<grass-gis-zacatecnik/rastrova_data/tabulka-barev.html>` a kvôli prehľadnosti
 mapu premenujeme na :map:`kc` modulom :grasscmd:`g.rename`. Výsledok
 je na :num:`#kc`.
 

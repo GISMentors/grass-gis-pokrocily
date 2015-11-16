@@ -153,7 +153,7 @@ skupine sú vyplnené.
     SELECT cat,HydrSk FROM hpj_kpp_1 WHERE hydrSk = "NULL" 
 
 Nastavíme :skoleni:`tabuľku farieb
-<grass-gis-zacatecnik/raster/tabulka-barev.html>` pre jednotlivé
+<grass-gis-zacatecnik/rastrova_data/tabulka-barev.html>` pre jednotlivé
 skupiny pomocou modulu :grasscmd:`v.colors`. Kódy nemôžu byť použité,
 lebo tento modul podporuje iba celočíselné hodnoty, preto je potrebné
 vytvoriť nový atribút s jedinečnými hodnotami pre kódy (nazveme ho
@@ -173,7 +173,9 @@ kódom A až D. Použijeme moduly :grasscmd:`v.db.addcolumn` a
     update hpj_kpp_1 set HydrSk_key = 6 where HydrSk = 'CD';
     update hpj_kpp_1 set HydrSk_key = 7 where HydrSk = 'D'"
 
-.. note:: Nový stĺpec možno pridať aj pomocou :skoleni:`správcu atribútových dát <grass-gis-zacatecnik/vector/atributy.html>`.
+.. note:: Nový stĺpec možno pridať aj pomocou :skoleni:`správcu
+          atribútových dát
+          <grass-gis-zacatecnik/vektorova_data/atributy.html>`.
 
 Do textového súboru :file:`colors.txt` vložíme pravidlá pre vlastnú
 farebnú stupnicu pre jednotlivé kategórie.
@@ -192,7 +194,7 @@ Modulom :grasscmd:`g.region` nastavíme výpočtový región
 (napr. :map:`hpj_kpp`), konvertujeme vektorovú vrstvu na rastrovú,
 priradíme farebnú škálu a doplníme mimorámové údaje: legendu a mierku
 (viz školení GRASS GIS pro začátečníky kapitola :skoleni:`Mapové
-elementy <grass-gis-zacatecnik/misc/mapove-elementy.html>`).
+elementy <grass-gis-zacatecnik/ruzne/mapove-elementy.html>`).
 
 .. note:: Vektorovú vrstvu konvertujeme kvôli tomu, lebo zobraziť
           legendu je možné len pre rastrové dáta.
@@ -225,11 +227,11 @@ tvare *VyužitieÚzemia_KodHydrologickejSkupiny*, t.j. *LU_HydrSk*.
    db.execute sql="update hpj_kpp_land_1 set LU_HydrSk = b_LandUse || '_' || a_HydrSk"
 
 .. note: Túto operáciu je možné vykonať aj pomocou :skoleni:`správcu
-   atribútových dát <grass-gis-zacatecnik/vector/atributy.html>`
+   atribútových dát <grass-gis-zacatecnik/vektorova_data/atributy.html>`
    (`Field Calculator`)
 
 Pomocou modulu :grasscmd:`db.select` alebo pomocou :skoleni:`správcu
-atribútových dát <grass-gis-zacatecnik/vector/atributy.html>` vypíšeme
+atribútových dát <grass-gis-zacatecnik/vektorova_data/atributy.html>` vypíšeme
 počet všetkých kombinácií v stĺpci :dbcolumn:`LU_HydrSk`.
 
 .. code-block::bash
@@ -373,7 +375,7 @@ Vypočítame a zobrazíme priemerné hodnoty priameho odtoku pre
 jednotlivé povodia. Pritom je potrebné nastaviť rozlíšenie výpočtového
 regiónu, prekopírovať mapu povodí do aktuálneho mapsetu a nastaviť
 vhodnú :skoleni:`farebnosť výsledku
-<grass-gis-zacatecnik/raster/tabulka-barev.html>`.
+<grass-gis-zacatecnik/rastrova_data/tabulka-barev.html>`.
 
 .. code-block::bash
 
