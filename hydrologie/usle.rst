@@ -24,6 +24,8 @@ Základné symboly:
  * C ... faktor ochranného vplyvu vegetačného krytu ( )
  * P ... faktor účinnosti protieróznych opatrení ( )
 
+.. todo:: jednotky?
+             
 Vstupné dáta
 ------------
 
@@ -34,7 +36,9 @@ Vstupné dáta
  * :map:`hpj_kpp_land` - zjednotenie HPJ a KPP a ich prienik s LU(atribút :dbcolumn:`a_b_K_faktor`)
  * :map:`A07_Povodi_IV` - povodia IV. rádu
  * :map:`maska.pack` - vrstva líniových a plošných prvkov prerušujúcich odtok
-   
+
+.. todo:: sjednotit názvy map (velká vs. malá písmena)
+             
 Postup
 ------
 
@@ -51,8 +55,8 @@ sklonové pomery v stupňoch (*slope*). Tá bude potrebná neskôr na
 výpočet :ref:`topografického faktora LS <ls-faktor>`. V prvom kroku
 nastavíme :skoleni:`výpočtový región
 <grass-gis-zacatecnik/intro/region.html>` na základe vstupného DMT a
-následne použijeme modul :grasscmd:`r.slope.aspect`, viď.
-:skoleni:`topografické analýzy
+následne použijeme modul :grasscmd:`r.slope.aspect`, viď. školení
+GRASS GIS pro začátečníky :skoleni:`topografické analýzy
 <grass-gis-zacatecnik/raster/analyzy-povrchu.html>`.
 
 .. code-block:: bash
@@ -74,7 +78,10 @@ rastrovú mapu znázorňujúcu akumuláciu toku v každej bunke
           Addons modul :grasscmdaddons:`r.hydrodem`, pre výpočet smeru
           odtoku modul :grasscmd:`r.fill.dir` a pre akumuláciu odtoku
           :grasscmd:`r.watershed`.
-          
+
+   .. todo:: Tady by chtělo hlubší analýzu, v čem se moduly liší, to
+             je otázka na kolegy z k143.
+   
 Pred výpočtom si nastavíme masku podľa záujmového územia pomocou
 modulu :grasscmd:`r.mask`.
 
@@ -134,6 +141,8 @@ K a C faktor
 Do aktuálneho mapsetu importujeme vektorovú vrstvu :map:`hpj_kpp_land`
 (viď. :ref:`návod <hydrsk>` na jej vytvorenie).
 
+.. todo:: tady by měl být link na scs-cn (?)
+          
 .. tip:: V prípade, že mapa :map:`hpj_kpp_land` je len v inom mapsete,
          možno ju do aktuálneho mapsetu prekopírovať pomocou
          :grasscmd:`g.mapset`, tak, že najprv zmeníme mapset, pridáme
@@ -141,6 +150,10 @@ Do aktuálneho mapsetu importujeme vektorovú vrstvu :map:`hpj_kpp_land`
          vrstiev zvolíme pravým tlačidlom myši *Make a copy in the
          current mapset*.
 
+.. todo:: Ten tip zní zmatečně, kopírování je přes :grasscmd:`g.copy`,
+          přepínat se do mapsetu mapy není třeba, stačí ho přidat do
+          vyhledávací cesty.
+                   
 Do jej atribútovej tabuľky pridáme dva nové stĺpce :dbcolumn:`K` a
 :dbcolumn:`C`. To vykonáme pomocou :skoleni:`správcu atribútových dát
 <grass-gis-zacatecnik/vector/atributy.html>` alebo modulu
@@ -187,6 +200,8 @@ Chýbajúce informácie o hodnote faktora ``K`` doplníme z tabuľky
    SELECT b.K FROM hpj_kpp_land AS a JOIN kpp_k as b ON a.a_b_KPP = b.KPP)
    WHERE K IS NULL"
 
+.. todo:: nestačil by tady odkaz na text v scs-cn?
+             
 V dalšom kroku doplníme hodnoty ``C`` faktora z importovanej tabuľky
 :dbtable:`lu_c`.
 
@@ -194,6 +209,8 @@ V dalšom kroku doplníme hodnoty ``C`` faktora z importovanej tabuľky
                 
    v.db.join map=hpj_kpp_land column=b_LandUse other_table=lu_c other_column=LU 
 
+.. todo:: co je b_LandUse?
+             
 Údaje v atribútovej tabuľke si skontrolujeme, či sú vyplnené
 správne. Použijeme SQL dotaz :grasscmd:`db.select`, pričom vyberieme
 len prvé 3 záznamy.
@@ -261,7 +278,7 @@ na základe polygónu, ktorý zaberá najväčiu čásť plochy bunky.
 
 Na obrázku :num:`#porovkn` je znázornená časť záujmového územia, kde
 možno vidieť rastrovú vrstvu :map:`hpj_kpp_land_kc` pred (vľavo dole)
-a po použití modulu :grasscmd:`r.resamp`.
+a po použití modulu :grasscmd:`r.resamp.stats`.
 
 .. _porovkn:
 
@@ -387,9 +404,9 @@ prerušujúcich odtok (:num:`#dmt-m`).
 
 .. code-block:: bash
    
-   r.unpack -o input= ... /MASK.pack output=mask
-   r.mask raster=mask
-   r.terraflow elevation=dmt filled=dmt_fill_m direction=dir_m swatershed=sink_m accumulation=accu_m tci=tci_m
+   r.unpack -o input=MASK.pack output=maska
+   r.mask raster=maska
+   r.terraflow elevation=dmt filled=dmt_fill_m direction=dir_m swatershed=sink_maccumulation=accu_m tci=tci_m
 
 .. _dmt-m:
 

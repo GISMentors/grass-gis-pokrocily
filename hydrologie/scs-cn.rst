@@ -37,7 +37,7 @@ Vstupné dáta
  * :map:`hpj` - vektorová vrstva hlavných pôdnych jednotiek,
  * :map:`kpp` - vektorová vrstva komplexného prieskumu pôd,
  * :dbtable:`hpj_hydrsk.dbf`, :dbtable:`sum_kpp2hydrsk.dbf` - pomocné číselníky s hydrologickými skupinami pôd,
- * :map:`Land_Use` - vektorová vrstva využitia územia,
+ * :map:`land_use` - vektorová vrstva využitia územia,
  * :map:`A07_Povodi_IV` - vektorová vrstva povodí IV. rádu s návrhovými zrážkami :math:`H_s` (doba opakovania 5, 10, 20, 50 a 100 rokov).
 
 Navrhovaný postup:
@@ -57,10 +57,15 @@ Navrhovaný postup:
 
         Grafická schéma postupu 
 
+.. todo:: Nechybí v horní pravé části šipky? Možná by se do diagramu
+          hodilo graficky znázornit jednotlivé kroky (třeba
+          obdélníkem)? Dále sjednotit názvy vstupních souborů -
+          diagram a návod.
+                  
 .. note:: Ako vyplýva z :num:`#schema`, príprave rastrovej vrstvy s
           kódmi CN predchádza odvodenie hydrologických skupín pôd
           *HydrSk* a jej priestorové prekrytie s vrstvou využitia
-          krajinnej pokrývky *land*, čím sa získa jedinečná kombinácia
+          krajinnej pokrývky *land_use (LU)*, čím sa získa jedinečná kombinácia
           *HydrSk_land*.
 
 Postup spracovania v GRASS GIS
@@ -77,7 +82,7 @@ operáciu prekrývania *union*.
    
    v.overlay ainput=hpj binput=kpp operator=or output=hpj_kpp   
 
-Importujeme čiselníky.
+Pomocí modulu :grasscmd:`db.in.ogr` importujeme čiselníky.
                 
 .. code-block:: bash
 
@@ -103,8 +108,9 @@ prostredí GRASS GIS, prípadne aspoň ich stĺpcov. Použijeme moduly
    PRECISION* (príkaz :code:`db.describe table=hpj_hydrsk`); je
    potrebné prekonvertovať ho na celočíselný typ, t.j. *type: INTEGER*
    (kvôli spájaniu tabuliek a číselníkov pomocou
-   :grasscmd:`v.db.join`). Použijeme **ALTER** na vytvorenie atribútu
-   :dbcolumn:`HPJ_key` a **UPDATE** na naplnenie hodnôt atribútu.
+   :grasscmd:`v.db.join`). Použijeme :sqlcmd:`ALTER` na vytvorenie atribútu
+   :dbcolumn:`HPJ_key` a :sqlcmd:`UPDATE` na naplnenie hodnôt atribútu. SQL
+   příkazy provedeme pomocí modulu :grasscmd:`db.execute`.
 
 .. code-block:: bash
 
@@ -124,7 +130,7 @@ obsahujú stĺpce z číselníka a následne doplníme chýbajúce informácie o
 hydrologickej skupine :dbcolumn:`HydrSk` pomocou
 :map:`kpp_hydrsk`. Doplníme ich zo stĺpca :dbcolumn:`First_Hydr`
 vrstvy komplexného prieskumu pôd. Využijeme modul
-:grasscmd:`db.execute` a SQL príkaz **JOIN**.
+:grasscmd:`db.execute` a SQL príkaz :sqlcmd:`JOIN`.
 
 .. code-block:: bash
 
@@ -139,7 +145,7 @@ Výsledok môže vyzerať nasledovne.
    Atribútový dotaz s výsledkom hydrologickej skupiny pôd
 
 Prezrieme všetky informácie v atribútovej tabuľke :map:`hpj_kpp` cez
-*SQL Query BUILDER* a overíme či všetky hodnoty o hydrologickej
+*SQL Query Builder* a overíme či všetky hodnoty o hydrologickej
 skupine sú vyplnené.
 
 .. code-block:: bash
@@ -150,10 +156,10 @@ Nastavíme :skoleni:`tabuľku farieb
 <grass-gis-zacatecnik/raster/tabulka-barev.html>` pre jednotlivé
 skupiny pomocou modulu :grasscmd:`v.colors`. Kódy nemôžu byť použité,
 lebo tento modul podporuje iba celočíselné hodnoty, preto je potrebné
-vytvoriť nový atribút s jedinečnými hodnotami pre kódy. Nazveme ho
-:dbcolumn:`HydrSk_key`) a bude obsahovať čísla 1 až 7 prislúchajúce
+vytvoriť nový atribút s jedinečnými hodnotami pre kódy (nazveme ho
+:dbcolumn:`HydrSk_key`). Bude obsahovať čísla 1 až 7 prislúchajúce
 kódom A až D. Použijeme moduly :grasscmd:`v.db.addcolumn` a
-:grasscmd:`db.execute` a príkaz **UPDATE** jazyka SQL.
+:grasscmd:`db.execute` a príkaz :sqlcmd:`UPDATE` jazyka SQL.
 
 .. code-block:: bash
 
@@ -184,7 +190,9 @@ farebnú stupnicu pre jednotlivé kategórie.
 
 Modulom :grasscmd:`g.region` nastavíme výpočtový región
 (napr. :map:`hpj_kpp`), konvertujeme vektorovú vrstvu na rastrovú,
-priradíme farebnú škálu a doplníme mimorámové údaje: legendu a mierku.
+priradíme farebnú škálu a doplníme mimorámové údaje: legendu a mierku
+(viz školení GRASS GIS pro začátečníky kapitola :skoleni:`Mapové
+elementy <grass-gis-zacatecnik/misc/mapove-elementy.html>`).
 
 .. note:: Vektorovú vrstvu konvertujeme kvôli tomu, lebo zobraziť
           legendu je možné len pre rastrové dáta.
@@ -201,11 +209,11 @@ priradíme farebnú škálu a doplníme mimorámové údaje: legendu a mierku.
 
 Pridáme informácie o využití územia pre každú plochu pomocou operácie
 priniku *intersection* s dátovou vrstvou o krajinnej pokrývke
-:map:`Land_Use`.
+:map:`land_use`.
 
 .. code-block:: bash
 
-   v.overlay ainput=hpj_kpp binput=Land_Use operator=and output=hpj_kpp_land
+   v.overlay ainput=hpj_kpp binput=land_use operator=and output=hpj_kpp_land
 
 Pridáme stĺpec :dbcolumn:`LU_HydrSk` s informáciami o využití územia a
 hydrologickej skupine pre každú elementárnu plochu. Hodnoty budú v
@@ -280,7 +288,7 @@ Po zjednotení vidíme, že došlo k rozdeleniu územia na menšie plochy
 (87 237, 91 449). Presný počet možno zistiť použitím
 :grasscmd:`db.select`.
  
-.. code-block::bash
+.. code-block:: bash
 
    db.select sql="select count (*) as elem_pocet from hpj_kpp_land_1"
    db.select sql="select count (*) as elem_pocet from hpj_kpp_land_pov_1"
