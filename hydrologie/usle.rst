@@ -241,7 +241,7 @@ R a P faktor
 Hodnoty týchto parametrov nebudeme odvádzať ako tie predchádzajúce. V tomto prípade jednoducho použijeme priemernú hodnotu ``R`` a ``P`` faktora pre Českú republiku, t.j ``R = 40`` a ``P = 1``.
 
 Výpočet priemernej dlhodobej straty pôdy
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Stratu pôdy `G` vypočítame modulom :grasscmd:`r.mapcalc` (:num:`obr. #rmapcalc`), pričom vychádzame zo vzťahu, ktorý bol uvedený v :ref:`teoretickej časti školenia <vzorec-G>`. 
 

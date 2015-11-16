@@ -7,7 +7,7 @@ Teoretické východiská
 Ide o výpočet odtokovej straty z povodia. Metóda bola vypracovaná službou na ochranu pôd *Soil Conservation Service* (:wikipedia:`SCS CN <Metoda CN křivek>`) v USA. Objem zrážok je na objem odtoku prevedený podľa čísel odtokových kriviek *CN*, ktoré sú tabelizované na základe hydrologických vlastností pôd *HydrSk*. Metóda zohľadňuje závislosť retencie (zadržiavanie vody) od hydrologických vlastností pôd, počiatočné nasýtenie a spôsob využívania pôdy. Číslo *CN* krivky reprezentuje teda vlastnosť povodia. Obvykle nadobúda hodnoty :item:`30`, t.j. veľké straty až :item:`100`, t.j. malé straty.
 
 Základné symboly:
-----------------
+-----------------
 
  * :math:`CN` ... číslo odtokovej krivky
  * :math:`A`  ... maximálna potenciálna strata z povodia
