@@ -8,7 +8,7 @@ Základní verze skriptu
    :language: bash
    :linenos:
 
-Soubor ke stažení `zde <../_static/skripty/ndvi-v1.sh>`_.
+Skript ke stažení `zde <../_static/skripty/ndvi-v1.sh>`_.
 
 .. figure:: images/wxgui-launch-sh.png
    

@@ -6,7 +6,7 @@ from grass.pygrass.modules import Module
 
 rast = 'dmt@PERMANENT'
 
-Module('g.region', raster=rast, res=100)
+Module('g.region', raster=rast, res=1000)
 
 dmt = RasterRow(rast)
 dmt.open('r')

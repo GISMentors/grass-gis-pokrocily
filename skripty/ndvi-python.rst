@@ -22,7 +22,7 @@ další.
    :linenos:
    :emphasize-lines: 3, 7-12, 15, 18, 22-24, 35-36, 44-45, 53-54, 58
 
-Tento soubor je ke stažení `zde <../_static/skripty/ndvi-v1.py>`_.
+Skript je ke stažení `zde <../_static/skripty/ndvi-v1.py>`_.
 
 .. figure:: images/wxgui-ndvi-v1.png
    :class: middle

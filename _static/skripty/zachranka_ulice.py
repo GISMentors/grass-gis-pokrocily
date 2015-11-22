@@ -26,7 +26,7 @@ for z in zachranka:
         zu.write(u, (None, u.attrs['nazev'], None))
         seznam.append(u.cat)
 
-zu.table.conn.commit() # !!!
+zu.table.conn.commit() # nutne pro zapis atributu !!!
 
 zu.close()
 zachranka.close()
