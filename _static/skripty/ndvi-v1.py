@@ -3,17 +3,21 @@
 from grass.pygrass.modules import Module
 from subprocess import PIPE
 
-# pridat mapset do vyhledavaci cesty
-Module('g.mapsets', mapset='landsat', operation='add', quiet=True)
-
 # vstup
 vis="LC81920252013215LGN00_B4"
 nir="LC81920252013215LGN00_B5"
+mapset="landsat"
 # vysledek
 ndvi="ndvi"
 r_ndvi= "r_{}".format(ndvi)
 
-# vypocet NDIV
+# pridat mapset do vyhledavaci cesty
+Module('g.mapsets', mapset=mapset, operation='add', quiet=True)
+
+# nastavit vypocetni region
+Module('g.region', raster=vis)
+
+# vypocet NDVI
 print ("VIS: {0} ; NIR: {1}".format(vis, nir))
 Module('r.mapcalc',
        expression="{o} = float({n} - {v}) / ({n} + {v})".format(o=ndvi, v=vis, n=nir),

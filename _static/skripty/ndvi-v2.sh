@@ -33,7 +33,10 @@ nir=`g.list type=raster mapset=$mapset pattern='*B5$'`
 # vysledek
 ndvi=$GIS_OPT_OUTPUT_POSTFIX
 
-# vypocet NDIV
+# nastavit vypocetni region
+g.region raster=$vis
+
+# vypocet NDVI
 echo "VIS: $vis ; NIR: $nir"
 r.mapcalc exp="$ndvi = float($nir - $vis) / ($nir + $vis)" --o
 

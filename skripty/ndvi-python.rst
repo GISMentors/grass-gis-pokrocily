@@ -5,17 +5,29 @@ Základní verze skriptu
 ----------------------
 
 Začneme verzí skriptu *bez vstupní parametrů*, názvy vstupních a
-výstupních rastrových map jsou uvedeny na řádcích :lcode:`10-14`.
+výstupních rastrových map jsou uvedeny na řádcích :lcode:`7-12`.
 
 Na řádku :lcode:`3` importuje z knihovny :doc:`../pygrass/index` třídu
 :pygrass-modules:`Module`, která nám umožní z prostředí jazyka Python spouštět
 moduly systému GRASS jako je např. :grasscmd:`g.mapsets` (viz řádek :lcode:`7`) a
 další.
 
-.. literalinclude:: ndvi-v1.py
+.. note:: Spouštět moduly systému GRASS z jazyka Python umožňuje také
+          knihovna :grasscmd:`GRASS Python Scripting Library
+          <libpython/script_intro>`. V našech případech budeme ale použít pro
+          tento účel PyGRASS a jeho třídu :pygrass-modules:`Module`.
+          
+.. literalinclude:: ../_static/skripty/ndvi-v1.py
    :language: python
    :linenos:
-   :emphasize-lines: 3, 7, 10-14, 18-20, 31-32, 40-41, 49-50, 54
+   :emphasize-lines: 3, 7-12, 15, 18, 22-24, 35-36, 44-45, 53-54, 58
+
+Tento soubor je ke stažení `zde <../_static/skripty/ndvi-v1.py>`_.
+
+.. figure:: images/wxgui-ndvi-v1.png
+   :class: middle
+
+   Příklad spuštění skriptu v GUI a vizualizace výsledku v mapovém okně.
 
 .. _pygrass-module:
       
@@ -23,11 +35,11 @@ Poznámky k volání modulů
 ^^^^^^^^^^^^^^^^^^^^^^^^                     
 
 Moduly systému GRASS se volají ve skriptech se stejnými parametry jako z příkazové
-řádky. Například pro volání na řádku :lcode:`7`:
+řádky. Například pro volání na řádku :lcode:`15`:
 
-.. literalinclude:: ndvi-v1.py
+.. literalinclude:: ../_static/skripty/ndvi-v1.py
    :language: python
-   :lines: 7
+   :lines: 15
 
 by korespondující zápis pro příkazovou řádku vypadal následovně:
 
@@ -36,14 +48,17 @@ by korespondující zápis pro příkazovou řádku vypadal následovně:
    g.mapsets mapset=landsat operation=add --quiet
            
 Jednotlivé parametry modulu se zadávaní jako argumenty třídy
-:pygrass-modules:`Module`. Vyjímkou jsou globální přepínače jako je
-:option:`--quiet`, :option:`--overwrite` a další, ty se zadávají jako
-parametr s hodnotou ``True``. V tomto případě tedy ``quiet=True``.
+:pygrass-modules:`Module`. Vyjímkou jsou globální přepínače (tj. ty,
+které jsou uvozeny dvěma pomlčkami) jako je :option:`--quiet`,
+:option:`--overwrite` a další. Ty se zadávají jako argument s hodnotou
+``True``. V tomto případě tedy ``quiet=True``. Běžné přepínače
+(uvozeny jednou pomlčkou) se předávají jako hodnota argumentu
+:option:`flags`.
 
 .. note:: **Zkracování názvů parametrů**
 
    Při volání modulů z příkazové řádky lze názvy parametrů libovolně
-   zkracovat, pouze s tou podmínkou, aby byly jednoznačné. Ve níže
+   zkracovat, pouze s tou podmínkou, aby byly jednoznačné. V níže
    uvedeném případě bude následnující volání v pořádku i když méně
    čitelné.
 
@@ -56,9 +71,9 @@ parametr s hodnotou ``True``. V tomto případě tedy ``quiet=True``.
 
 .. note:: **Shortcuts**
 
-   PyGRASS umožňuje emulovat způsob volání modulů podobně jako :doc:`posix`
+   PyGRASS umožňuje emulovat způsob volání modulů podobně jako :doc:`ndvi-posix`
    přes tzv. "shortcuts". Příklad volání modulu :grasscmd:`g.mapsets`
-   (řádek :lcode:`7`)
+   (řádek :lcode:`15`):
 
    .. code-block:: python
 
@@ -70,15 +85,15 @@ Vstup
 ~~~~~
 
 Některé moduly přijímají vstup ze souboru, např. :grasscmd:`r.recode`
-s parametrem :option:`rules` (řádky :lcode:`26-32`). Místo fyzického
+s parametrem :option:`rules` (řádky :lcode:`30-36`). Místo fyzického
 vytvoření vstupního souboru na disku lze použít *standardní vstup*,
 konktrétně argument ``stdin_`` s hodnotou řetězce, který má být na
 vstupu. V tomto případě musí parameter modulu :option:`rules` nabývat
 hodnoty ``-``.
 
-.. literalinclude:: ndvi-v1.py
+.. literalinclude:: ../_static/skripty/ndvi-v1.py
    :language: python
-   :lines: 26-32
+   :lines: 30-36
 
 Zpracování výstupu
 ~~~~~~~~~~~~~~~~~~
@@ -86,11 +101,11 @@ Zpracování výstupu
 U modulů, které svůj výstup zapisují na *standardní výstup*, lze
 jejich výstup zachytit přes argument ``stdout_=PIPE``. Obsah výstupu
 je potom uložen jako řetězec v atributu třídy :pygrass-modules:`Module`
-``outputs.stdout``, viz řádek :lcode:`54,57`.
+``outputs.stdout``, viz řádek :lcode:`4,58,61-62`.
 
-.. literalinclude:: ndvi-v1.py
+.. literalinclude:: ../_static/skripty/ndvi-v1.py
    :language: python
-   :lines:  4, 54, 57-58
+   :lines:  4, 58, 61-62
 
 Pokročilejší verze skriptu
 --------------------------
@@ -101,18 +116,32 @@ Pokročilejší verze skriptu je rozšířena o:
 * vstupní parametry (:option:`mapset`, :option:`output_postfix` a
   :option:`classes`), viz řádky :lcode:`6-19`
 * uživatelské rozhraní je zpracováno funkcí ``parse()`` (řádek
-  :lcode:`99`), která je součástí balíčku ``grass.script`` (řádek
+  :lcode:`102`), která je součástí balíčku ``grass.script`` (řádek
   :lcode:`24`)
-* hodnoty parametrů jsou na řádku :lcode:`99` uloženy do proměnné
+* hodnoty parametrů jsou na řádku :lcode:`102` uloženy do proměnné
   ``options``, přepínače do proměnné ``flags``, ty jsou dále použity
-  na řádcích :lcode:`30-31,54`
+  na řádcích :lcode:`30-31,57`
 * celý kód je vložen do funkce ``main()`` (řádek :lcode:`29`)
     
-.. literalinclude:: ndvi-v2.py
+.. literalinclude:: ../_static/skripty/ndvi-v2.py
    :language: python
    :linenos:
-   :emphasize-lines: 3-19, 24, 29, 30-31, 54, 99
+   :emphasize-lines: 3-19, 24, 29, 30-31, 57, 102
 
+Výsledná verze skriptu ke stažení `zde
+<../_static/skripty/ndvi-v2.py>`_.
+
+.. _wxgui-ndvi-v2-0:
+
+.. figure:: images/wxgui-ndvi-v2-0.png
+
+   Příklad spuštění pokročilé verze skriptu v GUI, výběr vstupních
+   parametru v dialogu nástroje.
+
+.. figure:: images/wxgui-ndvi-v2-1.png
+
+   Výsledek je vypsán do záložky :item:`Command output` v dialogu
+   nástroje.
 
 Poznámky k uživatelskému rozhraní
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -134,14 +163,15 @@ U dalších parametrů jsou použity tzv. `standardizované volby
 <http://grass.osgeo.org/programming7/parser__standard__options_8c.html>`_,
 např. ``G_OPT_M_MAPSET`` definuje parametr pro volbu mapsetu. V našem
 případě nastavíme parametr skriptu jako povinný (``required: yes``) a
-doplníme výchozí volbu (mapset :mapset:`landsat`).
+doplníme výchozí volbu (mapset :mapset:`landsat`), viz
+:num:`#wxgui-ndvi-v2-0`.
 
 .. literalinclude:: ndvi-v2.py
    :language: python
    :lines: 6-9
 
-Ve výsledku se skript chová jako standardní modul, přepínačem
-:option:`--help` obdržíme informace o jeho syntaxi.
+Ve výsledku se skript chová jako standardní modul systému GRASS,
+přepínačem :option:`--help` obdržíme informace o jeho syntaxi.
 
 .. code-block:: bash
 
@@ -150,7 +180,7 @@ Ve výsledku se skript chová jako standardní modul, přepínačem
 ::
       
     Description:
-     Creates reclassified NDVI
+     Creates reclassified NDVI.
 
     Usage:
      ndvi-v2.py mapset=name [output_postfix=string] [classes=name] [--help]
@@ -177,15 +207,15 @@ Poznámky k vypisování informačních zpráv
 Nahradili jsme funkci ``print()`` pro vypisování zpráv o průběhu
 funkcí ``message()`` z balíčku ``grass.script``. 
 
-.. literalinclude:: ndvi-v1.py
+.. literalinclude:: ../_static/skripty/ndvi-v1.py
    :language: python
-   :lines: 23
+   :lines: 27
 
-``-->``
+přepsáno na
       
-.. literalinclude:: ndvi-v2.py
+.. literalinclude:: ../_static/skripty/ndvi-v2.py
    :language: python
-   :lines: 50
+   :lines: 53
 
 Díky tomu budou fungovat globální přepínače :option:`--quiet` a
 :option:`--verbose` pro tichý, resp. upovídaný mód.  Např. při použítí
@@ -199,16 +229,16 @@ zprávy o průběhu výpočtu budou skryty.
 ::
       
     --------------------------------------------------------------------------------
-    Trida 1 (bez vegetace, vodni plochy  ):   1.36%
-    Trida 2 (plochy s minimalni vegetaci ):  72.49%
-    Trida 3 (plochy pokryte vegetaci     ):  26.16%
+    Trida 1 (bez vegetace, vodni plochy  ):   0.28%
+    Trida 2 (plochy s minimalni vegetaci ):  30.24%
+    Trida 3 (plochy pokryte vegetaci     ):  21.00%
+    Trida * (no data                     ):  48.49%
     --------------------------------------------------------------------------------
-
 
 Poznámky k hledání vstupních rastrových dat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Pro nalezení rastrových map končící na *B4* a *B5* použijeme funkci
+Pro nalezení rastrových map končících na *B4* a *B5* použijeme funkci
 :pygrass-gis:`glist <Mapset.glist>` třídy :pygrass-gis:`Mapset`. Třída
 :pygrass-gis:`Mapset` je součástí balíčku ``pygrass.gis``.
 
@@ -226,19 +256,32 @@ Poznámky ke spuštění modulu
 Pokud skript spustíme bez parametrů mělo by vyskočit grafické okno
 podobné ostatním modulům systému GRASS.
 
-.. figure:: images/ndvi-v2.png
-   :width: 350px
+.. figure:: images/wxgui-ndvi-v2-0.png
         
-   Vygenerovaný grafický dialog skriptu
+   Vygenerovaný grafický dialog skriptu.
 
 .. note:: **Spuštění skriptu s parametrem classes**
 
    Mějme soubor `classes.txt` s odlišným rozdělením tříd:
 
-   .. literalinclude:: classes.txt
+   .. literalinclude:: ../_static/skripty/classes.txt
 
-   Spuštění skriptu bude vypadat následovně:
+   Soubor ke stažení `zde <../_static/skripty/classes.txt>`_.
+   
+   Spuštění skriptu bude vypadat následovně
 
    .. code-block:: bash
                 
       ndvi-v2.py map=landsat classes=classes.txt
+
+   s výsledkem:
+
+   ::
+      
+        --------------------------------------------------------------------------------
+        Trida 1 (bez vegetace, vodni plochy  ):   0.68%
+        Trida 2 (plochy s minimalni vegetaci ):  38.43%
+        Trida 3 (plochy pokryte vegetaci     ):  12.39%
+        Trida * (no data                     ):  48.49%
+       --------------------------------------------------------------------------------
+   

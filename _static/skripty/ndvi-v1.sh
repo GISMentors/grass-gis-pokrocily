@@ -1,15 +1,19 @@
 #!/bin/sh
 
-# pridat mapset do vyhledavaci cesty
-g.mapsets mapset=landsat ope=add --q
-
 # vstup
 vis="LC81920252013215LGN00_B4"
 nir="LC81920252013215LGN00_B5"
+mapset="landsat"
 # vysledek
 ndvi="ndvi"
 
-# vypocet NDIV
+# pridat mapset do vyhledavaci cesty
+g.mapsets mapset=$mapset ope=add --q
+
+# nastavit vypocetni region
+g.region raster=$vis
+
+# vypocet NDVI
 echo "VIS: $vis ; NIR: $nir"
 r.mapcalc exp="$ndvi = float($nir - $vis) / ($nir + $vis)" --o
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #%module
-#% description: Creates reclassified NDVI
+#% description: Creates reclassified NDVI.
 #%end
 #%option G_OPT_M_MAPSET
 #% required: yes
@@ -32,14 +32,17 @@ def main():
     
     # pridat mapset do vyhledavaci cesty
     Module('g.mapsets', mapset=mapset, operation='add', quiet=True)
-
+    
     try:
         vis = Mapset(mapset).glist('raster', pattern='*B4')[0]
         nir = Mapset(mapset).glist('raster', pattern='*B5')[0]
     except IndexError:
         grass.fatal("Nelze najit vstupni kanaly")
     r_ndvi= "r_{}".format(ndvi)
-
+    
+    # nastavit vypocetni region
+    Module('g.region', raster=vis)
+    
     # vypocet NDIV
     grass.message("VIS: {0} ; NIR: {1}".format(vis, nir))
     Module('r.mapcalc',

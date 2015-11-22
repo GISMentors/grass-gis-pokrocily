@@ -5,43 +5,51 @@ Mějme jednoduchý skript, který vypíše výměru města
 :wikipedia:`Pardubice` v hektarech. K tomu použijeme vektorovou mapu
 :map:`obce_polygon` z mapsetu :mapset:`ruian`.
 
-.. literalinclude:: obce_vymera-v1.py
+.. literalinclude:: ../_static/skripty/obce_vymera-v1.py
    :language: python
 
-Tento soubor uložte kamkoliv na disk. Bližší popis kódu nechme na
-kapitolu :doc:`python`.
+Tento soubor (ke stažení `zde
+<../_static/skripty/obce_vymera-v1.py>`_) uložte kamkoliv na
+disk. Bližší popis kódu nechme na kapitolu :doc:`ndvi-python` a
+:doc:`PyGRASS <../pygrass/index>`.
 
 Spuštění z GUI
 --------------
 
 Nejjednodušší cestou je spustit skript z grafického uživatelského
-rozhraní a to z menu *správce vrstev* :menuselection:`File -->
+rozhraní a to z menu správce vrstev :menuselection:`File -->
 Launch script` anebo z nástrojové lišty.
 
 .. figure:: images/lmgr-launch-script.png
 
-Po výběru skriptu si GRASS zkontroluje, zda je skript *spustitelný* a zda je tzv. v
-*spouštěcí cestě*. V připadě, že tomu tak není, tak se objeví příslušný
-dialog(y), který(é) potvrdíme.
+   Spuštění skriptu z nástrojové lišty správce vrstev.
+
+Po výběru skriptu si GRASS zkontroluje, zda je skript *spustitelný* a
+zda je tzv. v *spouštěcí cestě*. V připadě, že tomu tak není, tak se
+objeví příslušné dialogy, které potvrdíme.
 
 .. figure:: images/launch-permission.png
    :class: small
 
-   Nastavení spustitelnosti
+   Dialog pro nastavení spustitelnosti.
 
 .. figure:: images/launch-path.png
    :class: small
 
-   Přidání adresáře se skriptem do spouštěcí cesty
+   Dialog pro přidání adresáře se skriptem do spouštěcí cesty.
 
-Skript se poté spustí, výpis je přesměrován do okna *správce vrstev*.
+Skript se poté spustí, výpis je přesměrován do okna správce vrstev.
 
 .. figure:: images/launch-output.png
 
-Skript můžete také spustit zadáním úplné cesty do přikazové konzole
-*správce vrstev*.
+   Výsledek spuštění skriptu v okně správce vrstev.
+
+Skript můžete také spustit zadáním úplné cesty v přikazové řádce
+správce vrstev.
 
 .. figure:: images/lmgr-launch-cmd.png
+
+   Spuštění skriptu z příkazové řádky správce vrstev.
 
 ..
      .. note:: Přidání skriptu do spouštěcí cesty má tu výhodu, že lze
@@ -51,26 +59,31 @@ Skript můžete také spustit zadáním úplné cesty do přikazové konzole
 Spuštění z příkazové řádky
 --------------------------
 
-Nejprve nastavíme právo spustitelnosti pomocí :program:`chmod` a poté
+Nejprve nastavíme právo spustitelnosti pomocí příkazu :program:`chmod`
+(jde o Unixový nástroj, pod Windows použijeme správce souborů) a poté
 skript spustíme.
 
-.. note:: Předpokládejme, že adresář se skriptem není ve spouštěnící
-          cestě, skript spustíme tedy přes ``./``.
+.. notecmd:: Návod nastavení spustitelnosti a spuštění skriptu
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   chmod +x obce_vymera-v1.py
-   ./obce_vymera-v1.py
+      chmod +x obce_vymera-v1.py
+      ./obce_vymera-v1.py
+
+   Předpokládejme, že adresář se skriptem není ve spouštěcí cestě,
+   spustíme jej tedy přes ``./``.
 
 .. note:: Pro přidání adresáře do spouštěcí cesty můžete použít
           :grasscmd:`proměnnou prostředí <variables>`
           :envvar:`GRASS_ADDON_PATH`. Pokud je tato proměnná
-          definována před spuštěním systému GRASS, tak je její obsah přidán
-          do spouštěcí cesty. Proměnné prostředí systému GRASS by měly
-          být uloženy v soubor ``bashrc`` (v případě Windows jde o
-          soubor ``env.bat``) v konfiguračním adresáři systému
-          GRASS. Ten je umístěn pod Linuxem v ``$HOME/.grass7``, v
-          případě Windows ``$APPDATA\GRASS7``.
+          definována před spuštěním systému GRASS, tak se její obsah
+          automaticky vloží do spouštěcí cesty.
+
+          Proměnné prostředí systému GRASS jsou uloženy v souboru
+          ``bashrc`` (v případě Windows jde o soubor ``env.bat``) v
+          konfiguračním adresáři systému GRASS. Ten je umístěn pod
+          Linuxem v ``$HOME/.grass7``, v případě Windows
+          ``$APPDATA\GRASS7``.
 
           Např.
 
@@ -79,14 +92,14 @@ skript spustíme.
              export GRASS_ADDON_PATH=/opt/bin:$HOME/grassbin
 
           bude mít za následek, že se při spuštění systému GRASS přidají do
-          spouštěcí cesty dva adresáře -- ``/opt/bin`` a ``grassbin``
+          spouštěcí cesty dva adresáře: ``/opt/bin`` a ``grassbin``
           z domovského adresáře aktivního uživatele.
 
           V případě OS Windows by proměnná mohla vypadat následovně:
 
           ::
                 
-             set GRASS_ADDON_PATH=C:\opt\bin;$HOME\grassbin
+             set GRASS_ADDON_PATH=C:\opt\bin;%HOME%\grassbin
           
           Potom lze skript spustit jako jakýkoliv příkaz systému GRASS
           či operačního systému.
@@ -127,3 +140,5 @@ Proměnnou prostředí deaktivujeme pomocí příkazu :program:`unset`.
 .. code-block:: bash
 
    unset GRASS_BATCH_JOB
+
+Poté se GRASS bude chovat po startu již standardně.
