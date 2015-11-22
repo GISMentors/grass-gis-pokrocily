@@ -1,20 +1,21 @@
 Implementace skriptu pro GRASS
 ==============================
 
-Skript bude v první fázi vypisouvat pro dané PSČ seznam obcí a jejich
+Skript bude v první fázi vypisovat pro dané PSČ seznam obcí a jejich
 sousedy dle PSČ. 
 
 Příprava dat
 ------------
 
 Vektorová mapa :map:`obce_polygon` z mapsetu :mapset:`ruian`
-neobsahuje v atributové tabulce informace o PSČ. Tuto informaci bude
-muset nejprve doplnit, ke stažení `zde
-<http://training.gismentors.eu/geodata/db_pcobc.zip>`_.
+neobsahuje v atributové tabulce informace o PSČ. Tuto informaci budeme
+muset nejprve doplnit. PSČ obcí ke stažení `zde
+<http://training.gismentors.eu/geodata/db_pcobc.zip>`_ jako DBF
+tabulka.
 
-V aktualním mapsetu si vytvoříme kopii původní mapy
-(:grasscmd:`g.copy`) a k její atributové tabulce připojíme
-(:grasscmd:`v.db.join`) tabulku PSČ.
+V aktuálním mapsetu si vytvoříme kopii původní mapy
+(:grasscmd:`g.copy`) a k její atributové tabulce připojíme tabulku
+s PSČ.
 
 .. code-block:: bash
 
@@ -61,13 +62,15 @@ obsahovat dva sloupce: kód obce a PSČ.
    db.execute sql="create table obce_psc as select o.kod,z.psc from obce as o \
     join zv_pcobc_dbf as z on o.okreskod = z.KODOKRESU and o.nazev = z.NAZOBCE"
 
-.. note:: Tento postup je nutný neboť databáze SQLite (která je pro
-          systém GRASS vychozí při ukládání atributových dat),
-          nepodporuje :sqlcmd:`JOIN` v příkazu :sqlcmd:`UPDATE`. Pokud
-          používate namísto toho např. PostgreSQL, tak se operace
-          zjednoduší.
+.. note:: Tento postup je nutný, neboť databáze SQLite (která je pro
+          systém GRASS vychozí při ukládání atributových dat, viz
+          :skoleni:`školení pro začátečníky
+          <grass-gis-zacatecnik/intro/vektor.html#atributova-data>`), nepodporuje
+          :sqlcmd:`JOIN` v příkazu :sqlcmd:`UPDATE`. Pokud používate
+          namísto toho např. PostgreSQL, tak se operace zjednoduší.
 
-Tuto tabulku již lze k atributové tabulce vektorové mapy obcí připojit.
+Takto vytvořenou tabulku již lze k atributové tabulce vektorové mapy
+obcí pomocí :grasscmd:`v.db.join` připojit.
 
 .. code-block:: bash
 
@@ -91,7 +94,7 @@ Výsledek si můžeme zkontrolovat pomocí modulu :grasscmd:`v.db.select`.
 Implementace testovací verze skriptu
 ------------------------------------
 
-Podrobnější informace v kapitole :doc:`../pygrass/index`.
+Podrobnější informace v kapitole :doc:`../pygrass/vektory`.
 
 .. literalinclude:: ../_static/skripty/obce_psc_v1.py
    :language: python

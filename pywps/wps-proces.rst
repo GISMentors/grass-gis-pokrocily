@@ -1,10 +1,27 @@
 Vypublikování skriptu jako WPS procesu
 ======================================
 
+Skript upravíme následovně:
+
+#. Vytvoříme třídu :class:`Process` s rodičovskou třídou
+   :class:`WPSProcess`, která je definována v rámci PyWPS (řádky
+   :lcode:`17, 19` a :lcode:`21-28`).
+#. Definujeme vstupní (řádky :lcode:`30-32`) a výstupní (řádky
+   :lcode:`34-37`) parametry WPS procesu
+#. Implementujeme funkce ``export()`` (:lcode:`39`), která výstupní
+   vektorovou mapu exportuje do souboru ve formátu ESRI Shapefile,
+   který bude zkomprimován a poslán klientovi.
+#. Implementujeme funkci ``execute()`` (:lcode:`61`), která se vykoná
+   v okamžiku, kdy od klienta dorazí na server dotaz typu
+   ``request=execute``.
+#. Vlastní tělo původního skriptu vnoříme do funkce ``run()``
+   (:lcode:`66`).
+      
 .. literalinclude:: ../_static/skripty/obce_psc_wps.py
    :language: python
    :linenos:
-
+   :emphasize-lines: 17, 19, 21-28, 30-32, 34-37, 39, 61, 66
+                        
 Ukázka vypublikovaného procesu
 ------------------------------
 
