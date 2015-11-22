@@ -33,9 +33,9 @@ for prvek in obce.viter('areas'):
     for b in prvek.boundaries():
         if b.id not in hranice:
             hranice.append(b.id)
-            vystup.write(b, (None, None))
+            vystup.write(b, attrs=(None, None))
 
-    vystup.write(prvek.get_centroid(), (prvek.attrs['nazev'], prvek.attrs['psc']))
+    vystup.write(prvek.get_centroid(), attrs=(prvek.attrs['nazev'], prvek.attrs['psc']))
 
 vystup.table.conn.commit()
 
