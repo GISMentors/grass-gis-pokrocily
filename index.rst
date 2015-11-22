@@ -79,6 +79,7 @@ upravovat ho a tyto změny či opravy šířit dál.
 
    skripty/index
    pygrass/index
+   pywps/index
    tgrass/index
    formaty/index
    3d/index
