@@ -135,3 +135,12 @@ Druhá verze skriptu
 Druhá verze skriptu se bude lišit od první tím, že namísto textového
 výpisu, vytvoří novou vektorovou mapu se spojeným polygonem obcí s
 definovaným PSČ a zároveň bude obsahovat sousední obce.
+
+.. literalinclude:: ../_static/skripty/obce_psc_v2.py
+   :language: python
+   :linenos:
+
+.. figure:: images/obce_psc.png
+   :class: middle
+        
+   Vizualizace výsledku pro PSČ 41115.
