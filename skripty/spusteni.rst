@@ -142,3 +142,28 @@ Proměnnou prostředí deaktivujeme pomocí příkazu :program:`unset`.
    unset GRASS_BATCH_JOB
 
 Poté se GRASS bude chovat po startu již standardně.
+
+Spuštění explicitně
+-------------------
+
+Ve všech výše zmíněných příkladech vždy systém GRASS spouštíme
+explicitně. To není nutné, stačí ve skriptu nastavit cestu k instalaci
+systému GRASS (proměnná prostředí :envvar:`GISBASE`) a datům
+(tj. lokaci a mapset) - pomocí funkce ``init()``.
+
+.. code-block:: python
+
+   #!/usr/bin/env python
+   
+   import os
+   import sys
+
+   gisbase = os.environ['GISBASE'] = '/usr/lib/grass70'
+   
+   sys.path.insert(0, os.path.join(gisbase, 'etc', 'python'))
+   import grass.script.setup as gsetup
+   from grass.pygrass.vector import VectorTopo
+
+   gsetup.init(gisbase, '/opt/grassdata', 'gismentors', 'user1')
+   
+   ...
