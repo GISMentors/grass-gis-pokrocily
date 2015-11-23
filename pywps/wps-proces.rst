@@ -35,5 +35,7 @@ Ukázka vypublikovaného procesu
 
 **Execute**
 
-* http://geo102.fsv.cvut.cz/services/yfsgwps?service=wps&request=execute&identifier=obce_psc&version=1.0.0&datainputs=[psc=41115]
+*
+  `http://geo102.fsv.cvut.cz/services/yfsgwps?service=wps&request=execute&identifier=obce_psc&version=1.0.0&datainputs=[psc=41115]
+  <http://geo102.fsv.cvut.cz/services/yfsgwps?service=wps&request=execute&identifier=obce_psc&version=1.0.0&datainputs=[psc=41115]>`_
       
