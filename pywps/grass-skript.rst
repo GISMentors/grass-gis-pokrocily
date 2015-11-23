@@ -143,7 +143,22 @@ definovaným PSČ a zároveň bude obsahovat sousední obce.
    :language: python
    :linenos:
 
+Skript ke stažení `zde <../_static/skripty/obce_psc_v2.py>`_.
+      
 .. figure:: images/obce_psc.png
    :class: middle
         
    Vizualizace výsledku pro PSČ 41115.
+
+Poznámka
+^^^^^^^^
+
+Úloha by se dala samozřejmě řešit poměrně jednoduše namísto PyGRASS
+kombinací standardních modulů systému GRASS :grasscmd:`v.extract` a
+:grasscmd:`v.select`.
+
+.. literalinclude:: ../_static/skripty/obce_psc_v3.py
+   :language: python
+   :linenos:
+   
+Skript ke stažení `zde <../_static/skripty/obce_psc_v3.py>`_.
