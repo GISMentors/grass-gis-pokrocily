@@ -99,7 +99,16 @@ Podrobnější informace v kapitole :doc:`../pygrass/vektory`.
 .. literalinclude:: ../_static/skripty/obce_psc_v1.py
    :language: python
    :linenos:
+   :emphasize-lines: 24
 
+.. warning:: Mezi verzemi GRASS 7.1 a GRASS 7.0 se API PyGRASS
+             částečně změnilo. Místo funkce ``get_left_right()``
+             (:lcode:`24`) použijte v GRASS 7.1 ``read_area_ids()``.
+
+.. note:: Skript je koncipován jako ukázka, uvedená implementace má
+          vážné nedostatky, např. nepoužívá vůbec prostorový
+          index. Místo toho všechny prvky prochází sekvenčně.
+                       
 Skript ke stažení `zde <../_static/skripty/obce_psc_v1.py>`_.
 
 Výstup může vypadat následovně:
@@ -142,6 +151,11 @@ definovaným PSČ a zároveň bude obsahovat sousední obce.
 .. literalinclude:: ../_static/skripty/obce_psc_v2.py
    :language: python
    :linenos:
+   :emphasize-lines: 38
+
+.. warning:: Mezi verzemi GRASS 7.1 a GRASS 7.0 se API PyGRASS
+   částečně změnilo. Místo funkce ``get_centroid()`` (:lcode:`38`)
+   použijte v GRASS 7.1 ``centroid()``.
 
 Skript ke stažení `zde <../_static/skripty/obce_psc_v2.py>`_.
       

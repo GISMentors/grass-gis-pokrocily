@@ -94,6 +94,10 @@ okresů*.
    :linenos:
    :emphasize-lines: 5-6, 8, 10, 11
 
+.. warning:: Mezi verzemi GRASS 7.1 a GRASS 7.0 se API PyGRASS
+             částečně změnilo. Místo funkce ``get_left_right()``
+             (:lcode:`11`) použijte v GRASS 7.1 ``read_area_ids()``.
+
 Skript ke stažení `zde <../_static/skripty/okresy.py>`_.
 
 Výpis skriptu může vypadat následovně:
