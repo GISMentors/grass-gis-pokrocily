@@ -335,11 +335,6 @@ parameter :math:`A` a parameter :math:`I_{a}`.
 Kroky 4 a 5
 ^^^^^^^^^^^
 
-.. note:: V ďalších krokoch budeme uvažovať priemerný úhrn návrhovej zrážky 
-	  :math:`H_{s}` = 32 mm. Pri úhrne s dobou opakovania 2 roky (atribút
-	  :dbcolumn:`H_002_120`) či dobou 5, 10, 20, 50 alebo 100 rokov by bol 
-	  postup obdobný.
-
 Pridáme ďalšie nové stĺpce do atribútovej tabuľky pre parametre :math:`H_{o}`
 a :math:`O_{p}` a vypočítame ich hodnoty pomocou :grasscmd:`v.db.update`.
 
@@ -347,34 +342,32 @@ a :math:`O_{p}` a vypočítame ich hodnoty pomocou :grasscmd:`v.db.update`.
 
    H_O = \frac{(H_S − 0.2 \times A)^2}{H_S + 0.8 \times A}
 
+.. note:: V ďalších krokoch budeme uvažovať priemerný úhrn návrhovej zrážky 
+	  :math:`H_{s}` = 32 mm. Pri úhrne s dobou opakovania 2 roky (atribút
+	  :dbcolumn:`H_002_120`) či dobou 5, 10, 20, 50 alebo 100 rokov by bol 
+	  postup obdobný.
+
 .. note:: Hodnota v čitateli musí byť kladná, resp. nesmieme umocňovať záporné 
 	  číslo. V prípade, že čitateľ je záporný, výška priameho odtoku je
 	  rovná nule. Na vyriešenie tejto situácie si pomôžeme novým stĺpcom
 	  v atribútovej tabuľke, ktorý nazveme :dbcolumn:`HOklad`. 
 
+.. code-block:: bash
+
+   v.db.addcolumn map=hpj_kpp_land_pov columns="HOklad double, HO double, OP double" 
+   v.db.update map=hpj_kpp_land_pov column=HOklad value="(32 - 0.2 * A)"
+   db.execute sql="update hpj_kpp_land_pov_1 set HOklad = 0 where HOklad < 0"
+   v.db.update map=hpj_kpp_land_pov column=HO value="(HOklad * HOklad) / (32 + 0.8 * A)" 
+   
+Nakoniec vypočítame objem :math:`O_{p}` a výsledky zobrazíme v rastrovej podobe. 
+
 .. math::
 
    O_P = P_P \times \frac{H_O}{1000}
 
-.. code-block::bash
+.. code-block:: bash
 
-   v.db.addcolumn map=hpj_kpp_land_pov columns="HOklad double, HO double, 
-   OP double"
-
-   v.db.update map=hpj_kpp_land_pov column=HOklad value="((32 - 0.2 * A) *
-   (32 - 0.2 * A)) / (32 + 0.8 * A)"
-   
-
-
-   v.db.update map=hpj_kpp_land_pov column=HO value="((32 - 0.2 * A) *
-   (32 - 0.2 * A)) / (32 + 0.8 * A)"
    v.db.update map=hpj_kpp_land_pov column=OP value="vymera * (HO / 1000)"
-
-
-Výsledky zobrazíme v rastrovej podobe.
-
-.. code-block::bash
-
    v.to.rast input=hpj_kpp_land_pov output=HO use=attr attribute_column=HO
    v.to.rast input=hpj_kpp_land_pov output=OP use=attr attribute_column=OP
 
@@ -389,7 +382,7 @@ Pritom je potrebné nastaviť rozlíšenie výpočtového regiónu, prekopírova
 povodí do aktuálneho mapsetu a nastaviť vhodnú :skoleni:`farebnosť výsledku 
 <grass-gis-zacatecnik/raster/tabulka-barev.html>`.
 
-.. code-block::bash
+.. code-block:: bash
 
    g.region vector=kpp@PERMANENT res=10
    g.copy vector=A07_Povodi_IV,A07_Povodi_IV
