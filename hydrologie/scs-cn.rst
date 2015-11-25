@@ -413,10 +413,11 @@ Výstupné dáta:
 * :map:`hpj_kpp` - zjednotenie :map:`hpj` a :map:`kpp` (atribúty aj z číselníka 
   :map:`hpj`),
 * :map:`hpj_kpp_land` - prienik :map:`hpj_kpp` a :map:`LandUse`,
+* :map:`hpj_kpp_land_pov` - prienik :map:`hpj_kpp_land` a :map:`A07_Povodi_IV`,
 * :map:`hpj_kpp_rst` - raster s kódmi *HydrSk*,
-* :map:`hpj_kpp_land_rast` - raster s kódmi *CN*,
-* :map:`HO`, resp. :map:`HO_pov` - raster s výškou odtoku pre elementárne
-  plochy, resp. pre povodia v mm,
+* :map:`hpj_kpp_land_rst` - raster s kódmi *CN*,
+* :map:`HO`, resp. :map:`HO_pov` - raster s výškou odtoku :math:`mm` 
+  pre elementárne plochy, resp. pre povodia,
 * :map:`OP`, resp. :map:`OP_pov` - raster s hodnotami objemu odtoku v
   :math:`m^{3}` pre elementárne plochy, resp. povodia.
 
