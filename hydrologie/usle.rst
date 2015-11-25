@@ -390,6 +390,10 @@ prezentujeme, viď. :num:`#g-average`.
 Zahrnutie prvkov prerušujúcich odtok
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. todo:: Vziať *dmt*, vypočítať *svah* (bez prvkov 
+	  prerušujúcich odtok), potom dať masku, vytvoriť *accu* - to je ok.
+	  Treba to urobiť INAK!!! hlavne s normálnou vrstvou pvkov prerušujúcich odtok!
+
 Pre výpočet uvedený vyššie vychádza strata pôdy v niektorých miestach
 enormne vysoká. To je spôsobené tým, že vo výpočtoch nie sú zahrnuté
 líniové a plošné prvky prerušujúce povrchový odtok. Týmito prvkami sú
