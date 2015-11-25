@@ -222,7 +222,7 @@ Pridáme stĺpec :dbcolumn:`LU_HydrSk` s informáciami o využití územia
 a hydrologickej skupine pre každú elementárnu plochu. Hodnoty budú v
 tvare *VyužitieÚzemia_KodHydrologickejSkupiny*, t.j. *LU_HydrSk*.
 
-.. code-block::bash
+.. code-block:: bash
 
    v.db.addcolumn map=hpj_kpp_land columns="LU_HydrSk text"
    db.execute sql="update hpj_kpp_land_1 set LU_HydrSk = b_LandUse || '_'
@@ -236,7 +236,7 @@ Pomocou modulu :grasscmd:`db.select` alebo pomocou :skoleni:`správcu
 atribútových dát <grass-gis-zacatecnik/vector/atributy.html>` vypíšeme
 počet všetkých kombinácií v stĺpci :dbcolumn:`LU_HydrSk`.
 
-.. code-block::bash
+.. code-block:: bash
 
    db.select sql="select count(*) as comb_count from (select LU_HydrSk from
    hpj_kpp_land_1 group by LU_HydrSk)"`
@@ -250,7 +250,7 @@ počet všetkých kombinácií v stĺpci :dbcolumn:`LU_HydrSk`.
 Určíme odpovedajúce hodnoty :math:`CN`. Importujeme ich zo súboru
 :dbtable:`LU_CN.xls` a následne pripojíme pomocou :grasscmd:`v.db.join`.
 
-.. code-block::bash
+.. code-block:: bash
 
    db.in.ogr input=LU_CN.xls output=lu_cn
    v.db.join map=hpj_kpp_land column=LU_HydrSk other_table=lu_cn
@@ -262,7 +262,7 @@ a kód :math:`CN` zobrazíme v atribútovej tabuľke SQL dotazom
 
 Následne vytvoríme rastrovú vrstvu s kódmi :math:`CN`.
 
-.. cole-block::bash
+.. cole-block:: bash
 
    g.region vector=hpj_kpp_land
    v.to.rast input=hpj_kpp_land output=hpj_kpp_land_rst use=attr
@@ -287,7 +287,7 @@ informácie ku každej elementárnej ploche.
 Vrstvu :map:`hpj_kpp_land` zjednotíme s vrstvou povodí :map:`A07_Povodi_IV`,
 na čo využijeme modul :grasscmd:`v.overlay`.
 
-.. code-block::bash
+.. code-block:: bash
 
    v.overlay ainput=hpj_kpp_land binput=A07_Povodi_IV operator=or
    output=hpj_kpp_land_pov`
@@ -295,7 +295,7 @@ na čo využijeme modul :grasscmd:`v.overlay`.
 Po zjednotení vidíme, že došlo k rozdeleniu územia na menšie plochy (87
 237, 91 449). Presný počet možno zistiť použitím :grasscmd:`db.select`.
 
-.. code-block::bash
+.. code-block:: bash
 
    db.select sql="select count (*) as elem_pocet from hpj_kpp_land_1"
    db.select sql="select count (*) as elem_pocet from hpj_kpp_land_pov_1"
@@ -324,7 +324,7 @@ Do atribútovej tabuľky `hpj_kpp_land_pov` pridáme nové stĺpce
 :dbcolumn:`vymera`, :dbcolumn:`A`, :dbcolumn:`I_a` výpočítame výmeru,
 parameter :math:`A` a parameter :math:`I_{a}`.
 
-.. code-block::bash
+.. code-block:: bash
 
    v.db.addcolumn map=hpj_kpp_land_pov columns="vymera double,A double,I_a
    double"
