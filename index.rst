@@ -51,9 +51,8 @@ upravovat ho a tyto změny či opravy šířit dál.
 
 .. important:: Školení je zaměřeno na aktuální verzi `GRASS 7.0
                <http://grass.osgeo.org/download/software/#g70x>`_ a do
-               jisté míry navazuje na školení `GRASS GIS pro
-               začátečníky
-               <http://training.gismentors.eu/grass-gis-zacatecnik/>`_.
+               jisté míry navazuje na školení :skoleni:`GRASS GIS pro
+               začátečníky <grass-gis-zacatecnik>`.
 
 .. index::
    pair: datové sady; ke stažení
