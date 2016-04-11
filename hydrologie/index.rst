@@ -2,16 +2,16 @@
 Hydrologie
 **********
 
-GRASS nabízí celou řadu nástrojů pro hydrologické modelování, výpočet
+GRASS nabízí celou řadu nástrojů pro *hydrologické modelování*, výpočet
 eroze a pod, viz sekce :grasscmd:`hydrology <topic_hydrology>` a
 :grasscmd2:`erosion <keywords#erosion>`.
 
 .. figure:: images/lmgr-hydro-modules.png
    :class: small
 
-   Nástroje v sekci Hydrologic modeling
+   Nástroje v sekci Hydrologic modeling.
 
-Další nástroje jsou dostupné jako rozšíření Addons
+Další nástroje jsou dostupné jako rozšíření **Addons**
 (:menuselection:`Settings --> Addons extensions --> Install extension
 from addons`).
 

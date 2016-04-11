@@ -1,120 +1,162 @@
-Průměrná dlouhodobá ztráta půdy
-===============================
+2. Priemerná dlhodobá strata pôdy
+=================================
 
-Vstupní data
+Teoretické východiská
+---------------------
+
+Pri výpočtoch priemernej dlhodobej straty pôdy sa proces vodnej erózie
+popisuje pomocou matematického modelu USLE, tzv. univerzálnej rovnice
+straty pôdy:
+
+.. _vzorec-G:
+
+.. math::
+   
+   G = R \times K \times L \times S \times C \times P
+
+Základné symboly:
+
+ * G ... priemerná dlhodobá strata pôdy (:math:`t.ha^{-1} . rok^{-1}`)
+ * R ... faktor eróznej účinnosti dažďa (:math:`MJ.ha^{-1} .cm.h^{-1}`)
+ * K ... faktor erodovateľnosti pôdy (:math:`t.h.MJ^{-1} .cm^{-1} .rok^{-1}`) 
+ * L ... faktor dĺžky svahu ( )
+ * S ... faktor sklonu svahu ( ) 
+ * C ... faktor ochranného vplyvu vegetačného krytu ( )
+ * P ... faktor účinnosti protieróznych opatrení ( )
+
+.. todo:: jednotky?
+             
+Vstupné dáta
 ------------
 
-* vrstva povodí IV. řádu
-* DMT v rozlišení 10 x 10 m
-* HPJ - hlavní půdní jednotky z kódu BPEJ
-* KPP - komplexní průzkum půd
-* základní báze geografických dat - ZABAGED
-* ortofotomapa
-   
+ * :map:`DMT` v rozlišení 10 x 10 m
+ * :map:`HPJ` - hlavné pôdne jednotky (atribút :dbcolumn:`K_value`)
+ * :map:`KPP` - komplexný prieskum pôd (atribút :dbcolumn:`K_faktor`)
+ * :dbtable:`HPJ_K.xls`, :dbtable:`KPP_K.xls`, :dbtable:`LU_C.xls` - tabuľky s kódmi K a C
+ * :map:`hpj_kpp_land` - zjednotenie HPJ a KPP a ich prienik s LU(atribút :dbcolumn:`a_b_K_faktor`)
+ * :map:`A07_Povodi_IV` - povodia IV. rádu
+ * :map:`maska.pack` - vrstva líniových a plošných prvkov prerušujúcich odtok
+
+.. todo:: sjednotit názvy map (velká vs. malá písmena)
+             
 Postup
 ------
 
-Nejprve vytvoříme z DMT (digitální model terénu) rastrovou mapu
-znázorňující sklonové poměry ve stupních (*slope*), kterou později
-použijeme pro výpočet :ref:`topografického faktoru LS <ls-faktor>`. Pro výpočet sklonových
-poměrů použijeme :grasscmd:`r.slope.aspect`, viz
-:skoleni:`topografické analýzy
-<grass-gis-zacatecnik/raster/analyzy-povrchu.html>`. Nejprve je třeba
-nastavit :skoleni:`výpočetní region
-<grass-gis-zacatecnik/intro/region.html>` na základě vstupního DMT.
+Na :num:`#schema-usle` je prehľadne znázornený navrhovaný postup. 
+
+    .. _schema-usle:
+
+    .. figure:: images/schema_b.png
+
+        Grafická schéma postupu 
+
+Z digitálneho modelu terénu (DMT) vytvoríme rastrovú mapu znázorňujúcu
+sklonové pomery v stupňoch (*slope*). Tá bude potrebná neskôr na
+výpočet :ref:`topografického faktora LS <ls-faktor>`. V prvom kroku
+nastavíme :skoleni:`výpočtový región
+<grass-gis-zacatecnik/intro/region.html>` na základe vstupného DMT a
+následne použijeme modul :grasscmd:`r.slope.aspect`, viď. školení
+GRASS GIS pro začátečníky :skoleni:`topografické analýzy
+<grass-gis-zacatecnik/rastrova_data/analyzy-povrchu.html>`.
 
 .. code-block:: bash
                 
    g.region raster=dmt
-   r.slope.aspect elevation=dmt slope=svah                           
+   r.slope.aspect elevation=dmt slope=svah
 
-.. figure:: images/dmt_svah.png
+.. figure:: images/1b.png
+   :class: middle
 
-   DMT a míra svahu
+   Hypsografické stupne (DMT) v metroch a sklonové pomery v stupňoch
 
-Pomocí nástroje :grasscmd:`r.terraflow` vytvoříme rastrovou mapu směru
-odtoku do sousední buňky s největším sklonem (:option:`direction`),
-dále vyhlazený DMT (:option:`filled`) a rastrovou mapu znázorňující
-akumulaci toku v každé buňce (:option:`accumulation`).
+Ďalej vytvoríme vyhladený DMT (:option:`filled`), rastrovú mapu smeru
+odtoku do susednej bunky s najväčším sklonom (:option:`direction`) a
+rastrovú mapu znázorňujúcu akumuláciu toku v každej bunke
+(:option:`accumulation`).
 
-.. note:: Pro vytvoření vyhlazeného DMT lze doporučit Addons modul
-          :grasscmdaddons:`r.hydrodem`. Pro výpočet směru odtoku lze
-          použít alternativně modul :grasscmd:`r.fill.dir`, pro
-          akumulaci odtoku :grasscmd:`r.watershed`.
-          
-Před výpočtem si nastavíme masku podle zájmového území, modul
-:grasscmd:`r.mask`.
+.. note:: Na vytvorenie vyhladeného DMT možno alternatívne použiť aj
+          Addons modul :grasscmdaddons:`r.hydrodem`, pre výpočet smeru
+          odtoku modul :grasscmd:`r.fill.dir` a pre akumuláciu odtoku
+          :grasscmd:`r.watershed`.
+
+   .. todo:: Tady by chtělo hlubší analýzu, v čem se moduly liší, to
+             je otázka na kolegy z k143.
+   
+Pred výpočtom si nastavíme masku podľa záujmového územia pomocou
+modulu :grasscmd:`r.mask`.
 
 .. code-block:: bash
 
    r.mask raster=dmt
    r.terraflow elevation=dmt filled=dmt_fill direction=dir swatershed=sink accumulation=accu tci=tci
 
-.. figure:: images/flow-dir.png
+.. figure:: images/2b.png
+   :class: large
 
-   Směr odtoku vytvořený modulem :grasscmd:`r.terraflow`
-
-.. figure:: images/flow-accu.png
-
-   Akumuluce odtoku vytvořená modulem :grasscmd:`r.terraflow`
+   Smer v stupňoch a akumulácia odtoku v :math:`m^2` vytvorené modulom :grasscmd:`r.terraflow`
 
 .. _ls-faktor:
    
 LS faktor
 ^^^^^^^^^
 
-LS faktor lze vypočíst podle vzorce:
+LS faktor (topografický faktor) možno vypočítať podľa vzťahu:
 
 .. math::
    
    LS = (accu \times \frac{10.0}{22.13})^{0.6} \times (\frac{sin(slope \times \frac{pi}{180})}{0.09})^{1.3}
    
-Pro tyto účely využijeme nástroj :grasscmd:`r.mapcalc` jako hlavní
-nástroj :skoleni:`mapové algebry
-<grass-gis-zacatecnik/raster/rastrova-algebra.html>` v systému GRASS.
+Pre tieto účely využijeme nástroj :grasscmd:`r.mapcalc` ako hlavný
+nástroj :skoleni:`mapovej algebry
+<grass-gis-zacatecnik/rastrova_data/rastrova-algebra.html>` v systéme GRASS.
 
-V zápisu pro tento nástroj bude rovnice vypadat následovně:
+V zápise pre tento nástroj bude rovnica vyzerať nasledovne:
 
 .. code-block:: bash
 
    r.mapcalc expr="ls = pow(accu * (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)"
 
-Nastavíme vhodně tabulku barev:
+Nastavíme vhodnú tabuľku farieb:
 
 .. code-block:: bash
 
-   r.colors -e map=ls color=colors.txt
+   r.colors map=ls color=colors.txt
 
 ::
       
-   0 128:64:64
-   1 255:128:64
-   10 0:255:0
-   20 0:128:128
-   50 0:128:255
+    0.00 128:64:64
+    0.01 255:128:64
+    0.05 0:255:0
+    0.10 0:128:128
+    0.20 0:128:255
+    
+.. figure:: images/3b.png
+   :class: small
+
+   Topografický faktor LS zahrňujúci vplyv dĺžky a sklonu svahu
    
-K faktor, C faktor
-^^^^^^^^^^^^^^^^^^   
+K a C faktor
+^^^^^^^^^^^^
 
-Hodnota K faktoru byla určena primárně dle HPJ z kódu BPEJ. Na
-plochách bez kódu BPEJ byly hodnoty K faktoru určeny na základě
-půdních typů a subtypů dle KPP.
+Do aktuálneho mapsetu importujeme vektorovú vrstvu :map:`hpj_kpp_land`
+(viď. :ref:`návod <hydrsk>` na jej vytvorenie).
 
-Hodnota C faktoru zemědělsky využívaných oblastí byla zvolena na
-základě průměrných hodnot pro jednotlivé plodiny.
+.. todo:: tady by měl být link na scs-cn (?)
+          
+.. tip:: V prípade, že mapa :map:`hpj_kpp_land` je len v inom mapsete,
+         možno ju do aktuálneho mapsetu prekopírovať pomocou
+         :grasscmd:`g.mapset`, tak, že najprv zmeníme mapset, pridáme
+         mapu a potom sa vrátime do aktuálneho mapsetu. V správcovi
+         vrstiev zvolíme pravým tlačidlom myši *Make a copy in the
+         current mapset*.
 
-Převodní tabulky nejprve naimportujeme modulem :grasscmd:`db.in.ogr`:
-
-.. code-block:: bash
-                
-   db.in.ogr in=KPP_K.xls out=kpp_k
-   db.in.ogr in=HPJ_K.xls out=hpj_k
-   db.in.ogr in=LU_C.xls out=lu_c
-
-Do atributové tabulky vektorové mapy :map:`hpj_kpp_land` (viz :ref:`návod
-<hydrsk>` na její vytvoření) přídáme dva nové sloupečky :dbcolumn:`K`
-a :dbcolumn:`C`. To provedeme pomocí :skoleni:`správce atributových
-dat <grass-gis-zacatecnik/vector/atributy.html>` anebo modulu
+.. todo:: Ten tip zní zmatečně, kopírování je přes :grasscmd:`g.copy`,
+          přepínat se do mapsetu mapy není třeba, stačí ho přidat do
+          vyhledávací cesty.
+                   
+Do jej atribútovej tabuľky pridáme dva nové stĺpce :dbcolumn:`K` a
+:dbcolumn:`C`. To vykonáme pomocou :skoleni:`správcu atribútových dát
+<grass-gis-zacatecnik/vektorova_data/atributy.html>` alebo modulu
 :grasscmd:`v.db.addcolumn`.
 
 .. code-block:: bash
@@ -122,198 +164,342 @@ dat <grass-gis-zacatecnik/vector/atributy.html>` anebo modulu
    v.db.addcolumn map=hpj_kpp_land columns="K double"
    v.db.addcolumn map=hpj_kpp_land columns="C double" 
 
-K atributové tabulce vektorové mapy :map:`hpj_kpp_land` připojíme pomocí
-modulu :grasscmd:`v.db.join` informace z tabulky :dbtable:`hpj_k`.
+Hodnotu K faktora pre jednotlivé elementárne plochy priradíme pomocou
+tabuľky :dbtable:`HPJ_K.xls`. Pre plochy bez hodnoty K faktora
+doplníme údaje na základe pôdnych typov a subtypov podľa komplexného
+prieskumu pôd (tabuľka :dbtable:`KPP_K.xls`). Hodnotu C faktora
+poľnohospodársky využívaných oblastí zistíme z priemerných hodnôt pre
+jednotlivé plodiny z tabuľky :dbtable:`LU_C.xls`. Na spájanie tabuliek
+použijeme modul :grasscmd:`v.db.join`
+
+Prevodové tabuľky je potrebné najprv naimportovať do prostredia GRASS
+GIS. Použijeme modul :grasscmd:`db.in.ogr`:
 
 .. code-block:: bash
                 
-   v.db.join map=hpj_kpp_land column=a_HPJ_key other_table=hpj_k other_column=HPJ  
+   db.in.ogr in=KPP_K.xls out=kpp_k
+   db.in.ogr in=HPJ_K.xls out=hpj_k
+   db.in.ogr in=LU_C.xls out=lu_c
+ 
+Potom pristúpime k pripojeniu tabuľky :dbtable:`hpj_k` k atribútom
+vektorovej vrstvy :map:`hpj_kpp_land`, pričom spojítkom bude atribút
+:dbcolumn:`HPJ_key`.
 
-Chybějící informace dle KPP doplníme SQL dotazem, který provedeme
-modulem :grasscmd:`db.execute`.
+.. code-block:: bash 
+            
+   v.db.join map=hpj_kpp_land column=a_HPJ_key other_table=hpj_k other_column=HPJ 
 
-.. code-block:: sql
+
+Chýbajúce informácie o hodnote faktora ``K`` doplníme z tabuľky
+:dbtable:`kpp_k` SQL dotazom prostredníctvom modulu
+:grasscmd:`db.execute`.
+
+.. code-block:: bash
    
-   UPDATE hpj_kpp_land_1 SET K = (
-   SELECT b.K FROM hpj_kpp_land_1 AS a JOIN kpp_k aS b ON a.a_b_KPP = b.KPP)
-   WHERE K IS NULL
+   db.execute sql="UPDATE hpj_kpp_land SET K = (
+   SELECT b.K FROM hpj_kpp_land AS a JOIN kpp_k as b ON a.a_b_KPP = b.KPP)
+   WHERE K IS NULL"
 
-V dalším kroku doplníme hodnoty C faktoru z tabulky
+.. todo:: nestačil by tady odkaz na text v scs-cn?
+             
+V dalšom kroku doplníme hodnoty ``C`` faktora z importovanej tabuľky
 :dbtable:`lu_c`.
 
 .. code-block:: bash
                 
-   v.db.join map=hpj_kpp_land column=b_LandUse other_table=lu_c other_column=LU      
+   v.db.join map=hpj_kpp_land column=b_LandUse other_table=lu_c other_column=LU 
 
-Dále do atributové tabulky přidáme nový atribut :dbcolumn:`KC`, do
-kterého uložíme ``K * C``. To můžeme provést pomocí :skoleni:`správce
-atributových dat <grass-gis-zacatecnik/vector/atributy.html>` anebo
-modulem :grasscmd:`v.db.addcolumn` v kombinaci s
-:grasscmd:`v.db.update`.
+.. todo:: co je b_LandUse?
+             
+Údaje v atribútovej tabuľke si skontrolujeme, či sú vyplnené
+správne. Použijeme SQL dotaz :grasscmd:`db.select`, pričom vyberieme
+len prvé 3 záznamy.
+
+.. code-block:: bash
+
+   db.select sql="select cat,K,C from hpj_kpp_land where cat <= 5"
+
+Výsledok môže vyzerať napríklad aj takto:
+
+.. code-block:: bash
+
+   cat|K|C
+   1|0.13|0.19
+   2|0.13|0.19
+   3|0.13|0.19
+   ...
+
+Ďalej do atribútovej tabuľky pridáme nový atribút :dbcolumn:`KC`, do
+ktorého uložíme súčin faktorov ``K * C``. To môžeme vykonať pomocou
+:skoleni:`správcu atribútových dát
+<grass-gis-zacatecnik/vektorova_data/atributy.html>` alebo modulom
+:grasscmd:`v.db.addcolumn` v kombinácii s :grasscmd:`v.db.update`.
 
 .. code-block:: bash
 
    v.db.addcolumn map=hpj_kpp_land columns="KC double"
    v.db.update map=hpj_kpp_land column=KC value="K * C"
 
-Výsledek můžeme zkontrolovat jednoduchým SQL dotazem provedeným
-modulem :grasscmd:`db.select`.
+Ukážkový výsledok pre prvé tri záznamy opäť skontrolujeme.
 
 .. code-block:: bash
 
-   db.select sql="select cat,K,C,KC from hpj_kpp_land_1 where cat < 10"
+   db.select sql="select cat,K,C,KC from hpj_kpp_land where cat <= 3"
 
-V dalším kroku vektorovou mapu převedeme do rastrové reprezentace
-(:grasscmd:`v.to.rast`), pro zachování informace použijeme prostorové
-rozlišení 1m (:grasscmd:`g.region`, viz :skoleni:`výpočetní region
+.. code-block:: bash
+
+   cat|K|C|KC
+   1|0.13|0.19|0.0247
+   2|0.13|0.19|0.0247
+   3|0.13|0.19|0.0247
+   ...
+
+V ďalšom kroku vektorovú mapu prevedieme na rastrovú reprezentáciu
+modulom :grasscmd:`v.to.rast`. Pre zachovanie informácie použijeme
+priestorové rozlíšenie *1 m* (:grasscmd:`g.region`,
+viď. :skoleni:`výpočtový región
 <grass-gis-zacatecnik/intro/region.html>`).
 
+Pomocou modulu :grasscmd:`r.resamp.stats` potom vykonáme
+prevzorkovanie na priestorové rozlíšenie DMT *10 m* a to na základe
+priemeru hodnôt vypočítaného z hodnôt okolitých buniek. Týmto postupom
+zabránime strate informácií, ku ktorému by došlo pri priamom prevode
+na raster s rozlíšením *10 m*. Pri rasterizácii sa totiž hodnota bunky
+rastra volí na základe polygónu, ktorý prechádza stredom bunky alebo
+na základe polygónu, ktorý zaberá najväčiu čásť plochy bunky.
+
 .. code-block:: bash
    
-   g.region raster=dmt res=1                                             
-   v.to.rast input=hpj_kpp_land output=hpj_kpp_kc use=attr attribute_column=KC
+   g.region raster=dmt res=1 
+   v.to.rast input=hpj_kpp_land output=hpj_kpp_land_kc use=attr attribute_column=KC
 
-Pomocí modulu :grasscmd:`r.resamp.stats` poté provedeme převzorkování
-na prostorové rozlišení DMT 10 m a to na základě průměru hodnot
-vypočteného z hodnot okolních buněk. Tímto postupem zamezíme ztrátě
-informací, ke kterém by došlo při přímém převodu na rastr s rozlišením
-10 m (při rasterizace se hodnota buňky rastru volí na základě
-polygonu, který prochází středem buňky nebo na základě polygonu, který
-zabírá největší část plochy buňky).
+   g.region raster=dmt
+   r.resamp.stats input=hpj_kpp_land_kc output=hpj_kpp_land_kc10 
 
-.. code-block:: bash
+Na obrázku :num:`#porovkn` je znázornená časť záujmového územia, kde
+možno vidieť rastrovú vrstvu :map:`hpj_kpp_land_kc` pred (vľavo dole)
+a po použití modulu :grasscmd:`r.resamp.stats`.
 
-   g.region raster=dmt     
-   r.resamp.stats input=hpj_kpp_kc output=hpj_kpp_kc10                        
+.. _porovkn:
 
-Pro účely vizualizace nastavíme vhodnou :skoleni:`tabulku barev
-<grass-gis-zacatecnik/raster/tabulka-barev.html>`:
+.. figure:: images/10a.png
+   
+   Časť záujmového územia s faktorom *KC* pred a po prevzorkovaní
+                      
+Kvôli vizualizácii nastavíme vhodnú :skoleni:`tabuľku farieb
+<grass-gis-zacatecnik/rastrova_data/tabulka-barev.html>` a kvôli prehľadnosti
+mapu premenujeme na :map:`kc` modulom :grasscmd:`g.rename`. Výsledok
+je na :num:`#kc`.
 
 .. code-block:: bash
                 
-   r.colors map=hpj_kpp_kc10 color=wave                                       
+   r.colors map=hpj_kpp_land_kc10 color=wave
+   g.rename raster=hpj_kpp_land_kc10,kc
 
-.. figure:: images/hpj_kpp_kc.png
+.. _kc:
 
-   Výsledek rasterizace faktoru KC
+.. figure:: images/11.png
+   :class: small
 
-R faktor, P faktor
-^^^^^^^^^^^^^^^^^^   
+   Faktor *KC* zahrňujúci vplyv erodovateľnosti pôdy a vplyv ochranného vplyvu vegetačného krytu
 
-Použijeme průměrnou hodnota R a P faktoru pro Českou republiku
+R a P faktor
+^^^^^^^^^^^^
 
-.. math::
+Hodnoty týchto parametrov nebudeme odvádzať ako tie predchádzajúce. V
+tomto prípade jednoducho použijeme priemernú hodnotu ``R`` a ``P``
+faktora pre Českú republiku, t.j ``R = 40`` a ``P = 1``.
 
-   R = 40 \, MJ.ha^{-1} .cm.h^{-1}
-   
-   P = 1
+Výpočet priemernej dlhodobej straty pôdy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Výpočet průměrné dlouhodobé ztráty půdy
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Stratu pôdy `G` vypočítame modulom :grasscmd:`r.mapcalc`
+(:num:`#rmapcalc`), pričom vychádzame zo vzťahu, ktorý bol uvedený v
+:ref:`teoretickej časti školenia <vzorec-G>`.
 
-Ztráta půdy `G` vypočteme jako:
+.. _rmapcalc:
 
-.. math::
-   
-   G = R \times K \times L \times S \times C \times P
+.. figure:: images/15.png
+   :class: small
 
-kde je:
-
-* G průměrná dlouhodobá ztráta půdy (:math:`t.ha^{-1} . rok^{-1}`)
-* R faktor erozní účinnosti deště (:math:`MJ.ha^{-1} .cm.h^{-1}`)
-* K faktor erodovatelnosti půdy (:math:`t.h.MJ^{-1} .cm^{-1} .rok^{-1}`)
-* L faktor délky svahu (-)
-* S faktor sklonu svahu (-)
-* C faktor ochranného vlivu vegetačního pokryvu (-)
-* P faktor účinnosti protierozních opatření (-)
-
-Přepis pro :grasscmd:`r.mapcalc`:
+Pre výslednú vrstvu zvolíme primeranú farebnú škálu, pridáme legendu,
+mierku a mapu zobrazíme (:num:`#map-g`)
 
 .. code-block:: bash
                 
-   r.mapcalc expr="g = 40 ∗ ls ∗ hpj_kpp_kc ∗ 1"
+   r.mapcalc expr="g = 40 ∗ ls ∗ kc ∗ 1"
+   r.colors -n -e map=g color=corine
 
-Průměrná hodnota ztráty pro povodí
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   
+.. _map-g:
+
+.. figure:: images/12.png
+   :class: small
+
+   Vrstva s hodnotami predstavujúcimi priemernú dlhodobú stratu pôdy G
+   v jednotkách :math:`t.ha^{-1} . rok^{-1}`)
+
+.. note:: Na :num:`#map-g` je maximálna hodnota v legende *1*. Je to
+    len z dôvodu, aby bol výsledok prehľadný a korešpondoval s farbami
+    v mape. V skutočnosti parameter ``G`` nadobúda hodnotu až *230*,
+    no pri takomto rozsahu by bola stupnica v legende jednofarebná (v
+    našom prípade červená).  Zmeniť rozsah intervalu v legende bolo
+    možné nastavením parametra *range*, konkrétnejšie príkazom
+    :code:`d.legend raster=g range=0,1`.
+
+Priemerná hodnota straty pre povodie
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
    
-Pro tuto operaci použijeme modul :grasscmd:`v.rast.stats`, pomocí
-kterého vypočteme průměrné hodnoty a sumu ztráty půdy pro každé dílčí
-povodí.
+Na určenie priemernej hodnoty a sumy straty pre každé čiastkové
+povodie využijeme modul :grasscmd:`v.rast.stats`. Kľúčovou vrstvou je
+vektorová mapa povodí :map:`A07_Povodi_IV`, kde nastavíme prefix
+:item:`g_` pre novovytvorený stĺpec. Z toho potom modulom
+:grasscmd:`v.db.univar` zobrazíme štatistiky priemerných hodnôt straty
+pôdy.
 
 .. code-block:: bash
                 
-   v.rast.stats map=povodi_4 raster=g column_prefix=g_
+   v.rast.stats map=A07_Povodi_IV raster=g column_prefix=g method=average
+   v.db.univar map=A07_Povodi_IV column=g_average
 
-Statistiku průměrných hodnot ztráty půdy můžete vytisknout pomocí
-modulu :grasscmd:`v.db.univar`.
+.. note:: Vektorová vrstva povodí musí byť v aktuálnom mapsete. Ak
+          napríklad pracujeme v inom mapsete, stačí ak ju pridáme z
+          mapsetu :mapset:`PERMANENT` a následne v menu pravým
+          kliknutím na mapu zvolíme :item:`Make a copy in the current
+          mapset`.
+
+Pre účely vizualizácie vektorovú vrstvu prevedieme na raster, pomocou
+modulu :grasscmd:`r.colors` nastavíme vhodnú tabuľku farieb a výsledok
+prezentujeme, viď. :num:`#g-average`.
+
+.. code-block:: bash
+   
+   v.to.rast input=A07_Povodi_IV output=pov_avg_G use=attr attribute_column=g_average
+   r.colors -e map=pov_avg_G color=bgyr
+
+.. _g-average:
+
+.. figure:: images/13.png
+
+   Povodia s priemernými hodnotami straty pôdy
+
+.. note:: Z dôvodu prehľadnosti je opäť interval v legende
+          upravený. Maximálna hodnota priemernej straty pôdy na
+          povodie je až *0.74* (v jednotkách :math:`t.ha^{-1}
+          . rok^{-1}`)
+    
+Zahrnutie prvkov prerušujúcich odtok
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. todo:: Vziať *dmt*, vypočítať *svah* (bez prvkov 
+	  prerušujúcich odtok), potom dať masku, vytvoriť *accu* - to je ok.
+	  Treba to urobiť INAK!!! hlavne s normálnou vrstvou pvkov prerušujúcich odtok!
+
+Pre výpočet uvedený vyššie vychádza strata pôdy v niektorých miestach
+enormne vysoká. To je spôsobené tým, že vo výpočtoch nie sú zahrnuté
+líniové a plošné prvky prerušujúce povrchový odtok. Týmito prvkami sú
+najmä budovy, priekopy diaľnic a ciest, železničné trate alebo múry
+lemujúce pozemky.
+
+Aby sme zistili presnejšie hodnoty, je nutné tieto prvky do výpočtu
+zahrnúť. Pre tento účel použijeme masku líniových a plošných prvkov
+prerušujúcich odtok :map:`maska.patch` a vypočítame nové hodnoty LS
+faktora a straty pôdy. Vstupom bude :map:`dmt` bez prvkov
+prerušujúcich odtok (:num:`#dmt-m`).
+
+.. code-block:: bash
+   
+   r.unpack -o input=MASK.pack output=maska
+   r.mask raster=maska
+   r.terraflow elevation=dmt filled=dmt_fill_m direction=dir_m swatershed=sink_maccumulation=accu_m tci=tci_m
+
+.. _dmt-m:
+
+.. figure:: images/14a.png
+   :class: small
+
+   Vrstva digitálneho modelu terénu vstupujúca do výpočtov bez prvkov prerušujúcich odtok
+
+
+Ďalej dopočítame faktor LS a následne G.
 
 .. code-block:: bash
 
-   v.db.univar map=povodi_4 column=g_average
+   r.mapcalc expr="ls_m = pow(accu_m * (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)"
+   r.mapcalc expr="g_m = 40 ∗ ls_m ∗ kc ∗ 1"
+   
+   r.colors map=ls_m color=wave
+   r.colors -n -e map=g_m color=corine
 
-Pro účely vizualizace nastavíme vhodnou tabulku barev pomocí modulu
-:grasscmd:`v.colors`.
-
-.. code-block:: bash
+V poslednom kroku vymažeme masku, výsledky zobrazíme a porovnáme
+(:num:`#ls-porov` a :num:`#g-porov`).
              
-   v.colors map=povodi_4 use=attr column=g_average color=blues
+.. _ls-porov:
 
-.. figure:: images/povodi_g.png
+.. figure:: images/ls_porov.png
+   :scale: 55%
+     
+   Porovnanie hodnôt faktora LS bez ohľadu na prvky prerušujúce odtok
+   (vľavo) a s prvkami prerušujúcimi odtok (vpravo)
 
-   Povodí podle ztráty půdy
-               
-Zahrnutí prvků přerušujících odtok
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _g-porov:
 
-Pro výpočet uvedený výše vychází ztráta půdy v některých místech
-enormně vysoká. To je způsobeno tím, že ve výpočtu nejsou zahrnuty
-liniové a plošné prvky přerušující povrchový odtok. Těmito prvky jsou
-zejména budovy, příkopy silnic a cest, železniční tratě nebo zdi
-lemující pozemky.
+.. figure:: images/g_porov.png
+   :scale: 57%
 
-Pro zjištění přesnějších hodnot je tedy nutné tyto prvky do výpočtu
-zahrnout. Proto byla na základě vybraných prvků vytvořena maska prvků
-přerušujících odtok.
+   Porovnanie výsledkov USLE bez ohľadu na prvky prerušujúce odtok
+   (vľavo) a s prvkami prerušujúcimi odtok (vpravo)
 
-Masku liniových a plošných prvků spojíme pomocí modulu
-:grasscmd:`v.patch`. Před spojením vektorových map rozšíříme liniové
-prvky z důvodu nastavení masky pomocí modulu :grasscmd:`v.buffer`.
+Priemerná hodnota straty pre povodie s prvkami prerušujúcimi odtok
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   
+Opäť využijeme modul :grasscmd:`v.rast.stats`. Vektorovej mape povodí
+:map:`A07_Povodi_IV` nastavíme prefix :item:`g_m` pre novovytvorený
+stĺpec a potom modulom :grasscmd:`v.db.univar` zobrazíme štatistiky
+priemerných hodnôt straty pôdy. Výsledok v rastrovej podobe je na
+:num:`#g-m-average`.
+
+.. code-block:: bash
+                
+   v.rast.stats map=A07_Povodi_IV raster=g_m column_prefix=g_m method=average
+   v.db.univar map=A07_Povodi_IV column=g_m_average
+   
+   v.to.rast input=A07_Povodi_IV output=pov_avg_G_m use=attr attribute_column=g_m_average
+   r.colors -e map=pov_avg_G_m color=bgyr
+
+.. _g-m-average:
+
+.. figure:: images/16.png
+
+   Povodia s priemernými hodnotami straty pôdy s uvážením prvkov,
+   ktoré prerušujú odtok
+
+Na záver urobíme rozdiely (modul :grasscmd:`r.mapcalc`) výsledných
+vrstiev bez a s uvážením prvkov, ktoré prerušujú odtok pre faktor
+*LS*, hodnoty predstavujúce priemernú dlhodobú stratu pôdy *G* a
+povodia s priemernými hodnotami straty pôdy *G_pov*. Nazveme ich
+:map:`delta_ls`, :map:`delta_g` a :map:`delta_pov_avg` a každej
+nastavíme farbnú stupnicu :item:`differences`. Sú na :num:`#diff`.
 
 .. code-block:: bash
 
-   v.buffer input=maska_linie output=maska_linie5 distance=5
-   v.patch input=maska_linie5,maska_plochy output=maska
-                          
-Masku pro další analýzu nastavíme pomocí modulu :grasscmd:`r.mask`.
+   r.mapcalc expression=delta_ls = ls - ls_m
+   r.mapcalc expression=delta_g = g - g_m
+   r.mapcalc expression=delta_pov_avg = pov_avg_G - pov_avg_G_m
 
-.. code-block:: bash
+   r.colors map=delta_ls color=differences
+   r.colors map=delta_g color=differences
+   r.colors map=delta_pov_avg color=differences
 
-   r.mask -i vector=maska
+.. _diff:
 
-S využitím masky vypočteme nově LS faktor a ztrátu půdy G.
+.. figure:: images/diff.png
+   :scale: 55%
 
-.. code-block:: bash
-
-   r.terraflow elevation=dmt filled=dmt_fill2 direction=dir2 swatershed=sink2 accumulation=accu2 tci=tci2
-   r.mapcalc expr="ls2 = pow(accu2 * (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)"
-   r.mapcalc expr="g2 = 40 ∗ ls2 ∗ hpj_kpp_kc ∗ 1"
-
-.. todo:: doplnit porovnání, LS faktor vychází divně
-             
-::
-
-   .. figure:: images/porovnani_ls.png
-               
-               Porovnání hodnot LS faktoru bez zohlednění prvků přerušujících
-               odtok (vlelvo) a s prvky přerušujícími odtok (vpravo)
-
-   .. figure:: images/porovnani_g.png
-
-               Porovnání výsledků USLE bez zohlednění prvků přerušujících odtok
-               (vlelvo) a s prvky přerušujícími odtok (vpravo)
-
+   Znázornenie rozdielov rastrových vrstiev LS, G a G_pov, ktoré
+   vznikli bez uváženia a s uvážením prvkov, ktoré prerušujú odtok
+ 
 Poznámky
 --------
 
-GRASS nabízí pro výpočet USLE dva užitečné moduly :grasscmd:`r.uslek`
-a :grasscmd:`r.usler`.
+GRASS ponúka na výpočet USLE dva užitočné moduly :grasscmd:`r.uslek` a
+:grasscmd:`r.usler`.

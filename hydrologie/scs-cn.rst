@@ -1,125 +1,250 @@
-Metoda SCS CN
-=============
+1. Metoda SCS CN
+================
 
-Výpočet přímého objemu odtoku z povodí pomocí metody
-:wikipedia:`SCS CN <Metoda CN křivek>`.
+Teoretický základ
+-----------------
+
+Jde o výpočet přímého odtoku z povodí, který je tvořen tzv. povrchovým
+odtokem a tzv. hypodermeckým (podpovrchovým) odtokem. Metoda byla
+vypracovaná službou na ochranu půd *Soil Conservation Service*
+(:wikipedia:`SCS CN <Metoda CN křivek>`) v USA. Objem srážek je na
+objem odtoku převedený na základě hodnot odtokových křivek `CN`, které
+jsou tabelizovány na základě hydrologických vlastností půd. Metoda
+zohledňuje závislost retence (zadržování vody) od hydrologických
+vlastností půd, počátočné nasicení a způsob využívaní půdy. Hodnota
+`CN` křivky reprezentuje tedy vlastnost povodí a platí, že čím je
+hodnota `CN` vyšší, tím je vyšší pravdepodobnost, že při srážkové
+udalosti dojde k přímému odtoku.
+
+Hodnota `CN` závisí od kombinaci hydrologické skupiny půdy a způsobu
+využití území v daném místě. Kód hydrologické skupiny půdy je získaný
+z dat hlavních půdních jednotek (přesnější způsob) anebo dat
+komplexního průzkumu půd (tam, kde informace o hlavních půdních
+jednotkách nejsou k dispozici).
+
+Základní symboly
+----------------
+
+ * :math:`CN` - hodnota odtokové křivky
+ * :math:`A` - maximalní potenciální ztráta z povodí, výška vody
+   zadržané v povodí; ostatní je odtok (:math:`mm`)
+ * :math:`I_a` - počítaná ztráta z povodí, když ještě nedochází k odtoku
+   (:math:`mm`)
+ * :math:`H_s` - návrhová výška srážky, zátěžový stav (:math:`mm`)
+ * :math:`H_o` - výška přímého odtoku (:math:`mm`)
+ * :math:`O_p` - objem přímého odtoku (:math:`m^3`)
+
+Platí, že poměr mezi skutečnou a maximální ztrátou z povodí je stejný
+jako poměr odtoku a srážky, která je redukovaná o počáteční ztraty.
+
+.. math::
+
+   \frac{O_p}{A}=\frac{H_o}{H_s-I_a}
+
+.. _vstupne-data:
 
 Vstupní data
 ------------
 
- * vrstva povodí IV. řádu
- * návrhové srážky (s dobou opakování 5, 10, 20, 50 a 100 let pro
-   každé dílčí podpovodí IV. řádu)
- * využití území - landuse
- * HPJ - hlavní půdní jednotky z kódu BPEJ
- * KPP - komplexní průzkum půd
+ * :map:`hpj.shp` - vektorová vrstva hlavních půdních jednotek z
+   kodů BPEJ, :num:`#hpj-kpp` vlevo
+ * :map:`kpp.shp` - vektorová vrstva komplexního průzkumu půd, :num:`#hpj-kpp` vpravo
+ * :map:`landuse.shp` - vektorová vrstva využití území, :num:`#lu-pov` vlevo
+ * :map:`povodi.shp` - vektorová vrstva povodí IV. řádu s návrhovými
+   srážkami :math:`H_s` (doba opakovaní 2, 5, 10, 20, 50 a 100 rokov), :num:`#lu-pov` vpravo
+ * :dbtable:`hpj_hydrsk` - číselník s hydrologickými skupinami půd pro hlavní 
+   půdní jednotky, :num:`#ciselniky1` vlevo
+ * :dbtable:`kpp_hydrsk` - číselník s hydrologickými skupinami půd pro vrstvu 
+   komplexního průzkumu půd, :num:`#ciselniky1` uprostřed
+ * :dbtable:`lu_hydrsk_cn` - číselník s hodnotami CN pro kombinaci využití 
+   území a hydrologické skupiny, :num:`#ciselniky1` vpravo
 
-Postup
-------
+.. note:: Vrstvu povodí je možno získat z volně dostupné databáze
+          `DIBAVOD <http://www.dibavod.cz>`_. Bonitované půdní
+          ekologické jednotky - dvě číslice pětimístného kódu
+          udávající hlavní půdní jednotku, informace o využití území
+          *Land Parcel Identification System* a data komplexního
+          průzkumu půd poskytuje věčšinou krajský úřad příslušného
+          území. Návrhové srážky je možno získat z hydrometeorologického
+          ústavu.
 
-.. _hydrsk:
+Navrhovaný postup
+------------------
+:ref:`1.<kr1>` 
+sjednocení hlavních půdních jednotiek a komplexního průzkumu půd 
 
-Odvození hydrologických skupin půd
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:ref:`2.<kr2>` 
+připojení informací o hydrologické skupině
 
-Nejprve určíme hydrologické skupiny půd na celé ploše povodí.
+:ref:`3.<kr3>` 
+průnik vrstvy s hydrologickými skupinami s vrstvou využití územia 
 
-Spojíme (union) vektorové mapy :map:`hpj` a :map:`kpp` tak, aby došlo
-k rozdělení řešeného území na menší elementární plochy. K tomu
-použíjeme modul :grasscmd:`v.overlay`.
+:ref:`4.<kr4>` 
+připojení hodnot odtokové křivky :math:`CN`
 
-.. _hpj_kpp:
+:ref:`5.<kr5>` 
+sjednocení průniku vrstvy s hydrologickými skupinami a využitím území 
+s vrstvou povodí 
+
+:ref:`6.<kr6>` 
+výpočet výměry elementárních ploch, parametru :math:`A` a parametru :math:`I_a`
+
+:ref:`7.<kr7>` 
+výpočet parametru :math:`H_o` a parametru :math:`O_p` pre každou elementární plochu
+
+:ref:`8.<kr8>` 
+vytvoření rastrových vrstev výšky a objemu přímého odtoku
+
+:ref:`9.<kr9>` 
+výpočet průměrných hodnot výšky a objemu přímého odtoku pro povodí 
+
+.. _schema:
+
+.. figure:: images/schema_scs-cn.png
+   :class: middle
+
+   Grafické schéma postupu.
+
+Znázornění vstupních dat spolu s atributovými tabulkami je na :num:`#hpj-kpp`
+a :num:`#lu-pov`. Tabulky s informacemi o hydrologické skupině půdy a o 
+hodnotách CN pro kombinaci využití území a hydrologické skupiny, resp. 
+číselníky jsou na :num:`#ciselniky1`.
+
+.. _hpj-kpp:
+
+.. figure:: images/hpjkpp.png
+   :class: large
+
+   Hlavní půdní jednotky a podrobný průzkum půd spolu s jejich atributovými tabulkami.
+
+.. _lu-pov:
+
+.. figure:: images/lupov.png
+   :class: large
+
+   Využití území a vrstva povodí IV. řádu spolu s jejich atributovými tabulkami.
+
+.. _ciselniky1:
+
+.. figure:: images/ciselniky.png
+   :class: middle
+
+   Číselníky s informacemi o hydrologické skupině a hodnotami CN.
+
+Postup zpracování v GRASS GIS
+-----------------------------
+
+Krok 1
+^^^^^^
+
+V prvním kroku sjednotíme vrstvu hlavních půdních jednotek a
+komplexního průzkumu půd. Použijeme modul :grasscmd:`v.overlay` a
+operaci překrytí *union*.
 
 .. code-block:: bash
-   
-   v.overlay ainput=hpj binput=kpp operator=or output=hpj_kpp        
 
-Naimportujeme pomocné číselníky s hydrologickými skupinami půd
-(:grasscmd:`db.in.ogr` dostupný z menu :menuselection:`File --> Import
-database table --> Common import format`).
-                
+   v.overlay ainput=hpj binput=kpp operator=or output=hpj_kpp
+
+Dále importujeme číselníky.
+
 .. code-block:: bash
 
    db.in.ogr input=hpj_hydrsk.dbf output=hpj_hydrsk
    db.in.ogr input=sum_kpp2hydrsk.dbf output=kpp_hydrsk
 
-Poté přípojíme k atributové tabulce informace z
-:dbtable:`hpj_hydrsk`. Předtím ale musíme sloupec :dbcolumn:`HPJ`
-překonverovat na celočíselný typ (po importu tabulky má sloupeček
-datový typ ``double``, který ale modul :grasscmd:`v.db.join` nepodporuje
-jako klíč pro spojení tabulek).
-
-Přidáme nový sloupec s datovým typem ``integer`` a do toho sloupce
-poté uložíme pomocí :grasscmd:`db.execute` přetypované hodnoty.
+Pre kontrolu zkontrolujeme obsah importovaných číselníků (tabulek) v
+prostředí GRASS GIS, případně aspoň jejich sloupů. Použijeme moduly
+:grasscmd:`db.select` a :grasscmd:`db.columns`.
 
 .. code-block:: bash
-   
+
+   db.select table=hpj_hydrsk
+   db.select table=kpp_hydrsk
+
+   db.columns table=hpj_hydrsk
+   db.columns table=kpp_hydrsk
+
+.. note::
+
+   V atributové tabulce hlavních půdních jednotek :map:`hpj_hydrsk` je
+   po importu datový typ atributu :dbcolumn:`HPJ` jako *type: DOUBLE
+   PRECISION* (příkaz :code:`db.describe table=hpj_hydrsk`); je
+   potřebné jej překonvertovat na celočíselný typ, t.j. *type:
+   INTEGER* (kvůli spojení tabulek a číselníků pomocí
+   :grasscmd:`v.db.join`). Použijeme :sqlcmd:`ALTER` pro vytvorení
+   atributu :dbcolumn:`HPJ_key` a :sqlcmd:`UPDATE` pro naplnění hodnot
+   atributu.
+
+.. code-block:: bash
+
    db.execute sql="alter table hpj_hydrsk add column HPJ_key int"
    db.execute sql="update hpj_hydrsk set HPJ_key = cast(HPJ as int)"
 
-Po upravě tabulky :dbtable:`hpj_hydrsk` již můžeme tuto tabulku
-připojit k atributům vektorové mapy :map:`hpj_kpp`.
+Po úpravě tabulky :dbtable:`hpj_hydrsk` můžeme tuto tabulku připojit
+k atributům vektorové mapy :map:`hpj_kpp` pomocí klíče, konkrétně
+atributu :dbcolumn:`HPJ_key`.
 
 .. code-block:: bash
-                
-   v.db.join map=hpj_kpp column=a_HPJ other_table=hpj_hydrsk other_column=HPJ_key
 
-Pro prvky, které nemají informaci o HPJ odvodíme hydrologickou skupinu
-z tabulky :dbtable:`kpp_hydrosk`, k tomu požijeme SQL příkaz
-aplikovaný module :grasscmd:`db.execute`.
-   
-.. code-block:: sql
+   v.db.join map=hpj_kpp column=a_HPJ other_table=hpj_hydrsk
+   other_column=HPJ_key
 
+Atributy v tabulce :dbtable:`hpj_kpp` po spojení zkontrolujeme či
+obsahují sloupce z číselníku a následně doplníme chybějící informace o
+hydrologické skupině :dbcolumn:`HydrSk` pomocí
+:map:`kpp_hydrsk`. Doplníme je ze sloupce :dbcolumn:`First_Hydr`
+vrstvy komplexního průzkumu půd. Využijeme modul
+:grasscmd:`db.execute` a SQL príkaz :sqlcmd:`JOIN`.
 
-   UPDATE hpj_kpp_1 SET HydrSk = (
-   SELECT b.First_hydr FROM hpj_kpp_1 AS a JOIN kpp_hydrsk as b ON a.b_KPP = b.KPP
-   ) WHERE HydrSk IS NULL
+.. code-block:: bash
 
+    db.execute sql="UPDATE hpj_kpp_1 SET HydrSk = (
+    SELECT b.First_hydr FROM hpj_kpp_1 AS a JOIN kpp_hydrsk as b
+    ON a.b_KPP = b.KPP) WHERE HydrSk IS NULL"
 
-Výsledek může vypadat následovně.
+Výsledek může vypadat nasledovně.
 
 .. figure:: images/scs-cn-db-join.png
 
-   Atributový dotaz s výsledkem hydrologické skupiny půd
+   Atributový dotaz s výsledkem hydrologické skupiny půd.
 
-Pomocí modulu :grasscmd:`v.colors` můžeme na základě hydrologických
-skupin půd nastavit :skoleni:`tabulku barev
-<grass-gis-zacatecnik/raster/tabulka-barev.html>`. V současnosti ale
-modul podporuje pouze sloupce s číselnými hodnotami. Budeme si muset
-pomoci trikem, do nového sloupce :dbcolumn:`HydrSk_key` vložíme
-unikátní číselné kódy. Tento sloupce poté můžeme použít pro nastavení
-tabulky barev.
-
-Nový sloupec přidáme pomocí :skoleni:`správce atributových dat
-<grass-gis-zacatecnik/vector/atributy.html>` anebo pomocí modulu
-:grasscmd:`v.db.addcolumn`.
+Obsah atributové tabulky :map:`hpj_kpp` zkontrolujeme pomocí *SQL
+Query BUILDER* a ověříme zda všechny hodnoty hydrologické skupiny jsou
+vyplněné.
 
 .. code-block:: bash
-                           
-   v.db.addcolumn map=hpj_kpp columns=HydrSk_key int                        
 
-Číselné kódy do sloupce :dbcolumn:`HydrSk_key` vložíme jako níže
-uvedené SQL příkazy pomocí modulu :grasscmd:`db.execute`.
-   
-.. code-block:: sql
-                   
-   update hpj_kpp_1 set HydrSk_key = 1 where HydrSk = 'A';
-   update hpj_kpp_1 set HydrSk_key = 2 where HydrSk = 'AB';
-   update hpj_kpp_1 set HydrSk_key = 3 where HydrSk = 'B';
-   update hpj_kpp_1 set HydrSk_key = 4 where HydrSk = 'BC';
-   update hpj_kpp_1 set HydrSk_key = 5 where HydrSk = 'C';
-   update hpj_kpp_1 set HydrSk_key = 6 where HydrSk = 'CD';
-   update hpj_kpp_1 set HydrSk_key = 7 where HydrSk = 'D';
+    SELECT cat,HydrSk FROM hpj_kpp_1 WHERE hydrSk = "NULL"
 
-Nyní již můžeme nastavit vlastní tabulku barev:
+Nastavíme :skoleni:`tabulku barev
+<grass-gis-zacatecnik/raster/tabulka-barev.html>` pre jednotlivé
+skupiny pomocí modulu :grasscmd:`v.colors`. Kódy nelze použít, neboť
+tento modul podporuje pouze celočíselné hodnoty, proto je potřebné
+vytvorit nový atribut s jedinečnými hodnotami pro kódy. Nazveme ho
+:dbcolumn:`HydrSk_key` a bude obsahovat čísla 1 až 7 odpovídající
+kódům A až D. Použijeme moduly :grasscmd:`v.db.addcolumn` a
+:grasscmd:`db.execute` a příkaz :sqlcmd:`UPDATE` jazyka
+:wikipedia:`SQL`.
 
 .. code-block:: bash
-                
-   v.colors map=hpj_kpp use=attr column=HydrSk_key rules=colors.txt
 
-Obsah souboru :file:`colors.txt`:
+    v.db.addcolumn map=hpj_kpp columns=HydrSk_key int
 
-::
+    db.execute sql="update hpj_kpp_1 set HydrSk_key = 1 where HydrSk = 'A';
+    update hpj_kpp_1 set HydrSk_key = 2 where HydrSk = 'AB';
+    update hpj_kpp_1 set HydrSk_key = 3 where HydrSk = 'B';
+    update hpj_kpp_1 set HydrSk_key = 4 where HydrSk = 'BC';
+    update hpj_kpp_1 set HydrSk_key = 5 where HydrSk = 'C';
+    update hpj_kpp_1 set HydrSk_key = 6 where HydrSk = 'CD';
+    update hpj_kpp_1 set HydrSk_key = 7 where HydrSk = 'D'"
+
+.. note:: Nový sloupec je možné přidat i pomocí :skoleni:`správce
+          atributových dat <grass-gis-zacatecnik/vector/atributy.html>`.
+
+Do textového souboru :file:`colors.txt` vložíme pravidla vlastní
+barevnou stupnici pro jednotlivé kategorie.
+
+.. code-block:: bash
 
    1 red
    2 green
@@ -129,160 +254,258 @@ Obsah souboru :file:`colors.txt`:
    6 orange
    7 purple
 
-.. figure:: images/hydrosk-color.png
+Modulem :grasscmd:`g.region` nastavíme výpočetní region
+(např. :map:`hpj_kpp`), konvertujeme vektorovou vrstvu na rastrovou,
+přiřadíme barevnou škálu a doplníme mimorámové údaje jako legendu a
+měřítko.
 
-   Výsledná vizualizace
-
-Do atributové tabulky vrstvy přidáme data o využití území jednotlivých
-ploch, to vyřešíme průnikem (`intersection`) s vrstvou
-:map:`land_use`. Tuto operaci provedeme modulem
-:grasscmd:`v.overlay`. Zájmové území tak bylo rozděleno na více
-elemenrárních ploch.
-
-.. _hpj_kpp_lu:
+.. note:: Vektorovou vrstvu konvertujeme kvůli tomu, neboť zobrazit legendu je 
+	  možné pouze pro rastrové data.
 
 .. code-block:: bash
-                
-   v.overlay ainput=hpj_kpp binput=land_use operator=and output=hpj_kpp_land
 
-V dalším kroku přidáme sloupec obsahující údaje o využití území a o
-hydrologické skupině půdy dané elementární plochy ve tvaru ``využití
-území_hydrologická skupina`` ve zkratce :dbcolumn:`LU_HyrdSk`.
+   g.region vector=hpj_kpp
+   v.to.rast input=hpj_kpp output=hpj_kpp_rst use=attr
+   attribute_column=HydrSk_key
 
-Tuto operaci lze provést pomocí :skoleni:`správce atributových dat
-<grass-gis-zacatecnik/vector/atributy.html>` (`Field Calculator`) anebo
-pomocí modulu :grasscmd:`v.db.addcolumn` v kombinaci s
-:grasscmd:`db.execute` (SQL příkaz).
+.. figure:: images/1a.png
+   :class: middle
+
+   Výsledná vizualizace hydrologických skupin půd (1: A, 2: AB, 3:
+   B, 4: BC, 5: C, 6: CD a 7: D)
+
+Přidáme informacie o využití území pro každou plochu pomocí operace
+průniku *intersection* s datovou vrstvou využití území
+:map:`Land_Use`.
 
 .. code-block:: bash
-                
+
+   v.overlay ainput=hpj_kpp binput=Land_Use operator=and output=hpj_kpp_land
+
+Přidáme sloupec :dbcolumn:`LU_HydrSk` s informacemi o využití území a
+hydrologické skupině pro každou elementární plochu. Hodnoty budou ve
+tvarů *VyužitíÚzemí_KodHydrologickéSkupiny*, t.j. *LU_HydrSk*.
+
+.. code-block:: bash
+
    v.db.addcolumn map=hpj_kpp_land columns="LU_HydrSk text"
+   db.execute sql="update hpj_kpp_land_1 set LU_HydrSk = b_LandUse || '_'
+   || a_HydrSk"
+
+.. note:: Tuto operaci je možné provést i pomocí :skoleni:`správce
+          atributových dat
+          <grass-gis-zacatecnik/vector/atributy.html>` (`Field
+          Calculator`)
+
+Pomocí modulu :grasscmd:`db.select` anebo pomocí :skoleni:`spravce
+atributových dat <grass-gis-zacatecnik/vector/atributy.html>` vypíšeme
+počet všech kombinácí v sloupci :dbcolumn:`LU_HydrSk`.
 
 .. code-block:: bash
 
-   db.execute sql="update hpj_kpp_land_1 set LU_HydrSk = b_LandUse || '_' || a_HydrSk"
+   db.select sql="select count(*) as comb_count from (select LU_HydrSk from
+   hpj_kpp_land_1 group by LU_HydrSk)"`
 
-Pomocí jednoduchého SQL dotazu (modul :grasscmd:`db.select` anebo
-:skoleni:`správce atributových dat
-<grass-gis-zacatecnik/vector/atributy.html>`) byly zjištěny vzniklé
-kombinace :dbcolumn:`LU_HydrSk`.
+.. figure:: images/2a.png
+   :class: middle
+
+   Zobrazení části atributové tabulky a výpis počtu kombinací
+   využití území a hydrologické skupiny.
+
+Určíme odpovídající hodnoty :math:`CN`. Importujeme je do souboru
+:dbtable:`LU_CN.xls` a následně připojíme pomocí :grasscmd:`v.db.join`.
+
+.. code-block:: bash
+
+   db.in.ogr input=LU_CN.xls output=lu_cn
+   v.db.join map=hpj_kpp_land column=LU_HydrSk other_table=lu_cn
+   other_column=LU_HydrSk
+
+Výsledné informace jako kód hydrologické skupiny, kód využití území
+a kód :math:`CN` zobrazíme v atributové tabulce SQL dotazem 
+:code:`SELECT cat,a_HydrSk,b_LandUse,CN FROM hpj_kpp_land_1`.
+
+Následně vytvoříme rastrovou vrstvu s hodnotami :math:`CN`.
+
+.. cole-block:: bash
+
+   g.region vector=hpj_kpp_land
+   v.to.rast input=hpj_kpp_land output=hpj_kpp_land_rst use=attr
+   attribute_column=CN
+   r.colors -e map=hpj_kpp_land_rst color=aspectcolr
+
+.. figure:: images/3a.png
+   :class: middle
+
+   Kódy :math:`CN` pro každou elementární plochu využití půdy v
+   zájmovém území.
+
+Atributová tabulka vrstvy povodí obsahuje údaje o návrhových srážkách
+s dobou opakovaní 5, 10, 20, 50 a 100 let. Je potřebné přidat tuto
+informaci ke každé elementární ploše.
+
+.. figure:: images/5a.png
+   :class: middle
+
+   Atributy související s návrhovými srážkami s různou dobou opakovaní.
+
+Vrstvu :map:`hpj_kpp_land` sjednotíme s vrstvou povodí :map:`A07_Povodi_IV`,
+na čo využijeme modul :grasscmd:`v.overlay`.
 
 .. code-block:: bash
 
-   db.select sql="select LU_HydrSk from hpj_kpp_land_1 group by LU_HydrSk"
+   v.overlay ainput=hpj_kpp_land binput=A07_Povodi_IV operator=or
+   output=hpj_kpp_land_pov`
 
-Pro každou hodnotu určíme odpovídající hodnota CN, nejprve tabulku CN
-hodnot naimportujeme (:grasscmd:`db.in.ogr`) a poté připojíme k naší
-atributové tabulce (:grasscmd:`v.db.join`).
-
-.. code-block:: bash
-              
-   db.in.ogr input=LU_CN.xls output=lu_cn               
-   v.db.join map=hpj_kpp_land column=LU_HydrSk other_table=lu_cn other_column=LU_HydrSk
-
-.. todo:: Hodnoty návrhových sráţek s různou dobou opakování byly do
-          vrstvy přidány pomocí nástroje UNION, čímţ opět došlo k
-          rozdělení území povodí na menší elementární plochy.
-
-Výpočet výšky a objemu přímého odtoku
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Pro každou elementární plochu vypočteme její výměru buď pomocí
-:skoleni:`správce atributových dat
-<grass-gis-zacatecnik/vector/atributy.html>` anebo modulu
-:grasscmd:`v.to.db`.
+Po sjednotení vidíme, že došlo k rozdělení územia na menší plochy (87
+237, 91 449). Přesný počet je možné zjistit použitím :grasscmd:`db.select`.
 
 .. code-block:: bash
-      
-   v.db.addcolumn map=hpj_kpp_land columns="vymera double"                  
-   v.to.db map=hpj_kpp_land option=area columns=vymera                  
 
-V dalším kroku vypočteme z hodnot CN potenciální retenci :dbcolumn:`A`
+   db.select sql="select count (*) as elem_pocet from hpj_kpp_land_1"
+   db.select sql="select count (*) as elem_pocet from hpj_kpp_land_pov_1"
+
+.. figure:: images/6a.png
+   :class: small
+
+   Počet elementárních ploch před a po sjednocení s vrstvou povodí.
+
+Kroky 2 a 3
+^^^^^^^^^^^
+
+Pro každou elementární plochu vypočítame její výměru, parametr :math:`A`
+(maximální ztráta) a parametr :math:`I_{a}` (počáteční ztráta, což je
+5 % z :math:`A`)
 
 .. math::
-      
+
    A = 25.4 \times (\frac{1000}{CN} - 10)
 
-.. code-block:: bash
-
-   v.db.addcolumn map=hpj_kpp_land columns="A double"
-   v.db.update map=hpj_kpp_land column=A value="24.5 * (1000 / CN - 10)"
-
-Následně vypočteme počáteční ztráta :dbcolumn:`I_a`:
-   
 .. math::
-                   
+
    I_a = 0.2 \times A
 
+Do atributové tabulky `hpj_kpp_land_pov` přidáme nové sloupce
+:dbcolumn:`vymera`, :dbcolumn:`A`, :dbcolumn:`I_a` vzpočítame výměru,
+parametr :math:`A` a parametr :math:`I_{a}`.
+
 .. code-block:: bash
 
-   v.db.addcolumn map=hpj_kpp_land columns="I_a double"
-   v.db.update map=hpj_kpp_land column=I_a value="0.2 * A"
+   v.db.addcolumn map=hpj_kpp_land_pov columns="vymera double,A double,I_a
+   double"
+   v.to.db map=hpj_kpp_land_pov option=area columns=vymera
+   v.db.update map=hpj_kpp_land_pov column=A value="24.5 * (1000 / a_CN - 10)"
+   v.db.update map=hpj_kpp_land_pov column=I_a value="0.2 * A"
 
-.. todo:: Poté došlo k ověření, zda je návrhová srážka větší než
-          počáteční ztráta, pokud tomu tak není, znamená to, že
-          výsledný objem přímého odtoku bude nulový.
+Kroky 4 a 5
+^^^^^^^^^^^
 
-V následujícím kroku vypočteme *výšku přímého odtoku* :dbcolumn:`H_O` v mm:
+Přidáme další nové sloupce do atribútovej tabulky ro parametry :math:`H_{o}`
+a :math:`O_{p}` a vypočítame jejich hodnoty pomocí :grasscmd:`v.db.update`.
 
 .. math::
-   
+
    H_O = \frac{(H_S − 0.2 \times A)^2}{H_S + 0.8 \times A}
 
-kde :math:`H_S` je úhrn návrhové srážky (mm).
+.. note:: V dalších krocích budeme uvažovat průměrný úhrn návrhové srážky 
+	  :math:`H_{s}` = 32 mm. Při úhrnu s dobou opakovaní 2 roky (atribut
+	  :dbcolumn:`H_002_120`) či dobou 5, 10, 20, 50 anebo 100 let by byl 
+	  postup obdobný.
 
-.. note:: V našem případě použijeme konstantní úhrn návrhové srážky
-          :math:`H_S` pro celé území 32 mm.
-  
-*Objem přímého odtoku* vypočteme dle následujícího vztahu:
+.. note:: Hodnota v čitateli musí byť kladná, resp. nesmíme umocňovat záporné 
+	  číslo. V připadě, že čitatel je záporný, výška přímého odtoku je
+	  rovná nule. Pro vyřešení tejto situace si pomůžeme novým sloupcem
+	  v atributové tabulce, který nazveme :dbcolumn:`HOklad`. 
+
+.. code-block:: bash
+
+   v.db.addcolumn map=hpj_kpp_land_pov columns="HOklad double, HO double, OP double" 
+   v.db.update map=hpj_kpp_land_pov column=HOklad value="(32 - 0.2 * A)"
+   db.execute sql="update hpj_kpp_land_pov_1 set HOklad = 0 where HOklad < 0"
+   v.db.update map=hpj_kpp_land_pov column=HO value="(HOklad * HOklad) / (32 + 0.8 * A)" 
+   
+Nakonec vypočítáme objem :math:`O_{p}` a výsledky zobrazíme v rastrové podobě. 
 
 .. math::
-   
+
    O_P = P_P \times \frac{H_O}{1000}
 
-kde :math:`P_P` je výměra pozemku v metrech čtverečních.
+.. code-block:: bash
 
-Do atributové tabulky přidáme nové sloupce pomocí
-:grasscmd:`v.db.addcolumn`, hodnoty vypočteme pomocí
-:grasscmd:`v.db.update`.
+   v.db.update map=hpj_kpp_land_pov column=OP value="vymera * (HO / 1000)"
+   v.to.rast input=hpj_kpp_land_pov output=HO use=attr attribute_column=HO
+   v.to.rast input=hpj_kpp_land_pov output=OP use=attr attribute_column=OP
+
+.. figure:: images/7a.png
+   :class: middle
+
+   Výška v mm vlevo a objem v :math:`m^{3}` vpravo přímého odtoku pro
+   elementární plochy.
+
+Vypočítame a zobrazíme průměrné hodnoty přímého odtoku pro jednotlivé
+povodí.  Přitom je potrebné nastavit rozlišení výpočetního regionu,
+překopírovat mapu povodí do aktuálneho mapsetu a nastaviť vhodnou
+:skoleni:`barevnost výsledku
+<grass-gis-zacatecnik/raster/tabulka-barev.html>`.
 
 .. code-block:: bash
 
-   v.db.addcolumn map=hpj_kpp_land columns="HO double, OP double"
-   v.db.update map=hpj_kpp_land column=HO value="((32 - 0.2 * A) * (32 - 0.2 * A)) / (32 + 0.8 * A)"
-   v.db.update map=hpj_kpp_land column=OP value="vymera * (HO / 1000)"
+   g.region vector=kpp@PERMANENT res=10
+   g.copy vector=A07_Povodi_IV,A07_Povodi_IV
+   v.rast.stats map=A07_Povodi_IV raster=HO column_prefix=ho
+   v.to.rast input=A07_Povodi_IV output=HO_pov use=attr
+   attribute_column=ho_average
+   r.colors map=HO_pov color=bcyr
 
+   v.rast.stats map=A07_Povodi_IV raster=OP column_prefix=op
+   v.to.rast input=A07_Povodi_IV output=OP_pov use=attr
+   attribute_column=op_average
+   r.colors map=OP_pov color=bcyr
 
-Průměrná hodnota objemu přímého odtoku pro povodí
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   
+.. figure:: images/8a.png
+   :class: middle
 
-Pro tuto operaci použijeme modul :grasscmd:`v.rast.stats`, pomocí
-kterého vypočteme průměrné hodnoty a sumu objemu přímého odtoku pro
-každé dílčí povodí. Před touto operací musí informaci o objemu přímého
-odtoku převést do rastrové reprezentace pomocí modulu
-:grasscmd:`v.rast.stats`. Před rasterizací nastavíme
-:skoleni:`výpočetní region <grass-gis-zacatecnik/intro/region.html>` s
-rozlišením 10 m (:grasscmd:`g.region`).
+   Výpočet statistických údajů pro každé povodí.
 
-.. code-block:: bash
-             
-   g.region vector=kpp res=10
-   v.to.rast input=hpj_kpp_land output=ho use=attr attribute_column=HO
-   v.rast.stats map=povodi_4 raster=ho column_prefix=ho
+.. figure:: images/9a.png
+   :class: middle
 
-.. figure:: images/ho.png
+   Průměrná výška odtoku v :math:`mm` a průměrný objem odtoku v :math:`m^{3}`
+   povodí v zájmovém území.
 
-   Objem přímého odtoku pro elementární plochy
+Výstupní data
+-------------
 
-Pro účely vizualizace nastavíme vhodnou :skoleni:`tabulku barev
-<grass-gis-zacatecnik/raster/tabulka-barev.html>`:
+* :map:`hpj_kpp` - sjednocení :map:`hpj` a :map:`kpp` (atributy aj z číselníku
+  :map:`hpj`),
+* :map:`hpj_kpp_land` - průnik :map:`hpj_kpp` a :map:`LandUse`,
+* :map:`hpj_kpp_land_pov` - průnik :map:`hpj_kpp_land` a :map:`A07_Povodi_IV`,
+* :map:`hpj_kpp_rst` - rastr s hodnotami *HydrSk*,
+* :map:`hpj_kpp_land_rst` - rastr s hodnotami *CN*,
+* :map:`HO`, resp. :map:`HO_pov` - rastr s výškou odtoku :math:`mm` 
+  pro elementární plochy, resp. pre povodí,
+* :map:`OP`, resp. :map:`OP_pov` - rastr s hodnotami objemu odtoku v
+  :math:`m^{3}` pro elementární plochy, resp. povodí.
 
-.. code-block:: bash
-                
-   v.colors map=povodi_4 use=attr column=ho_average color=blues
+Použité zdroje
+--------------
 
-.. figure:: images/povodi_ho.png
+.. _o1:
 
-   Objem přímého odtoku pro povodí čtvrtého řádu
+[1] `Školení GRASS GIS pro pokročilé
+<http://training.gismentors.eu/grass-gis-pokrocily/hydrologie/scs-cn.html>`_
 
-   
+.. _o2:
+
+[2] `Index of /~landa/gis-zp-skoleni
+<http://geo102.fsv.cvut.cz/~landa/gis-zp-skoleni>`_
+
+.. _o3:
+
+[3] Wikipédia : `Metóda CN kriviek
+<https://cs.wikipedia.org/wiki/Metoda_CN_k%C5%99ivek>`_
+
+.. _o5:
+
+[4] `HYDRO.upol.cz <http://hydro.upol.cz/?page_id=15>`_
+
