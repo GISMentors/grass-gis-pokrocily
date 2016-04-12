@@ -41,7 +41,7 @@ jako poměr odtoku a srážky, která je redukovaná o počáteční ztraty.
 
    \frac{O_p}{A}=\frac{H_o}{H_s-I_a}
 
-.. _vstupne-data:
+.. _scs-cn-vstupni-data:
 
 Vstupní data
 ------------
