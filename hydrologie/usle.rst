@@ -1,5 +1,5 @@
-2. Průměrná dlouhodobá ztráta půdy
-==================================
+Průměrná dlouhodobá ztráta půdy
+===============================
 
 Teoretické základy
 ------------------

@@ -1,5 +1,5 @@
-1. Metoda SCS CN
-================
+Metoda SCS CN
+=============
 
 Teoretický základ
 -----------------
@@ -489,15 +489,4 @@ Použité zdroje
 
 .. _o1:
 
-[1] `Index of /~landa/gis-zp-skoleni
-<http://geo102.fsv.cvut.cz/~landa/gis-zp-skoleni>`_
-
-.. _o2:
-
-[2] Wikipedia : `Metóda CN kriviek
-<https://cs.wikipedia.org/wiki/Metoda_CN_k%C5%99ivek>`_
-
-.. _o3:
-
-[3] `HYDRO.upol.cz <http://hydro.upol.cz/?page_id=15>`_
-
+[1] `HYDRO.upol.cz <http://hydro.upol.cz/?page_id=15>`_
