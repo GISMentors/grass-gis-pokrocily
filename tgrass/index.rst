@@ -1,6 +1,6 @@
-*******************************
-Úvod do časoprostorových analýz
-*******************************
+**********************
+Časoprostorové analýzy
+**********************
 
 Více informací najdete v :grasscmd:`dokumentaci
 <temporalintro>`. Nástroje určené pro časoprostorové analýzy začínají

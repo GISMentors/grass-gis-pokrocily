@@ -1,6 +1,6 @@
-**************************************
-Vypublikování skriptu jako WPS procesu
-**************************************
+****************************
+Publikování jako WPS procesu
+****************************
 
 V této kapitole si ukážeme jakým způsobem vypublikovat libovolný
 skript pro systém GRASS nebo obecně jakýkoliv jeho nástroj jako

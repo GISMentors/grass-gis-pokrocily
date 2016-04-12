@@ -186,8 +186,7 @@ atributu :dbcolumn:`HPJ_key`.
 
 .. code-block:: bash
 
-   v.db.join map=hpj_kpp column=a_HPJ other_table=hpj_hydrsk
-   other_column=HPJ_key
+   v.db.join map=hpj_kpp column=a_HPJ other_table=hpj_hydrsk other_column=HPJ_key
 
 Atributy v tabulce :dbtable:`hpj_kpp` po spojení zkontrolujeme či
 obsahují sloupce z číselníku a následně doplníme chybějící informace o
@@ -198,23 +197,21 @@ vrstvy komplexního průzkumu půd. Využijeme modul
 
 .. code-block:: bash
 
-    db.execute sql="UPDATE hpj_kpp_1 SET HydrSk = (
-    SELECT b.First_hydr FROM hpj_kpp_1 AS a JOIN kpp_hydrsk as b
+    db.execute sql="UPDATE hpj_kpp_1 SET HydrSk = ( \
+    SELECT b.First_hydr FROM hpj_kpp_1 AS a JOIN kpp_hydrsk as b \
     ON a.b_KPP = b.KPP) WHERE HydrSk IS NULL"
 
-Výsledek může vypadat nasledovně.
-
-.. figure:: images/scs-cn-db-join.png
-
-   Atributový dotaz s výsledkem hydrologické skupiny půd.
-
 Obsah atributové tabulky :map:`hpj_kpp` zkontrolujeme pomocí *SQL
-Query BUILDER* a ověříme zda všechny hodnoty hydrologické skupiny jsou
+Query Builder* a ověříme zda všechny hodnoty hydrologické skupiny jsou
 vyplněné.
 
 .. code-block:: bash
 
-    SELECT cat,HydrSk FROM hpj_kpp_1 WHERE hydrSk = "NULL"
+    SELECT cat,HydrSk FROM hpj_kpp_1 WHERE hydrSk is "NULL"
+
+.. figure:: images/scs-cn-db-join.png
+
+   Atributový dotaz s výsledkem hydrologické skupiny půd.
 
 Nastavíme :skoleni:`tabulku barev
 <grass-gis-zacatecnik/raster/tabulka-barev.html>` pre jednotlivé
@@ -327,7 +324,7 @@ a kód :math:`CN` zobrazíme v atributové tabulce SQL dotazem
 
 Následně vytvoříme rastrovou vrstvu s hodnotami :math:`CN`.
 
-.. cole-block:: bash
+.. code-block:: bash
 
    g.region vector=hpj_kpp_land
    v.to.rast input=hpj_kpp_land output=hpj_kpp_land_rst use=attr
@@ -492,20 +489,15 @@ Použité zdroje
 
 .. _o1:
 
-[1] `Školení GRASS GIS pro pokročilé
-<http://training.gismentors.eu/grass-gis-pokrocily/hydrologie/scs-cn.html>`_
+[1] `Index of /~landa/gis-zp-skoleni
+<http://geo102.fsv.cvut.cz/~landa/gis-zp-skoleni>`_
 
 .. _o2:
 
-[2] `Index of /~landa/gis-zp-skoleni
-<http://geo102.fsv.cvut.cz/~landa/gis-zp-skoleni>`_
+[2] Wikipedia : `Metóda CN kriviek
+<https://cs.wikipedia.org/wiki/Metoda_CN_k%C5%99ivek>`_
 
 .. _o3:
 
-[3] Wikipédia : `Metóda CN kriviek
-<https://cs.wikipedia.org/wiki/Metoda_CN_k%C5%99ivek>`_
-
-.. _o5:
-
-[4] `HYDRO.upol.cz <http://hydro.upol.cz/?page_id=15>`_
+[3] `HYDRO.upol.cz <http://hydro.upol.cz/?page_id=15>`_
 
