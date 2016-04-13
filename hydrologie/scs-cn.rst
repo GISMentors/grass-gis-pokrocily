@@ -223,7 +223,7 @@ kódům A až D. Použijeme moduly :grasscmd:`v.db.addcolumn` a
 
 .. code-block:: bash
 
-    v.db.addcolumn map=hpj_kpp columns=HydrSk_key int
+    v.db.addcolumn map=hpj_kpp columns="HydrSk_key int"
 
     db.execute sql="update hpj_kpp_1 set HydrSk_key = 1 where HydrSk = 'A';
     update hpj_kpp_1 set HydrSk_key = 2 where HydrSk = 'AB';
@@ -237,7 +237,7 @@ kódům A až D. Použijeme moduly :grasscmd:`v.db.addcolumn` a
           atributových dat <grass-gis-zacatecnik/vektorova_data/atributy.html>`.
 
 Do textového souboru :file:`colors.txt` vložíme pravidla vlastní
-barevnou stupnici pro jednotlivé kategorie.
+barevné stupnice pro jednotlivé kategorie.
 
 .. code-block:: bash
 
@@ -249,57 +249,54 @@ barevnou stupnici pro jednotlivé kategorie.
    6 orange
    7 purple
 
-Modulem :grasscmd:`g.region` nastavíme výpočetní region
-(např. :map:`hpj_kpp`), konvertujeme vektorovou vrstvu na rastrovou,
+Modulem :grasscmd:`g.region` nastavíme výpočetní region na vektorovou
+mapu :map:`hpj_kpp` a konvertujeme vektorovou vrstvu na rastrovou,
 přiřadíme barevnou škálu a doplníme mimorámové údaje jako legendu a
-měřítko.
+měřítko. Pro rasterizaci použijeme vhodné prostorové rozlišení, v
+našem případě 10m.
 
 .. note:: Vektorovou vrstvu konvertujeme kvůli tomu, neboť zobrazit legendu je 
 	  možné pouze pro rastrové data.
 
 .. code-block:: bash
 
-   g.region vector=hpj_kpp
-   v.to.rast input=hpj_kpp output=hpj_kpp_rst use=attr
-   attribute_column=HydrSk_key
+   g.region vector=hpj_kpp res=10
+   v.to.rast input=hpj_kpp output=hpj_kpp_rst use=attr attribute_column=HydrSk_key
 
 .. figure:: images/1a.png
    :class: middle
 
    Výsledná vizualizace hydrologických skupin půd (1: A, 2: AB, 3:
-   B, 4: BC, 5: C, 6: CD a 7: D)
+   B, 4: BC, 5: C, 6: CD a 7: D).
 
-Přidáme informacie o využití území pro každou plochu pomocí operace
+Přidáme informace o využití území pro každou plochu pomocí operace
 průniku *intersection* s datovou vrstvou využití území
-:map:`Land_Use`.
+:map:`landuse`.
 
 .. code-block:: bash
 
-   v.overlay ainput=hpj_kpp binput=Land_Use operator=and output=hpj_kpp_land
+   v.overlay ainput=hpj_kpp binput=landuse operator=and output=hpj_kpp_land
 
 Přidáme sloupec :dbcolumn:`LU_HydrSk` s informacemi o využití území a
 hydrologické skupině pro každou elementární plochu. Hodnoty budou ve
-tvarů *VyužitíÚzemí_KodHydrologickéSkupiny*, t.j. *LU_HydrSk*.
+tvaru *VyužitíÚzemí_KodHydrologickéSkupiny*, t.j. *LU_HydrSk*.
 
 .. code-block:: bash
 
    v.db.addcolumn map=hpj_kpp_land columns="LU_HydrSk text"
-   db.execute sql="update hpj_kpp_land_1 set LU_HydrSk = b_LandUse || '_'
-   || a_HydrSk"
+   db.execute sql="update hpj_kpp_land_1 set LU_HydrSk = b_LandUse || '_' || a_HydrSk"
 
 .. note:: Tuto operaci je možné provést i pomocí :skoleni:`správce
           atributových dat
-          <grass-gis-zacatecnik/vector/atributy.html>` (`Field
+          <grass-gis-zacatecnik/vektorova_data/atributy.html>` (`Field
           Calculator`)
 
-Pomocí modulu :grasscmd:`db.select` anebo pomocí :skoleni:`spravce
-atributových dat <grass-gis-zacatecnik/vector/atributy.html>` vypíšeme
-počet všech kombinácí v sloupci :dbcolumn:`LU_HydrSk`.
+Pomocí modulu :grasscmd:`db.select` anebo pomocí *správce atributových
+dat* vypíšeme počet všech kombinácí v sloupci :dbcolumn:`LU_HydrSk`.
 
 .. code-block:: bash
 
-   db.select sql="select count(*) as comb_count from (select LU_HydrSk from
-   hpj_kpp_land_1 group by LU_HydrSk)"`
+   db.select sql="select count(*) as comb_count from (select LU_HydrSk from hpj_kpp_land_1 group by LU_HydrSk)"`
 
 .. figure:: images/2a.png
    :class: middle
@@ -313,8 +310,7 @@ Určíme odpovídající hodnoty :math:`CN`. Importujeme je do souboru
 .. code-block:: bash
 
    db.in.ogr input=LU_CN.xls output=lu_cn
-   v.db.join map=hpj_kpp_land column=LU_HydrSk other_table=lu_cn
-   other_column=LU_HydrSk
+   v.db.join map=hpj_kpp_land column=LU_HydrSk other_table=lu_cn other_column=LU_HydrSk
 
 Výsledné informace jako kód hydrologické skupiny, kód využití území
 a kód :math:`CN` zobrazíme v atributové tabulce SQL dotazem 
@@ -324,9 +320,8 @@ Následně vytvoříme rastrovou vrstvu s hodnotami :math:`CN`.
 
 .. code-block:: bash
 
-   g.region vector=hpj_kpp_land
-   v.to.rast input=hpj_kpp_land output=hpj_kpp_land_rst use=attr
-   attribute_column=CN
+   g.region vector=hpj_kpp_land res=10
+   v.to.rast input=hpj_kpp_land output=hpj_kpp_land_rst use=attr attribute_column=CN
    r.colors -e map=hpj_kpp_land_rst color=aspectcolr
 
 .. figure:: images/3a.png
@@ -335,24 +330,23 @@ Následně vytvoříme rastrovou vrstvu s hodnotami :math:`CN`.
    Kódy :math:`CN` pro každou elementární plochu využití půdy v
    zájmovém území.
 
-Atributová tabulka vrstvy povodí obsahuje údaje o návrhových srážkách
-s dobou opakovaní 5, 10, 20, 50 a 100 let. Je potřebné přidat tuto
-informaci ke každé elementární ploše.
+Atributová tabulka vrstvy :map:`povodi` obsahuje údaje o návrhových
+srážkách s dobou opakovaní 5, 10, 20, 50 a 100 let. Je potřebné přidat
+tuto informaci ke každé elementární ploše.
 
 .. figure:: images/5a.png
    :class: middle
 
    Atributy související s návrhovými srážkami s různou dobou opakovaní.
 
-Vrstvu :map:`hpj_kpp_land` sjednotíme s vrstvou povodí :map:`A07_Povodi_IV`,
-na čo využijeme modul :grasscmd:`v.overlay`.
+Vrstvu :map:`hpj_kpp_land` sjednotíme s vrstvou :map:`povodi`,
+na což využijeme modul :grasscmd:`v.overlay`.
 
 .. code-block:: bash
 
-   v.overlay ainput=hpj_kpp_land binput=A07_Povodi_IV operator=or
-   output=hpj_kpp_land_pov`
+   v.overlay ainput=hpj_kpp_land binput=povodi operator=or output=hpj_kpp_land_pov`
 
-Po sjednotení vidíme, že došlo k rozdělení územia na menší plochy (87
+Po sjednotení vidíme, že došlo k rozdělení území na menší plochy (87
 237, 91 449). Přesný počet je možné zjistit použitím :grasscmd:`db.select`.
 
 .. code-block:: bash
@@ -381,13 +375,12 @@ Pro každou elementární plochu vypočítame její výměru, parametr :math:`A`
    I_a = 0.2 \times A
 
 Do atributové tabulky `hpj_kpp_land_pov` přidáme nové sloupce
-:dbcolumn:`vymera`, :dbcolumn:`A`, :dbcolumn:`I_a` vzpočítame výměru,
+:dbcolumn:`vymera`, :dbcolumn:`A`, :dbcolumn:`I_a` vypočítame výměru,
 parametr :math:`A` a parametr :math:`I_{a}`.
 
 .. code-block:: bash
 
-   v.db.addcolumn map=hpj_kpp_land_pov columns="vymera double,A double,I_a
-   double"
+   v.db.addcolumn map=hpj_kpp_land_pov columns="vymera double,A double,I_a double"
    v.to.db map=hpj_kpp_land_pov option=area columns=vymera
    v.db.update map=hpj_kpp_land_pov column=A value="24.5 * (1000 / a_CN - 10)"
    v.db.update map=hpj_kpp_land_pov column=I_a value="0.2 * A"
@@ -395,7 +388,7 @@ parametr :math:`A` a parametr :math:`I_{a}`.
 Kroky 4 a 5
 ^^^^^^^^^^^
 
-Přidáme další nové sloupce do atribútovej tabulky ro parametry :math:`H_{o}`
+Přidáme další nové sloupce do atributové tabulky o parametry :math:`H_{o}`
 a :math:`O_{p}` a vypočítame jejich hodnoty pomocí :grasscmd:`v.db.update`.
 
 .. math::
@@ -407,9 +400,9 @@ a :math:`O_{p}` a vypočítame jejich hodnoty pomocí :grasscmd:`v.db.update`.
 	  :dbcolumn:`H_002_120`) či dobou 5, 10, 20, 50 anebo 100 let by byl 
 	  postup obdobný.
 
-.. note:: Hodnota v čitateli musí byť kladná, resp. nesmíme umocňovat záporné 
+.. note:: Hodnota v čitateli musí být kladná, resp. nesmíme umocňovat záporné 
 	  číslo. V připadě, že čitatel je záporný, výška přímého odtoku je
-	  rovná nule. Pro vyřešení tejto situace si pomůžeme novým sloupcem
+	  rovná nule. Pro vyřešení této situace si pomůžeme novým sloupcem
 	  v atributové tabulce, který nazveme :dbcolumn:`HOklad`. 
 
 .. code-block:: bash
@@ -448,13 +441,11 @@ překopírovat mapu povodí do aktuálneho mapsetu a nastaviť vhodnou
    g.region vector=kpp@PERMANENT res=10
    g.copy vector=A07_Povodi_IV,A07_Povodi_IV
    v.rast.stats map=A07_Povodi_IV raster=HO column_prefix=ho
-   v.to.rast input=A07_Povodi_IV output=HO_pov use=attr
-   attribute_column=ho_average
+   v.to.rast input=A07_Povodi_IV output=HO_pov use=attr attribute_column=ho_average
    r.colors map=HO_pov color=bcyr
 
    v.rast.stats map=A07_Povodi_IV raster=OP column_prefix=op
-   v.to.rast input=A07_Povodi_IV output=OP_pov use=attr
-   attribute_column=op_average
+   v.to.rast input=A07_Povodi_IV output=OP_pov use=attr attribute_column=op_average
    r.colors map=OP_pov color=bcyr
 
 .. figure:: images/8a.png
@@ -473,8 +464,8 @@ Výstupní data
 
 * :map:`hpj_kpp` - sjednocení :map:`hpj` a :map:`kpp` (atributy aj z číselníku
   :map:`hpj`),
-* :map:`hpj_kpp_land` - průnik :map:`hpj_kpp` a :map:`LandUse`,
-* :map:`hpj_kpp_land_pov` - průnik :map:`hpj_kpp_land` a :map:`A07_Povodi_IV`,
+* :map:`hpj_kpp_land` - průnik :map:`hpj_kpp` a :map:`landuse`,
+* :map:`hpj_kpp_land_pov` - průnik :map:`hpj_kpp_land` a :map:`povodi`,
 * :map:`hpj_kpp_rst` - rastr s hodnotami *HydrSk*,
 * :map:`hpj_kpp_land_rst` - rastr s hodnotami *CN*,
 * :map:`HO`, resp. :map:`HO_pov` - rastr s výškou odtoku :math:`mm` 
