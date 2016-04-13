@@ -5,19 +5,19 @@ Teoretický základ
 -----------------
 
 Jde o výpočet přímého odtoku z povodí, který je tvořen tzv. povrchovým
-odtokem a tzv. hypodermeckým (podpovrchovým) odtokem. Metoda byla
+odtokem a hypodermeckým (podpovrchovým) odtokem. Metoda byla
 vypracovaná službou na ochranu půd *Soil Conservation Service*
 (:wikipedia:`SCS CN <Metoda CN křivek>`) v USA. Objem srážek je na
 objem odtoku převedený na základě hodnot odtokových křivek `CN`, které
 jsou tabelizovány na základě hydrologických vlastností půd. Metoda
-zohledňuje závislost retence (zadržování vody) od hydrologických
-vlastností půd, počátočné nasicení a způsob využívaní půdy. Hodnota
-`CN` křivky reprezentuje tedy vlastnost povodí a platí, že čím je
-hodnota `CN` vyšší, tím je vyšší pravdepodobnost, že při srážkové
-udalosti dojde k přímému odtoku.
+zohledňuje závislost retence (zadržování vody) hydrologických
+vlastností půd, počáteční nasycení a způsob využívaní půdy. Hodnota
+`CN` křivek reprezentuje vlastnost povodí a platí, že čím je
+hodnota `CN` vyšší, tím je vyšší pravděpodobnost, že při srážkové
+události dojde k přímému odtoku.
 
-Hodnota `CN` závisí od kombinaci hydrologické skupiny půdy a způsobu
-využití území v daném místě. Kód hydrologické skupiny půdy je získaný
+Hodnota `CN` závisí na kombinaci hydrologické skupiny půd a způsobu
+využití území v daném místě. Kód hydrologické skupiny půd je získaný
 z dat hlavních půdních jednotek (přesnější způsob) anebo dat
 komplexního průzkumu půd (tam, kde informace o hlavních půdních
 jednotkách nejsou k dispozici).
@@ -64,20 +64,20 @@ Vstupní data
           ekologické jednotky - dvě číslice pětimístného kódu
           udávající hlavní půdní jednotku, informace o využití území
           *Land Parcel Identification System* a data komplexního
-          průzkumu půd poskytuje věčšinou krajský úřad příslušného
+          průzkumu půd poskytuje většinou krajský úřad příslušného
           území. Návrhové srážky je možno získat z hydrometeorologického
           ústavu.
 
 Navrhovaný postup
 ------------------
 :ref:`1.<kr1>` 
-sjednocení hlavních půdních jednotiek a komplexního průzkumu půd 
+sjednocení hlavních půdních jednotek a komplexního průzkumu půd
 
 :ref:`2.<kr2>` 
 připojení informací o hydrologické skupině
 
 :ref:`3.<kr3>` 
-průnik vrstvy s hydrologickými skupinami s vrstvou využití územia 
+průnik vrstvy s hydrologickými skupinami s vrstvou využití území
 
 :ref:`4.<kr4>` 
 připojení hodnot odtokové křivky :math:`CN`
@@ -105,10 +105,10 @@ výpočet průměrných hodnot výšky a objemu přímého odtoku pro povodí
 
    Grafické schéma postupu.
 
-Znázornění vstupních dat spolu s atributovými tabulkami je na :num:`#hpj-kpp`
-a :num:`#lu-pov`. Tabulky s informacemi o hydrologické skupině půdy a o 
-hodnotách CN pro kombinaci využití území a hydrologické skupiny, resp. 
-číselníky jsou na :num:`#ciselniky1`.
+Znázornění vstupních dat spolu s atributovými tabulkami je uvedeno na
+:num:`#hpj-kpp` a :num:`#lu-pov`. Tabulky s informacemi o hydrologické
+skupině půdy a o hodnotách CN pro kombinaci využití území a
+hydrologické skupiny, resp.  číselníky jsou na :num:`#ciselniky1`.
 
 .. _hpj-kpp:
 
@@ -145,15 +145,15 @@ operaci překrytí *union*.
 
    v.overlay ainput=hpj binput=kpp operator=or output=hpj_kpp
 
-Dále importujeme číselníky.
+Dále importujeme číselníky (:grasscmd:`db.in.ogr`):
 
 .. code-block:: bash
 
    db.in.ogr input=hpj_hydrsk.dbf output=hpj_hydrsk
    db.in.ogr input=sum_kpp2hydrsk.dbf output=kpp_hydrsk
 
-Pre kontrolu zkontrolujeme obsah importovaných číselníků (tabulek) v
-prostředí GRASS GIS, případně aspoň jejich sloupů. Použijeme moduly
+Zkontrolujeme obsah importovaných číselníků (tabulek) v prostředí
+GRASS GIS, případně aspoň jejich sloupů. Použijeme moduly
 :grasscmd:`db.select` a :grasscmd:`db.columns`.
 
 .. code-block:: bash
@@ -166,11 +166,11 @@ prostředí GRASS GIS, případně aspoň jejich sloupů. Použijeme moduly
 
 .. note::
 
-   V atributové tabulce hlavních půdních jednotek :map:`hpj_hydrsk` je
-   po importu datový typ atributu :dbcolumn:`HPJ` jako *type: DOUBLE
+   V atributové tabulce hlavních půdních jednotek :dbtable:`hpj_hydrsk` je
+   po importu datový typ atributu :dbcolumn:`HPJ` jako typ *DOUBLE
    PRECISION* (příkaz :code:`db.describe table=hpj_hydrsk`); je
-   potřebné jej překonvertovat na celočíselný typ, t.j. *type:
-   INTEGER* (kvůli spojení tabulek a číselníků pomocí
+   potřebné jej překonvertovat na celočíselný typ, t.j. *INTEGER*
+   (kvůli spojení tabulek a číselníků pomocí
    :grasscmd:`v.db.join`). Použijeme :sqlcmd:`ALTER` pro vytvorení
    atributu :dbcolumn:`HPJ_key` a :sqlcmd:`UPDATE` pro naplnění hodnot
    atributu.
@@ -193,16 +193,14 @@ obsahují sloupce z číselníku a následně doplníme chybějící informace o
 hydrologické skupině :dbcolumn:`HydrSk` pomocí
 :map:`kpp_hydrsk`. Doplníme je ze sloupce :dbcolumn:`First_Hydr`
 vrstvy komplexního průzkumu půd. Využijeme modul
-:grasscmd:`db.execute` a SQL príkaz :sqlcmd:`JOIN`.
+:grasscmd:`db.execute` a SQL příkaz :sqlcmd:`JOIN`.
 
 .. code-block:: bash
 
-    db.execute sql="UPDATE hpj_kpp_1 SET HydrSk = ( \
-    SELECT b.First_hydr FROM hpj_kpp_1 AS a JOIN kpp_hydrsk as b \
-    ON a.b_KPP = b.KPP) WHERE HydrSk IS NULL"
+    db.execute sql="UPDATE hpj_kpp_1 SET HydrSk = (SELECT b.First_hydr FROM hpj_kpp_1 AS a JOIN kpp_hydrsk as b ON a.b_KPP = b.KPP) WHERE HydrSk IS NULL"
 
 Obsah atributové tabulky :map:`hpj_kpp` zkontrolujeme pomocí *SQL
-Query Builder* a ověříme zda všechny hodnoty hydrologické skupiny jsou
+Query Builder* a ověříme, zda všechny hodnoty hydrologické skupiny jsou
 vyplněné.
 
 .. code-block:: bash
@@ -214,10 +212,10 @@ vyplněné.
    Atributový dotaz s výsledkem hydrologické skupiny půd.
 
 Nastavíme :skoleni:`tabulku barev
-<grass-gis-zacatecnik/raster/tabulka-barev.html>` pre jednotlivé
+<grass-gis-zacatecnik/raster/tabulka-barev.html>` pro jednotlivé
 skupiny pomocí modulu :grasscmd:`v.colors`. Kódy nelze použít, neboť
 tento modul podporuje pouze celočíselné hodnoty, proto je potřebné
-vytvorit nový atribut s jedinečnými hodnotami pro kódy. Nazveme ho
+vytvořit nový atribut s jedinečnými hodnotami pro kódy. Nazveme ho
 :dbcolumn:`HydrSk_key` a bude obsahovat čísla 1 až 7 odpovídající
 kódům A až D. Použijeme moduly :grasscmd:`v.db.addcolumn` a
 :grasscmd:`db.execute` a příkaz :sqlcmd:`UPDATE` jazyka
@@ -236,7 +234,7 @@ kódům A až D. Použijeme moduly :grasscmd:`v.db.addcolumn` a
     update hpj_kpp_1 set HydrSk_key = 7 where HydrSk = 'D'"
 
 .. note:: Nový sloupec je možné přidat i pomocí :skoleni:`správce
-          atributových dat <grass-gis-zacatecnik/vector/atributy.html>`.
+          atributových dat <grass-gis-zacatecnik/vektorova_data/atributy.html>`.
 
 Do textového souboru :file:`colors.txt` vložíme pravidla vlastní
 barevnou stupnici pro jednotlivé kategorie.
