@@ -344,10 +344,10 @@ na což využijeme modul :grasscmd:`v.overlay`.
 
 .. code-block:: bash
 
-   v.overlay ainput=hpj_kpp_land binput=povodi operator=or output=hpj_kpp_land_pov`
+   v.overlay ainput=hpj_kpp_land binput=povodi operator=or output=hpj_kpp_land_pov
 
-Po sjednotení vidíme, že došlo k rozdělení území na menší plochy (87
-237, 91 449). Přesný počet je možné zjistit použitím :grasscmd:`db.select`.
+Po sjednotení vidíme, že došlo k rozdělení území na menší
+plochy. Přesný počet je možné zjistit použitím :grasscmd:`db.select`.
 
 .. code-block:: bash
 
@@ -438,14 +438,13 @@ překopírovat mapu povodí do aktuálneho mapsetu a nastaviť vhodnou
 
 .. code-block:: bash
 
-   g.region vector=kpp@PERMANENT res=10
-   g.copy vector=A07_Povodi_IV,A07_Povodi_IV
-   v.rast.stats map=A07_Povodi_IV raster=HO column_prefix=ho
-   v.to.rast input=A07_Povodi_IV output=HO_pov use=attr attribute_column=ho_average
+   g.region vector=kpp res=10
+   v.rast.stats map=povodi raster=HO column_prefix=ho
+   v.to.rast input=povodi output=HO_pov use=attr attribute_column=ho_average
    r.colors map=HO_pov color=bcyr
 
-   v.rast.stats map=A07_Povodi_IV raster=OP column_prefix=op
-   v.to.rast input=A07_Povodi_IV output=OP_pov use=attr attribute_column=op_average
+   v.rast.stats map=povodi raster=OP column_prefix=op
+   v.to.rast input=povodi output=OP_pov use=attr attribute_column=op_average
    r.colors map=OP_pov color=bcyr
 
 .. figure:: images/8a.png
