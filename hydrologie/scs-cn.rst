@@ -310,7 +310,7 @@ Určíme odpovídající hodnoty :math:`CN`. Importujeme je do souboru
 .. code-block:: bash
 
    db.in.ogr input=LU_CN.xls output=lu_cn
-   v.db.join map=hpj_kpp_land column=LU_HydrSk other_table=lu_cn other_column=LU_HydrSk
+   v.db.join map=hpj_kpp_land column=LU_HydrSk other_table=lu_cn other_column=LU_HydrSk subset_columns=CN
 
 Výsledné informace jako kód hydrologické skupiny, kód využití území
 a kód :math:`CN` zobrazíme v atributové tabulce SQL dotazem 
