@@ -35,3 +35,4 @@ datasetů:
    :maxdepth: 2
 
    modis
+   landsat

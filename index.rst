@@ -40,7 +40,7 @@ grafických výstupů, časoprostorové modelování a vizualizaci dat.
 
 .. index::
    pair: free software; open source
-   single: GNU
+   1single: GNU
    pair: GPL; General Public License
 
 GRASS GIS (http://grass.osgeo.org) je *free software* a *open source*
