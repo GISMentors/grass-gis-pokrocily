@@ -72,8 +72,12 @@ Určení statististiky teplot pro jednotlivé měsíce pomocí modulu :grasscmd:
 
 .. code-block:: bash
                 
-   t.rast.aggregate input=modis out=modis_m basename=ag gra="1 months"
+   t.rast.aggregate input=modis output=modis_m basename=ag granularity="1 months"
 
+.. note:: Užitečný je parametr :option:`nprocs` pomocí kterého můžeme
+          výpočet agregace přenést na více jader počítače a tak
+          jej značně urychlit.
+             
 Vytvoří se dvanáct rastrových map v měsíční periodě, viz
 
 .. code-block:: bash
