@@ -112,9 +112,7 @@ Za `GISMentors <http://www.gismentors.cz/>`_:
 * `Ľudmila Furtkevičová
   <http://www.gismentors.cz/mentors/furtkevicova/>`_
 * `Martin Landa <http://www.gismentors.cz/mentors/landa>`_
-  ``<martin.landa opengeolabs.cz>``
 * `Jáchym Čepický <http://www.gismentors.cz/mentors/cepicky>`_
-  ``<jachym.cepicky opengeolabs.cz>``
 
 Text dokumentu
 --------------
