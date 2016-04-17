@@ -33,16 +33,16 @@ Pro dávkový import a vytvoření časoprostorového datasetu si napíšeme
 jednoduchý skript v jazyku Python, který provede následující kroky:
 
 #. naimportuje data včetně masek :lcode:`18`
-#. aplikuje masky nad originalními daty :lcode:`26`
+#. aplikuje masky nad originalními daty :lcode:`34`
 #. nastaví časovou značku (datum je uvedeno jako součást názvu
-   souboru) :lcode:`49`
+   souboru) :lcode:`59`
 #. maskované rastry zaregistruje do výstupního časoprostorového
-   datasetu :lcode:`57`
+   datasetu :lcode:`73`
 
 .. literalinclude:: ../_static/skripty/tgrass_landsat.py
    :language: python
    :linenos:
-   :emphasize-lines: 18, 26, 49, 57
+   :emphasize-lines: 18, 34, 59, 73
                 
 Skript je ke stažení `zde
 <../_static/skripty/tgrass_landsat.py>`_. Příklad spuštění:
