@@ -1,6 +1,9 @@
 MODIS
 =====
 
+GRASS lokace s daty MODIS je ke stažení `zde
+<http://training.gismentors.eu/geodata/grass/modis.zip>`_ (233MB).
+
 Vytvoření časoprostorového datasetu
 -----------------------------------
 

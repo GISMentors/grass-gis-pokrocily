@@ -9,9 +9,6 @@ Nástroje systému GRASS určené pro časoprostorové analýzy začínají na
 .. note:: Podpora pro časoprostorové analýzy je dostupná pouze ve
    verzi *GRASS 7.0 a vyšší*.
 
-   Testovací GRASS lokace ke stažení `zde
-   <http://training.gismentors.eu/geodata/grass/modis.zip>`_ (240MB).
-
 .. figure:: images/lmgr-t-modules.png
 
    Nástroje systému GRASS časoprostorových analýz.
