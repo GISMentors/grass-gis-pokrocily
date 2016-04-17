@@ -74,7 +74,7 @@ def create_strds(output):
     grass.run_command('t.create', output=output, title=output, description=output)
     map_file = grass.tempfile()
     grass.run_command('g.list', type='raster', mapset='.', separator='newline', output=map_file, overwrite=True)
-    grass.run_command('t.register', input=output, file=map_file, separator='newline', quiet=True)
+    grass.run_command('t.register', input=output, file=map_file, separator='newline', quiet=True, overwrite=True)
 
 def check_strds(name):
     strds = grass.read_command('t.list', quiet=True).splitlines()
