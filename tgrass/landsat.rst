@@ -14,6 +14,8 @@ hodnoty 1 a 2, přičemž hodnota 2 představuje oblačnost. Např.
    gdalinfo lndcal.LT51920262011306KIS00_20111102.tif -mm
    gdalinfo fmask.LT51920262011306KIS00_20111102.tif -noct -mm
 
+Viz `Landsat Surface Reflectance Quality Assessment <http://landsat.usgs.gov/landsat_climate_data_records_quality_calibration.php>`__.
+
 Import vstupních dat
 --------------------
 
