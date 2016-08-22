@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #%module
-#% description: Create temporal dataset from Landsat data
+#% description: Creates temporal dataset from Landsat data.
 #%end
 #%option G_OPT_M_DIR
 #% description: Name of directory with input Landsat files
