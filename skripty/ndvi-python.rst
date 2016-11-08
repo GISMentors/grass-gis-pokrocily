@@ -22,7 +22,7 @@ další.
    :linenos:
    :emphasize-lines: 3, 7-12, 15, 18, 22-24, 35-36, 44-45, 53-54, 58
 
-Skript je ke stažení `zde <../_static/skripty/ndvi-v1.py>`_.
+Skript je ke stažení `zde <../_static/skripty/ndvi-v1.py>`__.
 
 .. figure:: images/wxgui-ndvi-v1.png
    :class: middle
@@ -160,7 +160,7 @@ který definuje jeho
 * a typ parametru (``type``)
 
 U dalších parametrů jsou použity tzv. `standardizované volby
-<http://grass.osgeo.org/programming7/parser__standard__options_8c.html>`_,
+<http://grass.osgeo.org/programming7/parser__standard__options_8c.html>`__,
 např. ``G_OPT_M_MAPSET`` definuje parametr pro volbu mapsetu. V našem
 případě nastavíme parametr skriptu jako povinný (``required: yes``) a
 doplníme výchozí volbu (mapset :mapset:`landsat`), viz

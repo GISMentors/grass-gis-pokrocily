@@ -35,7 +35,7 @@ V následující ukázce vypíšeme statistiku převzorkovaného rastru:
    :linenos:
    :emphasize-lines: 9, 11-12, 16-17, 30
 
-Skript ke stažení `zde <../_static/skripty/dmt.py>`_.
+Skript ke stažení `zde <../_static/skripty/dmt.py>`__.
                      
 .. important:: Rastrová data budou v tomto případě převzorkována
                metodou :wikipedia-en:`nejblížšího souseda <Nearest

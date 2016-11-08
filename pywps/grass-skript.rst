@@ -10,7 +10,7 @@ Příprava dat
 Vektorová mapa :map:`obce_polygon` z mapsetu :mapset:`ruian`
 neobsahuje v atributové tabulce informace o PSČ. Tuto informaci budeme
 muset nejprve doplnit. PSČ obcí ke stažení `zde
-<http://training.gismentors.eu/geodata/db_pcobc.zip>`_ jako DBF
+<http://training.gismentors.eu/geodata/db_pcobc.zip>`__ jako DBF
 tabulka.
 
 V aktuálním mapsetu si vytvoříme kopii původní mapy

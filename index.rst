@@ -40,7 +40,7 @@ grafických výstupů, časoprostorové modelování a vizualizaci dat.
 
 .. index::
    pair: free software; open source
-   1single: GNU
+   single: GNU
    pair: GPL; General Public License
 
 GRASS GIS (http://grass.osgeo.org) je *free software* a *open source*
@@ -83,7 +83,8 @@ upravovat ho a tyto změny či opravy šířit dál.
    tgrass/index
    formaty/index
    3d/index
-
+   zod/index
+              
 *******
 Dodatky
 *******
@@ -107,7 +108,7 @@ Text dokumentu je licencován pod `Creative Commons Attribution-ShareAlike 4.0 I
 Autoři
 ------
 
-Za `GISMentors <http://www.gismentors.cz/>`_:
+Za `GISMentors <http://www.gismentors.cz/>`__:
 
 * `Ľudmila Furtkevičová
   <http://www.gismentors.cz/mentors/furtkevicova/>`_

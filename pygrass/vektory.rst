@@ -30,7 +30,7 @@ Skript níže *vypisuje souřadnice definičních bodů* z mapy
    :linenos:
    :emphasize-lines: 5-6, 8, 11
 
-Skript ke stažení `zde <../_static/skripty/obce_body.py>`_.
+Skript ke stažení `zde <../_static/skripty/obce_body.py>`__.
 
 .. important:: Tímto způsobem (bez topologie) lze procházet v mapě
           pouze základní geometrická primitiva jako jsou *body*, *linie*,
