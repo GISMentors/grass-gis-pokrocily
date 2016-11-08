@@ -97,7 +97,7 @@ zmenší, viz :num:`segment-1-2`.
 
    Porovnání objektů vzniklých po prvním a druhém běhu.
           
-Ve třetím kroku zvýšíme práh na hodnotu 0.12 a zároveň nastavíme
+Ve třetím kroku zvýšíme práh na hodnotu 0.09 a zároveň nastavíme
 minimální počet pixelů, které formují objekt na 15. Výsledek
 segmentace je znázorněn :num:`segment-3`.
 
