@@ -200,7 +200,7 @@ Na základě těchto atributů můžeme provést jednoduchou klasifikaci objekt�
 
 ::
 
-   diff_average > 2.5 AND ndvi_average < 0
+   diff_average > 2.5 AND ndvi_average < 0.1
 
 Výběr objektů splňujících dané atributové podmínky můžeme provést pomocí
 :skoleni:`správce atributových dat
