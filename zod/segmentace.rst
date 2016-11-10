@@ -209,10 +209,9 @@ modulem :grassCmd:`v.extract`.
 
 .. code-block:: bash
 
-   v.extract input=seg3 where="diff_average > 2.0 AND ndvi_average < 0" output=budovy
+   v.extract input=seg3 where="diff_average > 2.5 AND ndvi_average < 0.1" output=budovy
 
 .. figure:: images/segment-budovy.png
 
    Vizualizace výsledku filtrace objektů budov na základě NDVI a rozdílu výšek.
-               
-Podobně můžeme provést filtraci objektů reprezentující stromy a pod.
+
