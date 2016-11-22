@@ -16,6 +16,14 @@ hodnoty 1 a 2, přičemž hodnota 2 představuje oblačnost. Např.
 
 Viz `Landsat Surface Reflectance Quality Assessment <http://landsat.usgs.gov/landsat_climate_data_records_quality_calibration.php>`__.
 
+.. tip:: Existují užitečné utility, které usnadňují automatizované
+         stažení dat Landsat. Patří mezi ně např. `landsat-util
+         <https://pythonhosted.org/landsat-util/overview.html>`__,
+         `gsutil
+         <http://krstn.eu/landsat-batch-download-from-google/>`__ nebo
+         `Landsat-Download
+         <https://olivierhagolle.github.io/LANDSAT-Download/>`__.
+         
 Import vstupních dat
 --------------------
 
