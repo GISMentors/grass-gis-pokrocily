@@ -71,6 +71,6 @@ Ve výsledném datasetu máme zaregistrována data od roku 1984 do 2014:
    | Start time:................. 1984-06-25 00:00:00
    | End time:................... 2014-12-29 00:00:00
    ...
-   
-Další verze skriptu je ke stažení `zde
-<../_static/skripty/tgrass_landsat_foss4g2016.py>`_.
+
+.. tip:: Vylepšená verze skriptu s podporou pro multiprocessing je ke
+         stažení `zde <../_static/skripty/tgrass_landsat_foss4g2016.py>`_.
