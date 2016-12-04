@@ -14,7 +14,9 @@ Vstupní data
   infračerveného spektra (NIR)
 * digitální model reliéfu (DMR) a povrchu (DMP)
 * stíny (shadows)
-    
+
+.. todo:: Najít otevřená data pro tuto úlohu.
+     
 Import dat
 ^^^^^^^^^^
 
@@ -27,19 +29,19 @@ případě jde o S-JTSK :epsg:`5514`).
 
 Vstupní data naimportujeme do mapsetu PERMANENT, viz
 :skoleni:`poznámky k importu rastrových dat
-<grass-gis-zacatecnik/data/import.html#rastrova-data>` ve školení pro
-začátečníky.
+<grass-gis-zacatecnik/data/import.html#rastrova-data>` ze školení
+GRASS GIS pro začátečníky.
 
 .. figure:: images/segment-import.png
 
    Ukázka importu vstupních dat.
 
-.. note:: RGB snímek se po importu rozpadne na tři rastrové mapy (viz.
-   :map:`rgb.1`, :map:`rgb.2` a :map:`rgb.3`), současně
-   jsou tyto vrstvy registrovány v obrazové skupině :map:`rgb`,
-   viz příkaz :grassCmd:`i.group`. Jednotlivé obrazové kanály
-   lze složit do barevné kompozice příkazem :grassCmd:`d.rgb`,
-   viz :skoleni:`vizualizace dat
+.. note:: RGB snímek se po importu rozpadne na tři rastrové mapy
+   (:map:`rgb.1`, :map:`rgb.2` a :map:`rgb.3`), které jsou
+   registrovány v obrazové skupině :map:`rgb`, viz příkaz
+   :grassCmd:`i.group`. Jednotlivé obrazové kanály lze složit do
+   barevné kompozice příkazem :grassCmd:`d.rgb`, viz
+   :skoleni:`vizualizace dat
    <grass-gis-zacatecnik/intro/zobrazeni-geodat.html#rastrova-data>`.
 
    .. figure:: images/segment-rgb.png
@@ -48,8 +50,8 @@ začátečníky.
       Ukázka vizualizace vstupních dat, složení barevné syntézy v
       pravých (skutečných) barvách.
 
-Segmentace obrazu
------------------
+Proces segmentace obrazu
+------------------------
 
 Do segmentace obrazu bude vstupovat kromě pásem viditelného spektra
 (:map:`rgb.1`, :map:`rgb.2` a :map:`rgb.3`) také pásmo blízkého
@@ -65,10 +67,10 @@ groups --> Create/edit group` anebo jako příkaz :grassCmd:`i.group`.
    (:fignote:`1`) a přidání rastrových map do skupiny (:fignote:`2`).
 
 .. important:: Před dalším výpočtem je nutné nastavit korektní
-   :skoleni:`výpočetní region
-   <grass-gis-zacatecnik/intro/region.html>`. Vzhledem k tomu, že mají
+   *výpočetní region* (viz školení :skoleni:`GRASS GIS pro začátečníky
+   <grass-gis-zacatecnik/intro/region.html>`). Vzhledem k tomu, že mají
    vstupní vrstvy RGB a NIR stejné prostorové umístění a rozlišení,
-   zvolíme jednu z nich, např. :map:`nir`.
+   stačí zvolit libovolnou vrstvu, např. :map:`nir`.
 
    .. figure:: images/segment-region.png
       :class: small
@@ -95,7 +97,7 @@ zmenší, viz :num:`segment-1-2`.
 
 .. figure:: images/segment-1-2.png
 
-   Porovnání objektů vzniklých po prvním a druhém běhu.
+   Porovnání objektů vzniklých po prvním a druhém běhu segmentace obrazu.
           
 Ve třetím kroku zvýšíme práh na hodnotu 0.09 a zároveň nastavíme
 minimální počet pixelů, které formují objekt na 15. Výsledek
@@ -149,12 +151,12 @@ Filtrace objektů
 ----------------         
 
 Jako podkladové vrstvy pro filtraci objektů využijeme vrstvu
-normalizovaného diferečního vegetačního indexu (NDVI) vypočteného z vrstev
-červeného (:map:`rgb.1`) a blízkého infračerveného (:map:`nir`) pásma
-viz. :doc:`návod na jeho výpočet <../skripty/ndvi>`. Produkt NDVI
-můžeme vytvořit univerzálním nástrojem :skoleni:`mapové albegry
-<grass-gis-zacatecnik/rastrova_data/rastrova-algebra.html>`
-:grassCmd:`r.mapcalc` anebo přímo pomocí nástroje :grassCmd:`i.vi`.
+normalizovaného diferečního vegetačního indexu (NDVI) vypočteného z
+vrstev červeného (:map:`rgb.1`) a blízkého infračerveného (:map:`nir`)
+pásma viz. :doc:`návod na jeho výpočet <../skripty/ndvi>`. Produkt
+NDVI můžeme vytvořit univerzálním nástrojem :skoleni:`mapové albegry
+<grass-gis-zacatecnik/rastrova_data/rastrova-algebra.html>` anebo
+přímo pomocí nástroje :grassCmd:`i.vi`.
 
 .. code-block:: bash
 
@@ -164,11 +166,10 @@ můžeme vytvořit univerzálním nástrojem :skoleni:`mapové albegry
 
    Vrstva normalizovaného diferenčního vegetačního indexu.
 
-Dále pomocí nástroje :skoleni:`mapové albegry
+Dále pomocí nástroje :skoleni:`mapové albegry r.mapcalc
 <grass-gis-zacatecnik/rastrova_data/rastrova-algebra.html>`
-:grassCmd:`r.mapcalc` (:menuselection:`Raster --> Raster map
-calculator`) vypočteme rastrovou mapu rozdílu výšek digitalního modelu
-povrchu a terénu:
+(:menuselection:`Raster --> Raster map calculator`) vypočteme
+rastrovou mapu rozdílu výšek digitalního modelu povrchu a terénu:
 
 .. code-block:: bash
 
@@ -179,28 +180,50 @@ povrchu a terénu:
    Rastrová mapa rozdílu výšek digitálního modelu povrchu a terénu
    (tabulka barev: differences).
 
-Tyto dvě rastrové mapy použijeme pro výpočet zonální statistiky
-objektů pomocí modulu :grassCmd:`v.rast.stats` (:menuselection:`Vector
---> Update attributes --> Update area atributes from raster`). Ze
-statistických ukazatelů vybereme průměrnou hodnotu
-(:option:`method=average`).
+Statistiku objektů odvozenou z vrstev NDVI a rozdílu výšek určíme
+pomocí specializovaného modulu :grasscmdaddons:`i.segment.stats`.
 
 .. code-block:: bash
+                
+   i.segment.stats map=seg3 rasters=ndvi,diff raster_statistics=mean area_measures=area vectormap=seg3
 
-   v.rast.stats map=seg3 raster=ndvi column_prefix=ndvi method=average
-   v.rast.stats map=seg3 raster=diff column_prefix=diff method=average
+.. note:: Nástroj :grasscmdaddons:`i.segment.stats` není standardní
+          součástí systému GRASS, ale je distrubován jako
+          tzv. addons - rozšíření. Modul nainstalujeme z menu
+          :menuselection:`Settings --> Addons extensions --> Install
+          extensions from addons`.
 
+          .. figure:: images/segment-stats-install.png
+             :class: small
+             
+             Instalace nástroje i.segment.stats.
+
+          Modul :grasscmdaddons:`i.segment.stats` pro svůj běž
+          vyžaduje rozšíření :grasscmdaddons:`r.object.geometry`,
+          které je nutné nainstalovat taktéž.
+          
 .. figure:: images/segment-ndvi-diff.png
 
    Objekty s atributy průměrné hodnoty NDVI a rozdílu výšek.
-               
+
+.. note:: Namísto specializovaného modulu lze využít standardní nástroj
+          zonální statistiky :grassCmd:`v.rast.stats` (:menuselection:`Vector
+          --> Update attributes --> Update area atributes from raster`). Ze
+          statistických ukazatelů vybereme průměrnou hodnotu
+          (:option:`method=average`).
+
+          .. code-block:: bash
+
+             v.rast.stats map=seg3 raster=ndvi column_prefix=ndvi method=average
+             v.rast.stats map=seg3 raster=diff column_prefix=diff method=average
+
 Na základě těchto atributů můžeme provést jednoduchou klasifikaci objektů. Např.
 
 * budovy   
 
 ::
 
-   diff_average > 2.5 AND ndvi_average < 0.1
+   diff_mean > 2.5 AND ndvi_mean < 0.1
 
 Výběr objektů splňujících dané atributové podmínky můžeme provést pomocí
 :skoleni:`správce atributových dat
@@ -209,7 +232,7 @@ modulem :grassCmd:`v.extract`.
 
 .. code-block:: bash
 
-   v.extract input=seg3 where="diff_average > 2.5 AND ndvi_average < 0.1" output=budovy
+   v.extract input=seg3 where="diff_mean > 2.5 AND ndvi_mean < 0.1" output=budovy
 
 .. figure:: images/segment-budovy.png
 
