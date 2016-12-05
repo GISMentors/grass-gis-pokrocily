@@ -1,6 +1,8 @@
 Metoda SCS CN
 =============
 
+.. _scs-cn-teorie:
+
 Teoretický základ
 -----------------
 
@@ -21,6 +23,8 @@ využití území v daném místě. Kód hydrologické skupiny půd je získaný
 z dat hlavních půdních jednotek (přesnější způsob) anebo dat
 komplexního průzkumu půd (tam, kde informace o hlavních půdních
 jednotkách nejsou k dispozici).
+
+.. _scs-cn-symboly:
 
 Základní symboly
 ----------------
@@ -67,6 +71,8 @@ Vstupní data
           průzkumu půd poskytuje většinou krajský úřad příslušného
           území. Návrhové srážky je možno získat z hydrometeorologického
           ústavu.
+
+.. _scs-cn-postup:
 
 Navrhovaný postup
 ------------------
