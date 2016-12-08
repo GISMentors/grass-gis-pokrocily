@@ -83,13 +83,13 @@ sjednocení hlavních půdních jednotek a komplexního průzkumu půd
 připojení informací o hydrologické skupině
 
 :ref:`3.<kr3>` 
-průnik vrstvy s hydrologickými skupinami s vrstvou využití území
+průnik vrstvy hydrologických skupin s vrstvou využití území
 
 :ref:`4.<kr4>` 
 připojení hodnot odtokové křivky :math:`CN`
 
 :ref:`5.<kr5>` 
-sjednocení průniku vrstvy s hydrologickými skupinami a využitím území 
+sjednocení průniku vrstvy hydrologických skupinami a využití území 
 s vrstvou povodí 
 
 :ref:`6.<kr6>` 
