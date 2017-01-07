@@ -49,8 +49,8 @@ License)`.  Tato licence nejenže umožňuje software použít k libovolným
 účelům včetně komerčních, dovoluje také studovat jeho zdrojový kód,
 upravovat ho a tyto změny či opravy šířit dál.
 
-.. important:: Školení je zaměřeno na aktuální verzi `GRASS 7.0
-               <http://grass.osgeo.org/download/software/#g70x>`_ a do
+.. important:: Školení je zaměřeno na aktuální verzi `GRASS 7.2
+               <http://grass.osgeo.org/download/software/#g72x>`_ a do
                jisté míry navazuje na školení :skoleni:`GRASS GIS pro
                začátečníky <grass-gis-zacatecnik>`.
 
@@ -81,9 +81,11 @@ upravovat ho a tyto změny či opravy šířit dál.
    pywps/index
    hydrologie/index
    tgrass/index
+   lidar/index
+   zod/index
    formaty/index
    3d/index
-   zod/index
+
               
 *******
 Dodatky
