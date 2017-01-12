@@ -116,6 +116,8 @@ Poté již provedeme import (tj. vynecháme přepínače :option:`-sg`):
                 
    r.in.xyz input=HLIN04_5g.xyz separator=space output=HLIN04_5g
 
+.. _lidar-import-xyz-vektor:
+
 Pokud chceme vstupní data importovat jako vektorovou mapu, použijeme
 modul :grasscmd:`v.in.ascii`.
 
@@ -130,7 +132,7 @@ modul :grasscmd:`v.in.ascii`.
 
 .. code-block:: bash
 
-   v.in.ascii in=HLIN04_5g.xyz out=HLIN04_5g separator=space z=3 -tbz
+   v.in.ascii input=HLIN04_5g.xyz output=HLIN04_5g separator=space z=3 -tbz
 
 .. figure:: images/import-rast-vect.png
 
@@ -228,6 +230,8 @@ Poté již provedeme import:
       nsres:      1
       ewres:      1
 
+.. _lidar-import-las-vektor:
+
 Pro vytvoření vektorové mapy na základě vstupních dat slouží modul
 :grasscmd:`v.in.lidar`.
 
@@ -237,12 +241,12 @@ Pro vytvoření vektorové mapy na základě vstupních dat slouží modul
 
 .. tip:: Podobně jako v případě importu textových dat lze proces
    urychlit tím, že nebudeme vytvářet atributová data (pokud je
-   nepotřebujeme, což je typicky u již klasifikovaných dat
-   určených pro tvorbu digitálního modelu terénu, viz kapitola
-   :doc:`cuzk-dmr-dmp`) a přeskočíme tvorbu topologie, která u
-   bodových dat stejně nedává smysl. V našem případě ještě
-   použijeme přepínač :option:`-o`, který přeskočí kontrolu
-   souřadnicového systému.
+   nepotřebujeme, což je typicky u již klasifikovaných dat určených
+   pro tvorbu digitálního modelu terénu, viz kapitola
+   :doc:`dmr-dmp-cuzk`) a přeskočíme tvorbu topologie, která u
+   bodových dat stejně nedává smysl. V našem případě ještě použijeme
+   přepínač :option:`-o`, který přeskočí kontrolu souřadnicového
+   systému.
 
    .. code-block:: bash
 
