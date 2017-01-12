@@ -46,6 +46,8 @@ aktuálním výpočetním regionem. Proto je třeba před importem nastavit
 výpočetní region na základě vstupních dat. K tomu nám poslouží
 přepínače :option:`-sg`.
 
+.. _lidar-import-scan:
+
 .. code-block:: bash
 
    r.in.xyz -sg input=HLIN04_5g.xyz separator=space output=HLIN04_5g --o
@@ -130,5 +132,118 @@ modul :grasscmd:`v.in.ascii`.
 
    v.in.ascii in=HLIN04_5g.xyz out=HLIN04_5g separator=space z=3 -tbz
 
+.. figure:: images/import-rast-vect.png
+
+   Ukázka importu Lidarových dat do rastrové a vektorové mapy.
+   
 Binární formát LAS/LAZ
 ----------------------
+
+Data v binárím formátu LAS či komprimované LAZ lze do systému GRASS
+naimportovat jako rastrovou mapu a to pomocí modulu
+:grasscmd:`r.in.lidar` anebo jako mapu vektorovou pomocí
+:grasscmd:`v.in.lidar`.
+
+Modul :grasscmd:`r.in.lidar` funguje obdobně jako :grasscmd:`r.in.xyz`
+s tím, že nejrpve zjistíme rozsah dat a podle toho nastavíme výpočetní
+region. V tomto regionu dojde k agregaci vstupních bodu na základě
+zvolené statistické metody (parametr :option:`method`, výchozí metoda
+je průměrná hodnota *mean*).
+
+.. code-block: bash
+
+   r.in.lidar input=pr_TANV37_5g.laz -sg
+
+.. note:: Je možné, že vstupní soubor nebude obsahovat informace o
+   souřadnicovém systému. V tomto případě příkaz skončí chybou:
+
+   ::
+
+      ERROR: Projection of dataset does not appear to match current location.
+
+      GRASS LOCATION PROJ_INFO is:
+      name: WGS 84 / UTM zone 33N
+      datum: wgs84
+      ellps: wgs84
+      proj: utm
+      zone: 33
+      no_defs: defined
+
+      Import dataset PROJ_INFO is:
+      Dataset proj = 0 (unreferenced/unknown)
+      
+      In case of no significant differences in the projection definitions, use the -o flag...
+      Consider generating a new location with 'location' parameter from input data set.
+
+   V tomto případě, přídejte přepínač :option:`-o`, který kontrolu
+   souřadnicového systému přeskočí. V našem případě ještě použijeme
+   přepínač :option:`--quiet`, tak abychom potlačili všechny zprávy
+   modulu.
+
+   .. code-block:: bash
+
+      r.in.lidar input=pr_TANV37_5g.laz -sgo --quiet
+
+Výsledek, v našem případě
+
+::
+   
+   n=5627727.26 s=5625597.55 e=534548.84 w=531815.05 b=925.35 t=1292.54
+
+použijeme pro nastavení výpočetního regionu včetně rozlišení (parametr :option:`res`).
+
+.. code-block:: bash
+
+   g.region n=5627727.26 s=5625597.55 e=534548.84 w=531815.05 b=925.35 t=1292.54 res=1
+
+Poté již provedeme import:
+
+.. code-block:: bash
+
+   r.in.lidar input=pr_TANV37_5g.laz output=pr_TANV37_5g -o
+
+.. tip:: Modul :grasscmd:`r.in.lidar` umožňuje výpočetní region
+         nastavit automaticky na základě vstupních dat. K tomu slouží
+         přepínač :option:`-e`. V tomto ohledu se hodí použít ještě
+         přepínač :option:`-n`, který aktualní výpočetní region
+         nastaví na základě vstupních dat. Prostorové rozlišení
+         regionu nastavíme parametrem :option:`resolution`.
+   
+.. code-block:: bash
+
+   r.in.lidar input=pr_TANV37_5g.laz output=pr_TANV37_5g resolution=1 -one
+
+.. note:: Výsledný výpočetní region bude v tomto případě schodný s příkazem (preference rozlišení):
+
+   .. code-block:: bash
+
+      g.region n=5627727.26 s=5625597.55 e=534548.84 w=531815.05 b=925.35 t=1292.54 res=1 -a
+
+   ::
+      
+      north:      5627728
+      south:      5625597
+      west:       531815
+      east:       534549
+      nsres:      1
+      ewres:      1
+
+Pro vytvoření vektorové mapy na základě vstupních dat slouží modul
+:grasscmd:`v.in.lidar`.
+
+.. code-block:: bash
+
+   v.in.lidar input=pr_TANV37_5g.laz output=pr_TANV37_5g
+
+.. tip:: Podobně jako v případě importu textových dat lze proces
+   urychlit tím, že nebudeme vytvářet atributová data (pokud je
+   nepotřebujeme, což je typicky u již klasifikovaných dat
+   určených pro tvorbu digitálního modelu terénu, viz kapitola
+   :doc:`cuzk-dmr-dmp`) a přeskočíme tvorbu topologie, která u
+   bodových dat stejně nedává smysl. V našem případě ještě
+   použijeme přepínač :option:`-o`, který přeskočí kontrolu
+   souřadnicového systému.
+
+   .. code-block:: bash
+
+      v.in.lidar input=pr_TANV37_5g.laz output=pr_TANV37_5g  -otb
