@@ -73,7 +73,7 @@ Poté spustíme proces interpolace:
 
 .. tip:: Modul :grasscmd:`v.surf.rst` poskytuje dobré výsledky,
          bohužel je ale velmi pomalý. Na testovacím PC trvala
-         interpolace pro výše zmíněná data XXX min!
+         interpolace pro výše zmíněná data 3hod 14min!
 
          Od verze GRASS 7.3 (aktuální vývojová větev) podporuje modul
          paralelizaci výpočtu, což může vést k signifikatnímu
@@ -131,4 +131,48 @@ Produkt DMP vytvoříme obdobně jako v případě DMR:
 Dávkové zpracování dlaždic DMR/DMP
 ----------------------------------
 
-.. todo:: doplnit
+ČÚZK poskytuje typicky data ve formě dlaždic, v případě testovacího
+datasetu se jedna o:
+
+* HLIN04,
+* HLIN05,
+* HLIN14,
+* HLIN15.
+
+Zpracování dlaždic můžeme urychlit paralelizací výpočtu, k tomu
+použijeme nástoje frameworku PyGRASS, viz kapitola
+:doc:`../pygrass/index`. Moduly systému GRASS umožňuje spuštět třída
+:class:`Module`, viz příklad v kapitole :doc:`Úvod do skriptování
+<../skripty/ndvi-python>`. Paralelizaci výpočtu je možné poměrně
+jednoduše implementovat pomocí třídy :class:`ParallelModuleQueue`,
+viz `dokumentace
+<https://grass.osgeo.org/grass72/manuals/libpython/pygrass.modules.interface.html#pygrass.modules.interface.module.ParallelModuleQueue>`__. Příklad
+použití si ukážeme na jednoduché operaci importu dat pomocí modulu
+:ref:`v.in.ascii <lidar-import-xyz-vektor>`:
+
+.. literalinclude:: ../_static/skripty/create-dmt.py
+   :language: python
+   :lines: 45-49,52-55
+   :linenos:
+   :emphasize-lines: 1-2, 7, 8, 9
+
+Komentáře:
+
+* Na řádcích :lcode:`1-2` vytvoříme objekt modulu
+  :grasscmd:`v.in.ascii` obsahující společné parametry.
+* Na řádku :lcode:`7` vytvoříme pro každý importovaný soubor kopii
+  objektu pro import.
+* Této kopii nastavíme na souboru závislé parametry - cestu k
+  importovanému souboru (:option:`input` a název výstupní vektorové
+  mapy (:option:`output`). Spustíme instanci takto upraveného objektu
+  a zařadíme do fronty (``queue`` jako instance třídy
+  :class:`ParallelModuleQueue`), viz řádek :lcode:`8`.
+
+  .. literalinclude:: ../_static/skripty/create-dmt.py
+     :language: python
+     :lines: 71
+* Poté necháme všechny paralelně běžící procesy proběhnout, viz řádek
+  :lcode:`9`.
+
+Výsledná verze skriptu ke stažení `zde
+<../_static/skripty/create-dmt.py>`_.
