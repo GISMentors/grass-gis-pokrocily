@@ -17,7 +17,7 @@
 #%option
 #% key: resolution
 #% description: Output resolution
-#% type: float
+#% type: double
 #%end
 #%option
 #% key: nprocs
@@ -65,26 +65,29 @@ def import_files(directory, pattern):
             queue.put(import_task(input=f, output=mapname))
         queue.wait()
     except CalledModuleError:
-        return 1
+        return sys.exit(1)
 
     return maps
 
 def create_dmt_tiles(maps, res, rst_nprocs, offset_multiplier=10):
     offset=res * offset_multiplier
-    region_module = Module('g.region', n=n+offset, s=s-offset, e=e+offet, w=w-offset)
+    region_module = Module('g.region', n='n+{}'.format(offset), s='s-{}'.format(offset),
+                           e='e+{}'.format(offset), w='w-{}'.format(offset),
+                           quiet=True)
     rst_module = Module('v.surf.rst', nprocs=rst_nprocs,
                         overwrite=overwrite(), quiet=True, run_=False)
     try:
         for mapname in maps:
             message("Interpolating <{}>...".format(mapname))
+            region_task = deepcopy(region_module)
             rst_task = deepcopy(rst_module)
             mm = MultiModule([region_task(vector=mapname),
-                              rst_task(input=mapname, output=mapname)
-                              sync=False, set_temp_region=True])
+                              rst_task(input=mapname, elevation=mapname)],
+                              sync=False, set_temp_region=True)
             queue.put(mm)
         queue.wait()
     except CalledModuleError:
-        return 1
+        return sys.exit(1)
     
 def patch_tiles(maps):
     message("Patching tiles <{}>".format(','.join(maps)))
