@@ -174,5 +174,25 @@ Komentáře:
 * Poté necháme všechny paralelně běžící procesy proběhnout, viz řádek
   :lcode:`9`.
 
+Podobně lze paralelně volat i interpolační modul
+:grasscmd:`v.surf.rst`. Výsledný skript může vypadat následovně:
+          
+.. literalinclude:: ../_static/skripty/create-dmt.py
+   :language: python
+   :linenos:
+
+.. note:: Skript umožňuje paralelizovat jak běh modulů pro import a
+          interpolaci (parametr :option:`nprocs`), tak modulu
+          :grasscmd:`v.surf.rst` jako takového (:option:`rst_nprocs`).
+
+.. todo:: Vysvetlit MultiModule
+          
+Ukázka volání (v tomto případě bude vytíženo při interpolaci 12 jader
+CPU):
+
+.. code-block:: bash
+
+   create-dmt.py in=VYSKOPIS elev=dmt pat=*5g* resolution=1 nprocs=4 rst_nprocs=3
+   
 Výsledná verze skriptu ke stažení `zde
 <../_static/skripty/create-dmt.py>`_.

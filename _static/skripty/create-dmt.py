@@ -15,8 +15,19 @@
 #%option G_OPT_R_ELEV
 #%end
 #%option
+#% key: resolution
+#% description: Output resolution
+#% type: float
+#%end
+#%option
 #% key: nprocs
 #% description: Number of processes
+#% answer: 1
+#% type: integer
+#%end
+#%option
+#% key: rst_nprocs
+#% description: Number of v.surf.rst processes
 #% answer: 1
 #% type: integer
 #%end
@@ -27,7 +38,7 @@ from copy import deepcopy
 
 from grass.script.core import parser, message, fatal, overwrite
 
-from grass.pygrass.modules import Module, ParallelModuleQueue
+from grass.pygrass.modules import Module, MultiModule, ParallelModuleQueue
 from grass.exceptions import CalledModuleError
 
 def import_files(directory, pattern):
@@ -58,15 +69,36 @@ def import_files(directory, pattern):
 
     return maps
 
-def main():
-    import_files(options['input'], options['pattern'])
+def create_dmt_tiles(maps, res, rst_nprocs, offset_multiplier=10):
+    offset=res * offset_multiplier
+    region_module = Module('g.region', n=n+offset, s=s-offset, e=e+offet, w=w-offset)
+    rst_module = Module('v.surf.rst', nprocs=rst_nprocs,
+                        overwrite=overwrite(), quiet=True, run_=False)
+    try:
+        for mapname in maps:
+            message("Interpolating <{}>...".format(mapname))
+            rst_task = deepcopy(rst_module)
+            mm = MultiModule([region_task(vector=mapname),
+                              rst_task(input=mapname, output=mapname)
+                              sync=False, set_temp_region=True])
+            queue.put(mm)
+        queue.wait()
+    except CalledModuleError:
+        return 1
     
+def patch_tiles(maps):
+    message("Patching tiles <{}>".format(','.join(maps)))
+    
+def main():
+    maps = import_files(options['input'], options['pattern'])
+    create_dmt_tiles(maps, float(options['resolution']), int(options['rst_nprocs']))
+    patch_tiles(maps)
+                             
     return 0
 
 if __name__ == "__main__":
     options, flags = parser()
 
-    print overwrite()
     # queue for parallel jobs
     queue = ParallelModuleQueue(int(options['nprocs']))
 
