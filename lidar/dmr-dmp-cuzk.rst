@@ -79,11 +79,11 @@ Poté spustíme proces interpolace:
          paralelizaci výpočtu, což může vést k signifikatnímu
          zrychlení výpočtu. V našem případě rozložení výpočtu na 8
          jader CPU (parametr :option:`nprocs=8`) vedlo ke snížení
-         výpočetního času na XXX min.
+         výpočetního času na 30 min.
 
          .. code-block:: bash
 
-            v.surf.rst input=HLIN04_5g elevation=HLIN04_5g ncprocs=8
+            v.surf.rst input=HLIN04_5g elevation=HLIN04_5g nprocs=8
    
 .. figure:: images/dtm-cuzk.png
 
@@ -152,7 +152,7 @@ použití si ukážeme na jednoduché operaci importu dat pomocí modulu
 
 .. literalinclude:: ../_static/skripty/create-dmt.py
    :language: python
-   :lines: 45-49,52-55
+   :lines: 60-64,67-69
    :linenos:
    :emphasize-lines: 1-2, 7, 8, 9
 
@@ -170,12 +170,47 @@ Komentáře:
 
   .. literalinclude:: ../_static/skripty/create-dmt.py
      :language: python
-     :lines: 71
+     :lines: 127
 * Poté necháme všechny paralelně běžící procesy proběhnout, viz řádek
   :lcode:`9`.
 
 Podobně lze paralelně volat i interpolační modul
-:grasscmd:`v.surf.rst`. Výsledný skript může vypadat následovně:
+:grasscmd:`v.surf.rst` pouze s tím rozdílem je že třeba pro každý
+proces nastavit příslušný region na základě vstupních dat
+(dlaždice). Tuto operaci nám zásadně usnadní třída
+:class:`MultiModule`, která umožňuje registrovat moduly jako jeden
+proces ve frontě. V prvním kroku zaregistrujeme modul
+:grasscmd:`g.region` pomocí kterého nastavíme výpočetní region
+dlaždice (:lcode:`11`) a poté přidáme do procesu interpolační modul
+:grasscmd:`v.surf.rst` (:lcode:`12`).
+
+.. literalinclude:: ../_static/skripty/create-dmt.py
+   :language: python
+   :lines: 86-100
+   :linenos:
+   :emphasize-lines: 1-2, 11-14
+
+Komentáře:
+
+* Ve skriptu nastavujeme výpočetní region dlaždice o něco větší tak,
+  aby u výstupních dlaždic DMT vznikly pásy překryvu a bylo možno
+  vytvořit výslednou mozaiku DMT bez ostrých přechodů na hranicích
+  dlaždic, viz ``offset`` jako desetinásobek zadaného rozlišení na
+  řádce :lcode:`1-2`.
+
+.. todo:: Vysvětlit ``sync``
+
+.. warning:: Třída :class:`MultiModule` je v současnosti dostupná
+             pouze ve vývojové verzi systému GRASS 7.3, viz
+             `dokumentace
+             <https://grass.osgeo.org/grass73/manuals/libpython/pygrass.modules.interface.html#pygrass.modules.interface.module.MultiModule>`__.
+                       
+.. todo:: Dopsat scénář řešení v nižších verzích bez třídy
+   MultiModule.
+
+Výsledná mozaika DMT jednotlivých dlaždic může být vytvořena modulem
+:grasscmd:`r.series` a vhodnou statistickou metodou, viz
+:lcode:`109`. Výsledný skript může vypadat následovně:
           
 .. literalinclude:: ../_static/skripty/create-dmt.py
    :language: python
@@ -185,10 +220,8 @@ Podobně lze paralelně volat i interpolační modul
           interpolaci (parametr :option:`nprocs`), tak modulu
           :grasscmd:`v.surf.rst` jako takového (:option:`rst_nprocs`).
 
-.. todo:: Vysvetlit MultiModule
-          
 Ukázka volání (v tomto případě bude vytíženo při interpolaci 12 jader
-CPU):
+CPU, výpočet trval přes hodinu a 20 minut):
 
 .. code-block:: bash
 
@@ -196,3 +229,8 @@ CPU):
    
 Výsledná verze skriptu ke stažení `zde
 <../_static/skripty/create-dmt.py>`_.
+
+.. figure:: images/dmr5g_ortofoto_3d.png
+
+   Ukázka vizualizace výsledného DMT ve 3D s ortofotem (ČÚZK WMS).
+
