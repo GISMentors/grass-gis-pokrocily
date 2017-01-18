@@ -13,6 +13,7 @@
 #% description: File name pattern to filter files in input directory
 #%end
 #%option G_OPT_R_ELEV
+#% description: Name for output elevation raster map mosaics
 #%end
 #%option
 #% key: resolution
@@ -34,6 +35,7 @@
 
 import os
 import sys
+import time
 from copy import deepcopy
 
 from grass.script.core import parser, message, fatal, overwrite
@@ -53,6 +55,8 @@ def import_files(directory, pattern):
                     os.listdir(directory)
         )
 
+    start = time.time()
+
     import_module = Module('v.in.ascii', separator='space', z=3, flags='tbz',
                            overwrite=overwrite(), quiet=True, run_=False)
     try:
@@ -67,10 +71,18 @@ def import_files(directory, pattern):
     except CalledModuleError:
         return sys.exit(1)
 
+    if not maps:
+        fatal("No input files found")
+
+    message("Import finished in {:.0f} sec".format(time.time() - start))
+
     return maps
 
 def create_dmt_tiles(maps, res, rst_nprocs, offset_multiplier=10):
     offset=res * offset_multiplier
+
+    start = time.time()
+
     region_module = Module('g.region', n='n+{}'.format(offset), s='s-{}'.format(offset),
                            e='e+{}'.format(offset), w='w-{}'.format(offset),
                            quiet=True)
@@ -88,15 +100,24 @@ def create_dmt_tiles(maps, res, rst_nprocs, offset_multiplier=10):
         queue.wait()
     except CalledModuleError:
         return sys.exit(1)
+
+    message("Interpolation finished in {:.0f} min".format((time.time() - start) / 60.))
     
-def patch_tiles(maps):
-    message("Patching tiles <{}>".format(','.join(maps)))
-    
+def patch_tiles(maps, output, resolution):
+    message("Patching tiles <{}>...".format(','.join(maps)))
+    Module('g.region', raster=maps, res=resolution)
+    Module('r.series', input=maps, output=output, method='average')
+    Module('r.colors', map=output, color='elevation')
+
 def main():
+    start = time.time()
+
     maps = import_files(options['input'], options['pattern'])
     create_dmt_tiles(maps, float(options['resolution']), int(options['rst_nprocs']))
-    patch_tiles(maps)
-                             
+    patch_tiles(maps, options['elevation'], options['resolution'])
+
+    message("Done in {:.0f} min".format((time.time() - start) / 60.))
+    
     return 0
 
 if __name__ == "__main__":

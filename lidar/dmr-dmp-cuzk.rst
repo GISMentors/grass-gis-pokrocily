@@ -192,7 +192,7 @@ CPU):
 
 .. code-block:: bash
 
-   create-dmt.py in=VYSKOPIS elev=dmt pat=*5g* resolution=1 nprocs=4 rst_nprocs=3
+   create-dmt.py input=VYSKOPIS elevation=HLIN_5g pattern=*5g* resolution=1 nprocs=4 rst_nprocs=3
    
 Výsledná verze skriptu ke stažení `zde
 <../_static/skripty/create-dmt.py>`_.
