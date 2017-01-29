@@ -275,6 +275,8 @@ našem případě 10m.
    Výsledná vizualizace hydrologických skupin půd (1: A, 2: AB, 3:
    B, 4: BC, 5: C, 6: CD a 7: D).
 
+.. _scs-cn-hpj_kpp_land:
+
 Přidáme informace o využití území pro každou plochu pomocí operace
 průniku *intersection* s datovou vrstvou využití území
 :map:`landuse`.
