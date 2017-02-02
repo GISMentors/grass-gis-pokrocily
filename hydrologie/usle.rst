@@ -228,9 +228,9 @@ GIS. Použijeme modul :grasscmd:`db.in.ogr`:
 
 .. code-block:: bash
                 
-   db.in.ogr in=KPP_K.xls out=kpp_k
-   db.in.ogr in=HPJ_K.xls out=hpj_k
-   db.in.ogr in=LU_C.xls out=lu_c
+   db.in.ogr in=kpp_k.csv out=kpp_k
+   db.in.ogr in=hpj_k.csv out=hpj_k
+   db.in.ogr in=lu_c.csv out=lu_c
  
 Potom přistoupíme k připojení tabulky :dbtable:`hpj_k` k atributům
 vektorové vrstvy :map:`hpj_kpp_land`, přitom klíčem bude atribut
@@ -238,7 +238,7 @@ vektorové vrstvy :map:`hpj_kpp_land`, přitom klíčem bude atribut
 
 .. code-block:: bash 
             
-   v.db.join map=hpj_kpp_land column=a_HPJ_key other_table=hpj_k other_column=HPJ 
+   v.db.join map=hpj_kpp_land column=a_HPJ other_table=hpj_k other_column=HPJ 
 
 Chýbějící informace hodnoty faktoru ``K`` doplníme z tabulky
 :dbtable:`kpp_k` SQL dotazem prostřednictvím modulu
@@ -250,8 +250,6 @@ Chýbějící informace hodnoty faktoru ``K`` doplníme z tabulky
    SELECT b.K FROM hpj_kpp_land AS a JOIN kpp_k as b ON a.a_b_KPP = b.KPP)
    WHERE K IS NULL"
 
-.. todo:: Nestačil by tady odkaz na text v scs-cn?
-             
 V dalším kroku doplníme hodnoty ``C`` faktoru z importované tabulky
 :dbtable:`lu_c`.
 
@@ -402,15 +400,15 @@ Průměrná hodnota ztráty pro povodí
 
 Na určení průměrné hodnoty a sumy ztráty pro každé částečné povodí
 využijeme modul :grasscmd:`v.rast.stats`. Klíčovou vrstvou je
-vektorová mapa povodí :map:`A07_Povodi_IV`, kde nastavíme prefix
+vektorová mapa povodí :map:`povodi_iv`, kde nastavíme prefix
 :item:`g_` pre nově vytvořený sloupec. Z toho potom modulem
 :grasscmd:`v.db.univar` zobrazíme statistiky průměrných hodnot ztráty
 půdy.
 
 .. code-block:: bash
                 
-   v.rast.stats map=A07_Povodi_IV raster=g column_prefix=g method=average
-   v.db.univar map=A07_Povodi_IV column=g_average
+   v.rast.stats map=povodi_iv raster=g column_prefix=g method=average
+   v.db.univar map=povodi_iv column=g_average
 
 .. note:: Vektorová vrstva povodí musí být v aktuálním mapsetu. Pokud
           například pracujeme v jiném mapsetě, stačí když ji přidáme z
@@ -424,7 +422,7 @@ prezentujeme, viz. :num:`#g-average`.
 
 .. code-block:: bash
    
-   v.to.rast input=A07_Povodi_IV output=pov_avg_G use=attr attribute_column=g_average
+   v.to.rast input=povodi_iv output=pov_avg_G use=attr attribute_column=g_average
    r.colors -e map=pov_avg_G color=bgyr
 
 .. _g-average:
@@ -505,17 +503,17 @@ Průměrná hodnota ztráty prp povodí s prvky přerušujícími odtok
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
 Opět využijeme modul :grasscmd:`v.rast.stats`. Vektorové mapě povodí
-:map:`A07_Povodi_IV` nastavíme prefix :item:`g_m` pro nově vytvořený
+:map:`povodi_iv` nastavíme prefix :item:`g_m` pro nově vytvořený
 sloupec a potom modulem :grasscmd:`v.db.univar` zobrazíme statistiky
 průměrných hodnot ztráty půdy. Výsledek v rastrové podobě je na
 :num:`#g-m-average`.
 
 .. code-block:: bash
                 
-   v.rast.stats map=A07_Povodi_IV raster=g_m column_prefix=g_m method=average
-   v.db.univar map=A07_Povodi_IV column=g_m_average
+   v.rast.stats map=povodi_iv raster=g_m column_prefix=g_m method=average
+   v.db.univar map=povodi_iv column=g_m_average
    
-   v.to.rast input=A07_Povodi_IV output=pov_avg_G_m use=attr attribute_column=g_m_average
+   v.to.rast input=povodi_iv output=pov_avg_G_m use=attr attribute_column=g_m_average
    r.colors -e map=pov_avg_G_m color=bgyr
 
 .. _g-m-average:

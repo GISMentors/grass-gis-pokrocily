@@ -155,8 +155,8 @@ Dále importujeme číselníky (:grasscmd:`db.in.ogr`):
 
 .. code-block:: bash
 
-   db.in.ogr input=hpj_hydrsk.dbf output=hpj_hydrsk
-   db.in.ogr input=sum_kpp2hydrsk.dbf output=kpp_hydrsk
+   db.in.ogr input=hpj_hydrsk.csv output=hpj_hydrsk
+   db.in.ogr input=kpp_hydrsk.csv output=kpp_hydrsk
 
 Zkontrolujeme obsah importovaných číselníků (tabulek) v prostředí
 GRASS GIS, případně aspoň jejich sloupů. Použijeme moduly
@@ -192,7 +192,7 @@ atributu :dbcolumn:`HPJ_key`.
 
 .. code-block:: bash
 
-   v.db.join map=hpj_kpp column=a_HPJ other_table=hpj_hydrsk other_column=HPJ_key
+   v.db.join map=hpj_kpp column=a_HPJ other_table=hpj_hydrsk other_column=HPJ
 
 Atributy v tabulce :dbtable:`hpj_kpp` po spojení zkontrolujeme či
 obsahují sloupce z číselníku a následně doplníme chybějící informace o
@@ -203,7 +203,7 @@ vrstvy komplexního průzkumu půd. Využijeme modul
 
 .. code-block:: bash
 
-    db.execute sql="UPDATE hpj_kpp_1 SET HydrSk = (SELECT b.First_hydr FROM hpj_kpp_1 AS a JOIN kpp_hydrsk as b ON a.b_KPP = b.KPP) WHERE HydrSk IS NULL"
+    db.execute sql="UPDATE hpj_kpp SET HydrSk = (SELECT b.HydrSk FROM hpj_kpp AS a JOIN kpp_hydrsk as b ON a.b_KPP = b.KPP) WHERE HydrSk IS NULL"
 
 Obsah atributové tabulky :map:`hpj_kpp` zkontrolujeme pomocí *SQL
 Query Builder* a ověříme, zda všechny hodnoty hydrologické skupiny jsou
@@ -211,7 +211,7 @@ vyplněné.
 
 .. code-block:: bash
 
-    SELECT cat,HydrSk FROM hpj_kpp_1 WHERE hydrSk is "NULL"
+    SELECT cat,HydrSk FROM hpj_kpp WHERE HydrSk is NULL
 
 .. figure:: images/scs-cn-db-join.png
 
@@ -231,13 +231,13 @@ kódům A až D. Použijeme moduly :grasscmd:`v.db.addcolumn` a
 
     v.db.addcolumn map=hpj_kpp columns="HydrSk_key int"
 
-    db.execute sql="update hpj_kpp_1 set HydrSk_key = 1 where HydrSk = 'A';
-    update hpj_kpp_1 set HydrSk_key = 2 where HydrSk = 'AB';
-    update hpj_kpp_1 set HydrSk_key = 3 where HydrSk = 'B';
-    update hpj_kpp_1 set HydrSk_key = 4 where HydrSk = 'BC';
-    update hpj_kpp_1 set HydrSk_key = 5 where HydrSk = 'C';
-    update hpj_kpp_1 set HydrSk_key = 6 where HydrSk = 'CD';
-    update hpj_kpp_1 set HydrSk_key = 7 where HydrSk = 'D'"
+    db.execute sql="update hpj_kpp set HydrSk_key = 1 where HydrSk = 'A';
+    update hpj_kpp set HydrSk_key = 2 where HydrSk = 'AB';
+    update hpj_kpp set HydrSk_key = 3 where HydrSk = 'B';
+    update hpj_kpp set HydrSk_key = 4 where HydrSk = 'BC';
+    update hpj_kpp set HydrSk_key = 5 where HydrSk = 'C';
+    update hpj_kpp set HydrSk_key = 6 where HydrSk = 'CD';
+    update hpj_kpp set HydrSk_key = 7 where HydrSk = 'D'"
 
 .. note:: Nový sloupec je možné přidat i pomocí :skoleni:`správce
           atributových dat <grass-gis-zacatecnik/vektorova_data/atributy.html>`.
@@ -292,7 +292,7 @@ tvaru *VyužitíÚzemí_KodHydrologickéSkupiny*, t.j. *LU_HydrSk*.
 .. code-block:: bash
 
    v.db.addcolumn map=hpj_kpp_land columns="LU_HydrSk text"
-   db.execute sql="update hpj_kpp_land_1 set LU_HydrSk = b_LandUse || '_' || a_HydrSk"
+   db.execute sql="update hpj_kpp_land set LU_HydrSk = b_LandUse || '_' || a_HydrSk"
 
 .. note:: Tuto operaci je možné provést i pomocí :skoleni:`správce
           atributových dat
@@ -317,8 +317,8 @@ Určíme odpovídající hodnoty :math:`CN`. Importujeme je do souboru
 
 .. code-block:: bash
 
-   db.in.ogr input=LU_CN.xls output=lu_cn
-   v.db.join map=hpj_kpp_land column=LU_HydrSk other_table=lu_cn other_column=LU_HydrSk subset_columns=CN
+   db.in.ogr input=lu_hydrsk_cn.csv output=lu_hydrsk_cn
+   v.db.join map=hpj_kpp_land column=LU_HydrSk other_table=lu_hydrsk_cn other_column=LU_HydrSk subset_columns=CN
 
 Výsledné informace jako kód hydrologické skupiny, kód využití území
 a kód :math:`CN` zobrazíme v atributové tabulce SQL dotazem 
