@@ -168,7 +168,7 @@ LS faktor (topografický faktor) možno vypočítat podle vztahu:
 
 .. math::
    
-   LS = (accu \times \frac{res}{22.13})^{0.6} \times (\frac{sin(slope \times \frac{pi}{180})}{0.09})^{1.3}
+   LS = 1.6 \times (accu \times \frac{res}{22.13})^{0.6} \times (\frac{sin(slope \times \frac{pi}{180})}{0.09})^{1.3}
 
 kde:
 
@@ -190,7 +190,7 @@ V zápisu pro tento nástroj bude rovnice vypadat následovně:
 
 .. code-block:: bash
 
-   r.mapcalc expr="ls = pow(accu * (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)"
+   r.mapcalc expr="ls = 1.6 * pow(accu * (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)"
 
 .. note:: Nastavíme vhodnou tabulku barev:
 
