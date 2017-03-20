@@ -21,11 +21,17 @@ Postup importu dat v textovém či binárním formátu je popsán v
 Pro tvorbu digitalního modelu reliefu či povrchu lze v systému GRASS
 využít několik postupů:
 
-1. import vstupních dat do vektorové mapy (viz navod pro :ref:`textová
-   <lidar-import-xyz-vektor>` a :ref:`binární
-   <lidar-import-las-vektor>` data), nastavení výpočetního regionu
-   (:grasscmd:`g.region`) a interpolace výsledného povrchu pomocí
-   modulu :grasscmd:`v.surf.rst` (metoda XXX).
+**1. Vytvoření rastru původních hodnot bodových dat** 
+
+Import vstupních dat do rastrové mapy s prostorových rozlišením
+odvozeným ze vstupních dat. Postup vhodný především pro pravidelnou
+mřížku vstupních dat.
+
+**2. Spline interpolace z bodových dat**
+
+Import vstupních dat do vektorové bodové mapy, interpolace výsledného
+povrchu pomocí modulu :grasscmd:`v.surf.rst`. Vhodné pro vytvoření DMT
+s vysokým prostorovým rozlišením.
 
 .. todo:: doplnit dalsi postupy (rastr)
              
@@ -50,8 +56,49 @@ Souřadnice X,Y jsou referencovány v souřadnicovém systému S-JTSK
 (:epsg:`5514`), souřadnice H (nadmořská výška) ve výškovém referenčním
 systému Balt po vyrovnání (Bpv).
 
-Příklad importu dat DMR5G a vytvoření výsledného produktu DMT pomocí
-:grasscmd:`v.surf.rst`. Nejprve nastavíme výpočetní region na základě vstupní bodové vektorové mapy, prostorové rozlišení zarovnáme (přepínač :option:`-a`) na 1 metr.
+Následující dva příklady vytvoření rastrové reprezentace DMT prezentují dva rozdílné přístupy:
+
+* vytvoření DMT *převzetím* hodnot pravidelné mřížky bodových dat
+  DMR4G, prostorové rozlišení je odvozeno ze vstupních dat (tj. 5m)
+
+* vytvoření vysoce podrobného DMT metodou *spline* na základě DMR5G
+
+Vytvoření DMT *převzetím* hodnot pravidelné mřížky bodových dat DMR4G
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+V prvním kroku zjistíme hraniční souřadnice importovaných dat.
+
+.. code-block:: bash
+
+   r.in.xyz -sg input=HLIN04_4g.xyz separator=space
+
+Na základě toho nastavíme výpočetní region a to tak, aby střed buňky
+odpovídal vstupní pravidelné mřížce bodů. Prostorové rozlišení
+nastavíme na 5m, což odpovídá vzdálenosti bodů DMR4G.
+
+.. code-block:: bash
+   
+   g.region n=-1088005 s=-1090000 e=-625005 w=-627500 b=461.5 t=554.31
+   g.region n=n+2.5 s=s-2.5 w=w-2.5 e=e+2.5 res=5
+
+Následně na to, data do nastaveného výpočetního regionu naimportujeme.
+
+.. code-block:: bash
+
+   r.in.xyz input=HLIN04_4g.xyz separator=space output=HLIN04_4g
+
+.. figure:: images/dmr4g.png
+               
+   Ukázka výsledného produktu digitálního modelu reliéfu vytvořeno na
+   bázi DMR4G převzetím hodnot vstupních bodů. Na obrázku jsou pro
+   ilustraci vykreslena vstupní pravidelná síť bodů DMR4G a výstupní
+   mřížka rastrové mapy.
+
+Vytvoření vysoce podrobného DMT metodou spline na základě DMR5G
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Nastavíme výpočetní region na základě vstupní bodové vektorové mapy,
+prostorové rozlišení zarovnáme (přepínač :option:`-a`) na 1 metr.
           
 .. code-block:: bash
 
@@ -85,10 +132,16 @@ Poté spustíme proces interpolace:
 
             v.surf.rst input=HLIN04_5g elevation=HLIN04_5g nprocs=8
    
-.. figure:: images/dtm-cuzk.png
+.. figure:: images/dmr5g.png
 
-   Ukázka výsledného produktu digitálního modelu reliéfu.
+   Ukázka výsledného produktu digitálního modelu reliéfu vytvořeno na
+   bázi DMR5G metodou spline s rozlišením 1m.
 
+.. figure:: images/dmr4g-vs-5g.png
+
+   Porovnání vytvořených DMR převzetím hodnot DMR4G při rozlišení 5m a
+   interpolací spline v rozlišení 1m.
+   
 Digitální model povrchu
 -----------------------
 
@@ -97,7 +150,7 @@ povrchu>` (DMP), tj. digitální reprezentaci modelu reliefu *včetně*
 umělých a přírodních objektů (např. vegetace nebo budovy) poskytuje
 ČÚZK v současnosti v jedné verzi a to jako:
 
-* **DMP4G** - diskrétních bodů v nepravidelné sítě výškových bodů
+* **DMP1G** - diskrétních bodů v nepravidelné sítě výškových bodů
   (TIN) s úplnou střední chybou výšky 0,4 m pro přesně vymezené
   objekty (budovy) a 0,7 m pro objekty přesně neohraničené (lesy a
   další prvky rostlinného pokryvu). Další informace `zde
