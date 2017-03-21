@@ -1,12 +1,12 @@
-**************************
-Zpracování LiDARrových dat
-**************************
+*************************
+Zpracování lidarových dat
+*************************
 
-**LiDAR** (Light Detection And Ranging, také LADAR) je metoda
-dálkového měření vzdálenosti na základě výpočtu doby šíření pulsu
+**Lidar** (Light Detection And Ranging) je metoda dálkového měření
+vzdálenosti na základě výpočtu doby šíření pulsu
 :wikipedia:`laserového <Laser>` paprsku odraženého od snímaného
 objektu. Obvykle se využívá spektra 1064 - 1540 nm, pro
-:wikipedia:`batymetrická <Batymetrie>` měření cca 530 nm. LIDAR lze
+:wikipedia:`batymetrická <Batymetrie>` měření cca 530 nm. Lidar lze
 použít pro měření vzdálenosti, mapování terénu, měření vlastností
 atmosférických jevů aj. Výsledkem mapování je mračno bodů, které se po
 zpracování může interpolovat do podoby :wikipedia:`digitálního modelu

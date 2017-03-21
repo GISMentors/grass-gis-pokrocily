@@ -12,6 +12,8 @@ GRASS umožňuje pracovat jak 2D tak 3D rastrovými a vektorovými daty.
 .. note:: Topologie vektorovývh dat je pouze 2D, pro 3D vektorová
    data je sestavena topologie průmětu do roviny XY.
 
+.. _vizualizace-3d:
+   
 Vizualizace ve 3D
 =================
 
