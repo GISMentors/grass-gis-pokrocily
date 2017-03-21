@@ -211,8 +211,8 @@ Produkt DMP vytvoříme obdobně jako v případě DMR interpolací spline:
    Ukázka výsledného produktu digitálního modelu povrchu vytvořeného
    spline interpolací v prostorovém rozlišení 1m.
 
-Dávkové zpracování dlaždic DMR/DMP
-----------------------------------
+Dávkové zpracování dlaždic DMR/DMP a vytvoření výsledné mozaiky
+---------------------------------------------------------------
 
 ČÚZK poskytuje typicky data ve formě dlaždic, v případě testovacího
 datasetu se jedná o:
