@@ -84,7 +84,7 @@ běhu s práhem (:option:`threshold`) 0.01 použijeme pro další krok, kde
 navýšíme práh na hodnotu 0.05. Výsledky první segmetace využijeme v
 druhém běhu pomocí parametru :option:`seeds`. Objekty se společnými
 spekrálními a geometrickými vlastnosti se spojí, jejich počet se
-zmenší, viz :num:`segment-1-2`.
+zmenší, viz :numref:`segment-1-2`.
 
 .. code-block:: bash
    
@@ -101,7 +101,7 @@ zmenší, viz :num:`segment-1-2`.
           
 Ve třetím kroku zvýšíme práh na hodnotu 0.09 a zároveň nastavíme
 minimální počet pixelů, které formují objekt na 15. Výsledek
-segmentace je znázorněn :num:`segment-3`.
+segmentace je znázorněn :numref:`segment-3`.
 
 .. _segment-3:
 
