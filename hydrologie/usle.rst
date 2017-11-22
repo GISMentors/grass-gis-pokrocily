@@ -33,15 +33,15 @@ Vstupní data
  * :map:`landuse.shp` - vektorová vrstva využití území
  * :map:`povodi.shp` - vektorová vrstva povodí IV. řádu s návrhovými
    srážkami :math:`H_s` (doba opakovaní 2, 5, 10, 20, 50 a 100 let)
- * :dbtable:`hpj_k.csv` - číselník s kódem `K` pro hlavní půdní jednotky, :num:`#ciselniky` vlevo
+ * :dbtable:`hpj_k.csv` - číselník s kódem `K` pro hlavní půdní jednotky, :numref:`ciselniky` vlevo
  * :dbtable:`kpp_k.csv` - číselník s kódem `K` pro vrstvu komplexního
-   průzkumu půd, :num:`#ciselniky` vpravo
+   průzkumu půd, :numref:`ciselniky` vpravo
  * :dbtable:`lu_c.csv` - číselník s kódem `C` pro vrstvu využití území,
-   :num:`#ciselniky` vpravo
+   :numref:`ciselniky` vpravo
  * :map:`dmt.tif` - digitální model terénu v rozlišení 10 x 10 m,
-   :num:`#dmt-maska` vlevo
+   :numref:`dmt-maska` vlevo
  * :map:`maska.pack` - oblast území bez liniových a plošných prvků
-   prerušujících odtok, :num:`#dmt-maska` vpravo
+   prerušujících odtok, :numref:`dmt-maska` vpravo
              
 Navrhovaný postup
 -----------------
@@ -90,8 +90,8 @@ Znázornění vstupních vektorových dat spolu s atributovými tabulkami je
 totožné se :ref:`vstupními vektorovými daty pro metodu SCS CN
 <scs-cn-vstupni-data>`. Digitální model reliéfu a oblast řešeného
 území bez liniových a plošných prvků přerušující odtok (maska) jsou
-zobrazena na :num:`#dmt-maska`. Tabulky s faktory `K` a `C` jsou
-uvedeny na :num:`#ciselniky`.
+zobrazena na :numref:`dmt-maska`. Tabulky s faktory `K` a `C` jsou
+uvedeny na :numref:`ciselniky`.
 
 .. _dmt-maska:
 
@@ -347,7 +347,7 @@ základě polygonu, který zabírá největší část plochy buňky.
    g.region raster=dmt
    r.resamp.stats input=hpj_kpp_land_kc output=hpj_kpp_land_kc10 
 
-Na obrázku :num:`#porovkn` je znázorněná část zájmového území, kde
+Na obrázku :numref:`porovkn` je znázorněná část zájmového území, kde
 možno vidět rastrovou vrstvu :map:`hpj_kpp_land_kc` před (vlevo dole)
 a po použití modulu :grasscmd:`r.resamp.stats`.
 
@@ -360,7 +360,7 @@ a po použití modulu :grasscmd:`r.resamp.stats`.
 Kvůli vizualizaci nastavíme vhodnou :skoleni:`tabulku barev
 <grass-gis-zacatecnik/rastrova_data/tabulka-barev.html>` a kvůli
 přehlednosti mapu přejmenujeme na :map:`kc` modulem
-:grasscmd:`g.rename`. Výsledek je na :num:`#kc`.
+:grasscmd:`g.rename`. Výsledek je na :numref:`kc`.
 
 .. code-block:: bash
                 
@@ -386,7 +386,7 @@ Výpočet průmerné dlouhodobé ztráty půdy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Ztrátu půdy `G` vypočítame modulem :grasscmd:`r.mapcalc`
-(:num:`#rmapcalc`), přičemž vycházíme ze vztahu, který byl uvedený v
+(:numref:`rmapcalc`), přičemž vycházíme ze vztahu, který byl uvedený v
 :ref:`teoretické časti školení <vzorec-G>`.
 
 .. _rmapcalc:
@@ -400,7 +400,7 @@ Ztrátu půdy `G` vypočítame modulem :grasscmd:`r.mapcalc`
    r.colors -n -e map=g color=corine
 
 Pro výslednou vrstvu zvolíme vhodnou barevnou škálu, přidáme legendu,
-měřítko a mapu zobrazíme (:num:`#map-g`)
+měřítko a mapu zobrazíme (:numref:`map-g`)
 
 .. _map-g:
 
@@ -410,7 +410,7 @@ měřítko a mapu zobrazíme (:num:`#map-g`)
    Vrstva s hodnotami představujícími průměrnou dlouhodobou ztrátu
    půdy G v jednotkách :math:`t.ha^{-1} . rok^{-1}`.
 
-.. note:: Na :num:`#map-g` je maximální hodnota v legendě *1*. Je to
+.. note:: Na :numref:`map-g` je maximální hodnota v legendě *1*. Je to
     pouze z důvodu, aby byl výsledek přehledný a korespondoval s
     barvami v mapě. V skutečnosti parametr ``G`` nabývá hodnot až
     *230*, při takovémto rozsahu by byla stupnice v legendě
@@ -441,7 +441,7 @@ půdy.
 
 Pro účely vizualizace vektorovou vrstvu převedeme na rastr, pomocí
 modulu :grasscmd:`r.colors` nastavíme vhodnou tabulku barev a výsledek
-prezentujeme, viz. :num:`#g-average`.
+prezentujeme, viz. :numref:`g-average`.
 
 .. code-block:: bash
    
@@ -471,7 +471,7 @@ Abysme zjistili přesnější hodnoty, je nutné tyto prvky do výpočtu
 zahrnout. Pro tento účel použijeme masku liniových a plošných prvků
 přerušujících odtok :map:`maska.pack` a vypočítame nové hodnoty LS
 faktoru a ztráty půdy. Vstupem bude :map:`dmt` bez prvků přerušujících
-odtok (:num:`#dmt-m`).
+odtok (:numref:`dmt-m`).
 
 .. todo:: Tuto část je potřeba rozšířit. Maska by se dala určit z
           RÚIAN, a pod.
@@ -502,7 +502,7 @@ Dále dopočítame faktor *LS* a následně *G*.
    r.colors -n -e map=g_m color=corine
 
 V posledním kroku vymažeme masku, výsledky zobrazíme a porovnáme
-(:num:`#ls-porov` a :num:`#g-porov`).
+(:numref:`ls-porov` a :numref:`g-porov`).
              
 .. _ls-porov:
 
@@ -527,7 +527,7 @@ Opět využijeme modul :grasscmd:`v.rast.stats`. Vektorové mapě povodí
 :map:`povodi_iv` nastavíme prefix :item:`g_m` pro nově vytvořený
 sloupec a potom modulem :grasscmd:`v.db.univar` zobrazíme statistiky
 průměrných hodnot ztráty půdy. Výsledek v rastrové podobě je na
-:num:`#g-m-average`.
+:numref:`g-m-average`.
 
 .. code-block:: bash
                 
@@ -549,7 +549,7 @@ vrstev bez a s uvážením prvků, které přerušují odtok pro faktor *LS*,
 hodnoty představující průměrnou dlouhodobou ztrátu půdy *G* a povodí s
 průměrnými hodnotami ztráty půdy *G_pov*. Nazveme je :map:`delta_ls`,
 :map:`delta_g` a :map:`delta_pov_avg` a nastavíme barevnou stupnici
-:item:`differences`. Viz. :num:`#diff`.
+:item:`differences`. Viz. :numref:`diff`.
 
 .. code-block:: bash
 

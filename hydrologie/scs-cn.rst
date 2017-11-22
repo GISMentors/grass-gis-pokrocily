@@ -51,17 +51,17 @@ Vstupní data
 ------------
 
  * :map:`hpj.shp` - vektorová vrstva hlavních půdních jednotek z
-   kodů BPEJ, :num:`#hpj-kpp` vlevo
- * :map:`kpp.shp` - vektorová vrstva komplexního průzkumu půd, :num:`#hpj-kpp` vpravo
- * :map:`landuse.shp` - vektorová vrstva využití území, :num:`#lu-pov` vlevo
+   kodů BPEJ, :numref:`hpj-kpp` vlevo
+ * :map:`kpp.shp` - vektorová vrstva komplexního průzkumu půd, :numref:`hpj-kpp` vpravo
+ * :map:`landuse.shp` - vektorová vrstva využití území, :numref:`lu-pov` vlevo
  * :map:`povodi.shp` - vektorová vrstva povodí IV. řádu s návrhovými
-   srážkami :math:`H_s` (doba opakovaní 2, 5, 10, 20, 50 a 100 rokov), :num:`#lu-pov` vpravo
+   srážkami :math:`H_s` (doba opakovaní 2, 5, 10, 20, 50 a 100 rokov), :numref:`lu-pov` vpravo
  * :dbtable:`hpj_hydrsk` - číselník s hydrologickými skupinami půd pro hlavní 
-   půdní jednotky, :num:`#ciselniky1` vlevo
+   půdní jednotky, :numref:`ciselniky1` vlevo
  * :dbtable:`kpp_hydrsk` - číselník s hydrologickými skupinami půd pro vrstvu 
-   komplexního průzkumu půd, :num:`#ciselniky1` uprostřed
+   komplexního průzkumu půd, :numref:`ciselniky1` uprostřed
  * :dbtable:`lu_hydrsk_cn` - číselník s hodnotami CN pro kombinaci využití 
-   území a hydrologické skupiny, :num:`#ciselniky1` vpravo
+   území a hydrologické skupiny, :numref:`ciselniky1` vpravo
 
 .. note:: Vrstvu povodí je možno získat z volně dostupné databáze
           `DIBAVOD <http://www.dibavod.cz>`_. Bonitované půdní
@@ -112,9 +112,9 @@ výpočet průměrných hodnot výšky a objemu přímého odtoku pro povodí
    Grafické schéma postupu.
 
 Znázornění vstupních dat spolu s atributovými tabulkami je uvedeno na
-:num:`#hpj-kpp` a :num:`#lu-pov`. Tabulky s informacemi o hydrologické
+:numref:`hpj-kpp` a :numref:`lu-pov`. Tabulky s informacemi o hydrologické
 skupině půdy a o hodnotách CN pro kombinaci využití území a
-hydrologické skupiny, resp.  číselníky jsou na :num:`#ciselniky1`.
+hydrologické skupiny, resp.  číselníky jsou na :numref:`ciselniky1`.
 
 .. _hpj-kpp:
 

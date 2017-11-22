@@ -164,7 +164,7 @@ U dalších parametrů jsou použity tzv. `standardizované volby
 např. ``G_OPT_M_MAPSET`` definuje parametr pro volbu mapsetu. V našem
 případě nastavíme parametr skriptu jako povinný (``required: yes``) a
 doplníme výchozí volbu (mapset :mapset:`landsat`), viz
-:num:`#wxgui-ndvi-v2-0`.
+:numref:`wxgui-ndvi-v2-0`.
 
 .. literalinclude:: ndvi-v2.py
    :language: python
