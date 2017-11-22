@@ -74,3 +74,15 @@ Ve výsledném datasetu máme zaregistrována data od roku 1984 do 2014:
 
 .. tip:: Vylepšená verze skriptu s podporou pro multiprocessing je ke
          stažení `zde <../_static/skripty/tgrass_landsat_foss4g2016.py>`_.
+
+Detektce vodní ploch v časové řadě
+----------------------------------
+
+.. code-block:: bash
+
+   t.rast.extract input=landsat where="name like '%_B2'" output=landsat_b2
+   t.rast.extract input=landsat where="name like '%_B5'" output=landsat_b5
+                
+   t.rast.mapcalc inputs=landsat_b2,landsat_b5
+    expression="float(landsat_b2 - landsat_b5) / (landsat_b2 + landsat_b5) > 0"
+    output=landsat_voda basename=voda
