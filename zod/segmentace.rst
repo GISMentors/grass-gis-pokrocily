@@ -115,38 +115,6 @@ segmentace je znázorněn :numref:`segment-3`.
    # třetí běh (~ 25 000 objektů)            
    i.segment group=seg output=seg3 threshold=0.09 minsize=15 seeds=seg2
 
-Výsledek segmentace převedeme do vektorové reprezentace pomocí modulu
-:grassCmd:`r.to.vect` (:menuselection:`Raster --> Map type conversions
---> Raster to vector`). Jako kategorie objektů použijeme rastrové
-hodnoty, viz přepínač :option:`-v`.
-
-.. code-block:: bash
-
-   r.to.vect -v input=seg3 output=seg3 type=area
-
-.. figure:: images/segment-vect.png
-
-   Ukázka vizualizace hranic objektů na podkladové vrstvě barevné
-   kompozice v pravých barvách.
-
-Do atributové tabulky můžeme přidat nový atribut výměry
-objektů. Objekty by měly mít výměru větší než 0,9375m :sup:`2`
-(vstupní data mají prostorové rozlišení 0,25m, minimální velikost
-objektu byla nastavena na 15 pixelů). Tuto operaci můžete provést ze
-:skoleni:`správce atributových dat
-<grass-gis-zacatecnik/vektorova_data/atributy.html#editace-atributovych-dat>`
-anebo pomocí kombinace příkazů :grassCmd:`v.db.addcolumn` a
-:grassCmd:`v.to.db`:
-
-.. code-block:: bash
-
-   v.db.addcolumn map=seg3 columns="area double"
-   v.to.db map=seg3 option=area columns=area
-
-.. figure:: images/segment-area.png
-
-   Výběr objektů s minimální výměrou.
-            
 Filtrace objektů
 ----------------         
 
@@ -205,17 +173,6 @@ pomocí specializovaného modulu :grasscmdaddons:`i.segment.stats`.
 .. figure:: images/segment-ndvi-diff.png
 
    Objekty s atributy průměrné hodnoty NDVI a rozdílu výšek.
-
-.. note:: Namísto specializovaného modulu lze využít standardní nástroj
-          zonální statistiky :grassCmd:`v.rast.stats` (:menuselection:`Vector
-          --> Update attributes --> Update area atributes from raster`). Ze
-          statistických ukazatelů vybereme průměrnou hodnotu
-          (:option:`method=average`).
-
-          .. code-block:: bash
-
-             v.rast.stats map=seg3 raster=ndvi column_prefix=ndvi method=average
-             v.rast.stats map=seg3 raster=diff column_prefix=diff method=average
 
 Na základě těchto atributů můžeme provést jednoduchou klasifikaci objektů. Např.
 
