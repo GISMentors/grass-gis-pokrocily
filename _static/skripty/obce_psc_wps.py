@@ -7,9 +7,9 @@ import logging
 import types
 from zipfile import ZipFile
 
-gisbase = os.environ['GISBASE'] = "/usr/local/grass70"
-os.environ['LD_LIBRARY_PATH'] = "/usr/local/grass70/lib"
-sys.path.insert(0, os.path.join(os.environ["GISBASE"], "etc", "python"))
+gisbase = os.environ['GISBASE'] = "/usr/lib/grass72"
+sys.path.append(os.path.join(os.environ["GISBASE"], "etc", "python"))
+os.environ['LD_LIBRARY_PATH'] = os.path.join(os.environ["GISBASE"], "lib")
 
 from grass.pygrass.modules import Module
 from grass.pygrass.vector import VectorTopo
@@ -22,8 +22,8 @@ class Process(WPSProcess):
                               identifier='obce_psc',
                               version="1.0",
                               title="Dotaz na obce podle PSČ",
-                              abstract="Testovací služba školení GISMentors.",
-                              grassLocation='gismentors',
+                              abstract="Testovací služba PyWPS.",
+                              grassLocation='gismentors_pywps',
                               storeSupported=True,
                               statusSupported=True)
           
@@ -80,12 +80,14 @@ class Process(WPSProcess):
           obec_id = None
           obce_psc = set()
           for prvek in obce.viter('areas'):
-              if prvek.attrs['psc'] == psc:
+               if prvek.attrs is None:
+                    continue
+               if prvek.attrs['psc'] == psc:
                   if obec_id is None:
                       obec_id = prvek.id
 
                   for b in prvek.boundaries():
-                      for n in b.get_left_right():
+                      for n in b.read_area_ids():
                           if n != -1 and n != obec_id:
                               obce_psc.add(n)
           obce_psc.add(obec_id)
@@ -100,7 +102,7 @@ class Process(WPSProcess):
                       hranice.append(b.id)
                       vystup.write(b, attrs=(None, None))
 
-              vystup.write(prvek.get_centroid(), attrs=(prvek.attrs['nazev'], prvek.attrs['psc']))
+              vystup.write(prvek.centroid(), attrs=(prvek.attrs['nazev'], prvek.attrs['psc']))
 
           vystup.table.conn.commit()
 
