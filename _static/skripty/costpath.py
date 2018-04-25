@@ -29,8 +29,8 @@ def main():
     ep='{}|{}|1'.format(ex, ey)
     resolution = 25
 
-    Module('v.in.ascii', input='-', output='startp', stdin_=sp)
-    Module('v.in.ascii', input='-', output='endp', stdin_=ep)
+    Module('v.in.ascii', input='-', output='startp', stdin_=sp, overwrite=True)
+    Module('v.in.ascii', input='-', output='endp', stdin_=ep, overwrite=True)
     
     Module('g.region', res=resolution, vector=['startp', 'endp'])
     Module('g.region', n='n+1000', s='s-1000', e='e+1000', w='w-1000')
