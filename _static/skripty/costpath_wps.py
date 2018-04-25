@@ -59,18 +59,43 @@ class Process(WPSProcess):
         ep='{}|{}|1'.format(ex, ey)
         map_name = 'cesta'
         resolution = 25
-
+        offset = 1e4
+        
         logging.debug("Computation started")          
 
-        Module('v.in.ascii', input='-', output='startp', stdin_=sp)
-        Module('v.in.ascii', input='-', output='endp', stdin_=ep)
+        Module('v.in.ascii',
+               input='-',
+               output='startp',
+               stdin_=sp)
+        Module('v.in.ascii',
+               input='-',
+               output='endp',
+               stdin_=ep)
 
-        Module('g.region', res=resolution, vector=['startp', 'endp'])
-        Module('g.region', n='n+1000', s='s-1000', e='e+1000', w='w-1000')
+        Module('g.region',
+               res=resolution,
+               vector=['startp', 'endp'])
+        Module('g.region',
+               n='n+{}'.format(offset),
+               s='s-{}'.format(offset),
+               e='e+{}'.format(offset),
+               w='w-{}'.format(offset))
 
-        Module('r.cost', flags='k', input='rychlost_cas@cost_path_wps', output='rychlost_naklady', start_points='startp')
-        Module('r.drain', flags='n', input='rychlost_naklady', output='cesta', start_points='endp')
-        Module('r.to.vect', flags='s', input='cesta', output=map_name, type='line')
+        Module('r.cost',
+               flags='k',
+               input='rychlost_cas@cost_path_wps',
+               output='rychlost_naklady',
+               start_points='startp')
+        Module('r.drain',
+               flags='n',
+               input='rychlost_naklady',
+               output='cesta',
+               start_points='endp')
+        Module('r.to.vect',
+               flags='s',
+               input='cesta',
+               output=map_name,
+               type='line')
 
         logging.debug("Computation finished")          
 
