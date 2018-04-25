@@ -28,16 +28,44 @@ def main():
     ex, ey = option['end'].split(',')
     ep='{}|{}|1'.format(ex, ey)
     resolution = 25
+    offset = 1e4
 
-    Module('v.in.ascii', input='-', output='startp', stdin_=sp, overwrite=True)
-    Module('v.in.ascii', input='-', output='endp', stdin_=ep, overwrite=True)
+    Module('v.in.ascii',
+           input='-',
+           output='startp',
+           stdin_=sp,
+           overwrite=True)
+    Module('v.in.ascii',
+           input='-',
+           output='endp',
+           stdin_=ep,
+           overwrite=True)
     
-    Module('g.region', res=resolution, vector=['startp', 'endp'])
-    Module('g.region', n='n+1000', s='s-1000', e='e+1000', w='w-1000')
+    Module('g.region',
+           res=resolution,
+           vector=['startp', 'endp'])
+    Module('g.region',
+           n='n+{}'.format(offset),
+           s='s-{}'.format(offset),
+           e='e+{}'.format(offset),
+           w='w-{}'.format(offset))
     
-    Module('r.cost', flags='k', input='rychlost_cas', output='rychlost_naklady', start_points='startp')
-    Module('r.drain', flags='n', input='rychlost_naklady', output='cesta', start_points='endp')
-    Module('r.to.vect', flags='s', input='cesta', output=option['output'], type='line')
+    Module('r.cost',
+           flags='k',
+           input='rychlost_cas',
+           output='rychlost_naklady',
+           start_points='startp',
+           overwrite=True)
+    Module('r.drain',
+           flags='n',
+           input='rychlost_naklady',
+           output=option['output'],
+           start_points='endp')
+    Module('r.to.vect',
+           flags='s',
+           input=option['output'],
+           output=option['output'],
+           type='line')
 
 if __name__ == "__main__":
     option, flag = gscript.parser()
