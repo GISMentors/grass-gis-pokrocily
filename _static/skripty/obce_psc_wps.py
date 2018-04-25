@@ -93,6 +93,7 @@ class Process(WPSProcess):
           obce_psc.add(obec_id)
 
           hranice = list()
+          cat = 1
           for prvek in obce.viter('areas'):
               if prvek.id not in obce_psc:
                   continue
@@ -100,9 +101,10 @@ class Process(WPSProcess):
               for b in prvek.boundaries():
                   if b.id not in hranice:
                       hranice.append(b.id)
-                      vystup.write(b, attrs=(None, None))
+                      vystup.write(b)
 
-              vystup.write(prvek.centroid(), attrs=(prvek.attrs['nazev'], prvek.attrs['psc']))
+              vystup.write(prvek.centroid(), cat=cat, attrs=(prvek.attrs['nazev'], prvek.attrs['psc']))
+              cat += 1
 
           vystup.table.conn.commit()
 
