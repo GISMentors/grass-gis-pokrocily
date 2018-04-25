@@ -35,7 +35,7 @@ def main():
     Module('g.region', res=resolution, vector=['startp', 'endp'])
     Module('g.region', n='n+1000', s='s-1000', e='e+1000', w='w-1000')
     
-    Module('r.cost', flags='k', input='rychlost_cas@cost_path_wps', output='rychlost_naklady', start_points='startp')
+    Module('r.cost', flags='k', input='rychlost_cas', output='rychlost_naklady', start_points='startp')
     Module('r.drain', flags='n', input='rychlost_naklady', output='cesta', start_points='endp')
     Module('r.to.vect', flags='s', input='cesta', output=option['output'], type='line')
 
