@@ -159,7 +159,7 @@ jako u :grasscmd:`r.in.xyz`.
 
    v.in.ascii input=HLIN04_5g.xyz output=HLIN04_5g separator=space z=3 -tbz
 
-.. note:: Import lze urychlit přepínačem :option:`-t` (nevytvářet
+.. important:: Import lze urychlit přepínačem :option:`-t` (nevytvářet
           atributovou tabulku) a :option:`-b` (nesestavovat
           topologii).
 
@@ -255,7 +255,9 @@ nastavíme parametrem :option:`resolution`.
 
       Z výše uvedeného je zřejmé, že jsou vstupní data v souřadnicovém
       systému S-JTSK :epsg:`5514`.
-      
+
+.. _lidar-las-raster-steps:
+   
 .. note:: Pokud si přejete větší kontrolu nad procesem importu, tak
    lze podobně jako v případě importu :ref:`textových dat
    <lidar-xyz-raster>` rozložit proces do dvou kroků. Nejprve určit
@@ -288,6 +290,24 @@ nastavíme parametrem :option:`resolution`.
 
       r.in.lidar input=pf_VIMP27_g.laz output=pf_VIMP27_g -o
 
+Základní metadata importované rastrové mapy vypíšeme pomocí modulu
+:grasscmd:`r.info`.
+
+.. code-block:: bash
+
+   r.info map=pf_VIMP27_g
+
+::
+   
+   |   Rows:         2000                                                       |
+   |   Columns:      2500                                                       |
+   |   Total Cells:  5000000                                                    |
+   ...
+   |            N:   -1154000    S:   -1156000   Res:     1                     |
+   |            E:    -805000    W:    -807500   Res:     1                     |
+   |   Range of data:    min = 804.313  max = 1061.487                          |
+   ...
+   
 .. _lidar-import-las-vektor:
 
 Vektorová reprezentace
@@ -300,7 +320,7 @@ Pro vytvoření vektorové mapy na základě vstupních dat slouží modul
 
    v.in.lidar input=pf_VIMP27_g.laz output=pf_VIMP27_g
 
-.. tip:: Podobně jako v případě importu :ref:`textových dat
+.. important:: Podobně jako v případě importu :ref:`textových dat
    <lidar-import-xyz-vektor>` lze proces urychlit tím, že nebudeme
    vytvářet atributová data (pokud je nepotřebujeme, např. v případě
    již klasifikovaných dat určených pro tvorbu digitálního modelu
@@ -312,3 +332,42 @@ Pro vytvoření vektorové mapy na základě vstupních dat slouží modul
    .. code-block:: bash
 
       v.in.lidar input=pf_VIMP27_g.laz output=pf_VIMP27_g  -otb
+
+Hustotu importovaných bodů můžeme ověřit pomocí modulu
+:grasscmd:`v.outlier`. Vzhledem k tomu, že tento modul používá pro
+výpočet nastavení aktualního výpočetního region, je potřeba jej
+nejprve nastavit pomocí :grasscmd:`g.region` (nastavení regionu může
+trvat několik sekund neboť chybí u vstupních dat topologie a modul
+musí rozsah souřadnic spočítat přímo z bodových dat).
+
+.. code-block:: bash
+
+   g.region vector=pf_VIMP27_g
+   v.outlier -e input=pf_VIMP27_g
+
+::
+
+   Estimated point density: 0.9996
+   Estimated mean distance between points: 1
+
+Základní metadata můžeme vypsat pomocí modulu :grasscmd:`v.info`.
+
+.. code-block:: bash
+
+   v.info map=pf_VIMP27_g
+
+::
+
+   |   Number of points:       4997968         Number of centroids:  0          |
+   ...
+   |               N:          -1154000    S:      -1155999.999                 |
+   |               E:           -805000    W:       -807499.998                 |
+   |               B:           804.294    T:          1061.487                 |
+
+.. figure:: images/import-rast-vect-holes.png
+
+   Ilustrace importu lidarových dat do rastrové a vektorové bodové
+   mapy. V rastrové mapě jsou zřetelná místa bez vstupních bodových
+   dat (no-data).
+   
+   
