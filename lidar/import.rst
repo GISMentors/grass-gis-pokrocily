@@ -182,6 +182,8 @@ jako data v textovém formátu, a to jako rastrovou mapu
 (:grasscmd:`r.in.lidar`) anebo jako mapu vektorovou
 (:grasscmd:`v.in.lidar`).
 
+.. _lidar-las-raster:
+
 Rastrová reprezentace
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -333,6 +335,28 @@ Pro vytvoření vektorové mapy na základě vstupních dat slouží modul
 
       v.in.lidar input=pf_VIMP27_g.laz output=pf_VIMP27_g  -otb
 
+.. figure:: images/import-rast-vect-holes.png
+
+   Ilustrace importu lidarových dat do rastrové a vektorové bodové
+   mapy. V rastrové mapě jsou zřetelná místa bez vstupních bodových
+   dat (no-data).
+
+Základní metadata můžeme vypsat pomocí modulu :grasscmd:`v.info`.
+
+.. code-block:: bash
+
+   v.info map=pf_VIMP27_g
+
+::
+
+   |   Number of points:       4997968         Number of centroids:  0          |
+   ...
+   |               N:          -1154000    S:      -1155999.999                 |
+   |               E:           -805000    W:       -807499.998                 |
+   |               B:           804.294    T:          1061.487                 |
+
+.. _v-outlier:      
+
 Hustotu importovaných bodů můžeme ověřit pomocí modulu
 :grasscmd:`v.outlier`. Vzhledem k tomu, že tento modul používá pro
 výpočet nastavení aktualního výpočetního region, je potřeba jej
@@ -349,25 +373,5 @@ musí rozsah souřadnic spočítat přímo z bodových dat).
 
    Estimated point density: 0.9996
    Estimated mean distance between points: 1
-
-Základní metadata můžeme vypsat pomocí modulu :grasscmd:`v.info`.
-
-.. code-block:: bash
-
-   v.info map=pf_VIMP27_g
-
-::
-
-   |   Number of points:       4997968         Number of centroids:  0          |
-   ...
-   |               N:          -1154000    S:      -1155999.999                 |
-   |               E:           -805000    W:       -807499.998                 |
-   |               B:           804.294    T:          1061.487                 |
-
-.. figure:: images/import-rast-vect-holes.png
-
-   Ilustrace importu lidarových dat do rastrové a vektorové bodové
-   mapy. V rastrové mapě jsou zřetelná místa bez vstupních bodových
-   dat (no-data).
    
    

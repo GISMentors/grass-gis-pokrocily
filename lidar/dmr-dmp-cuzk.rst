@@ -3,51 +3,34 @@ Tvorba DMR a DMP
 
 Tato kapitola shromažďuje informace, jak pracovat s daty **digitálního
 modelu reliéfu a povrchu** poskytovaných `Českým úřadem zeměměřičským
-a katastrálním <http://www.cuzk.cz/>`__ v systému GRASS.
+a katastrálním <http://www.cuzk.cz/>`__ v systému GRASS GIS.
 
 Tyto produkty poskytuje ČÚZK ve dvou formátech:
 
 1. textovém XYZ
 2. binárním LAS, resp. komprimované formě LAZ
 
+Souřadnice X,Y jsou referencovány v souřadnicovém systému S-JTSK
+(:epsg:`5514`), souřadnice H (nadmořská výška) ve výškovém referenčním
+systému Balt po vyrovnání (Bpv).
+
 .. note:: Tato data nejsou poskytována v režimu otevřených dat, ČÚZK
           nicméně zveřejnil vzorová data volně ke stažení `zde
           <http://geoportal.cuzk.cz/UKAZKOVA_DATA/VYSKOPIS.zip>`__. Ukázkový
           dataset obsahuje data pouze v textovém formátu XYZ.
 
-Postup importu dat v textovém či binárním formátu je popsán v
-:doc:`předcházející kapitole <import>`.
+Postup importu lidarových dat je popsán v :doc:`předcházející kapitole
+<import>`.
 
-Digitální model reliéfu či povrchu lze v systému GRASS vytvořit
-několika způsoby:
-
-**1. Vytvoření rastru převzetím hodnot vstupních bodových dat**
-
-Import vstupních dat do rastrové mapy s prostorových rozlišením
-odvozeným ze vstupu. Postup vhodný především pro pravidelnou
-mřížku vstupních dat.
-
-**2. Spline interpolace z bodových dat**
-
-Import vstupních dat do vektorové bodové mapy, interpolace výsledného
-povrchu pomocí modulu :grasscmd:`v.surf.rst`. Vhodné pro vytvoření DMT
-s vysokým prostorovým rozlišením.
-
-**3. Import to rastrové mapy a vyplnění "děr"**
-
-.. todo:: Doplnit
-
-**4. Vytvoření TIN reprezentace**
-
-.. todo:: Doplnit
-             
 Digitální model reliéfu
 -----------------------
-
+   
 Data pro :wikipedia:`digitální model reliéfu <Digitální model
 terénu>`, tj. digitální reprezentaci modelu reliéfu *bez* umělých a
 přírodních objektů (např. vegetace nebo budovy) poskytuje ČÚZK ve dvou
 verzích:
+
+.. _dmr4g:
 
 * **DMR4G** - diskrétní body v pravidelné síti (5 x 5 m) bodů o
   souřadnicích X,Y,H s úplnou střední chybou výšky 0,3 m v odkrytém
@@ -58,20 +41,63 @@ verzích:
   terénu a 0,3 m v zalesněném terénu. Další informace `zde
   <http://geoportal.cuzk.cz/(S(kle1ef454jwgniffefmzxmed))/Default.aspx?lng=CZ&mode=TextMeta&side=vyskopis&metadataID=CZ-CUZK-DMR5G-V&mapid=8&menu=302>`__.
 
-Souřadnice X,Y jsou referencovány v souřadnicovém systému S-JTSK
-(:epsg:`5514`), souřadnice H (nadmořská výška) ve výškovém referenčním
-systému Balt po vyrovnání (Bpv).
+Digitální model povrchu
+-----------------------
 
-Následující dva příklady vytvoření rastrové reprezentace DMT prezentují dva rozdílné přístupy:
+Data pro :wikipedia:`digitální model povrchu <Digitální model
+povrchu>` (DMP), tj. digitální reprezentaci modelu reliéfu *včetně*
+umělých a přírodních objektů poskytuje ČÚZK v současnosti v jedné
+verzi, a to jako:
 
-* vytvoření DMT *převzetím* hodnot pravidelné mřížky bodových dat
-  DMR4G, prostorové rozlišení je odvozeno ze vstupních dat (tj. 5m)
+* **DMP1G** - diskrétní body v nepravidelné sítě výškových bodů
+  (TIN) s úplnou střední chybou výšky 0,4 m pro přesně vymezené
+  objekty (budovy) a 0,7 m pro objekty přesně neohraničené (lesy a
+  další prvky rostlinného pokryvu). Další informace `zde
+  <http://geoportal.cuzk.cz/(S(kle1ef454jwgniffefmzxmed))/Default.aspx?lng=CZ&mode=TextMeta&side=vyskopis&metadataID=CZ-CUZK-DMP1G-V&mapid=8&menu=303>`__.
 
-* vytvoření vysoce podrobného DMT metodou :wikipedia-en:`spline
-  <Spline (mathematics)>` na základě DMR5G
+Následující kapitoly popisují typické postupy tvorby rastrové či TIN
+reprezentace DMR/DMP. 
 
-Vytvoření DMT *převzetím* hodnot pravidelné mřížky bodových dat DMR4G
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tvorba DMR/DMP reprezentace
+---------------------------
+
+Digitální model reliéfu či povrchu lze v systému GRASS vytvořit
+několika způsoby. První uvedený postup je vhodný především pro
+DMR4G. Další tři postupy jsou aplikovatelné jak na DMR5G tak DMP1G.
+
+**1. Vytvoření rastrové reprezentace převzetím hodnot vstupních bodových dat**
+
+Import vstupních dat do rastrové mapy s prostorových rozlišením
+odvozeným ze vstupu. Jednoduchý postup vhodný především pro vstupní
+bodová data v pravidelné mřížce. Příklad v kapitole
+:ref:`create-dmr4g`.
+
+**2. Vytvoření rastrové reprezentace s vyplněním "děr"**
+
+Import vstupních dat do rastrové mapy s prostorových rozlišením
+odvozeným ze vstupu. Interpolace hodnot pouze v místech, kde chybí
+vstupní data. Příklad v kapitole :ref:`create-dmr5g-holes`.
+
+**3. Spline interpolace z importovaných vektorových bodových dat**
+
+Import vstupních dat do vektorové bodové mapy, interpolace výsledného
+povrchu pomocí modulu :grasscmd:`v.surf.rst`. Časově náročné. Vhodné
+pro vytvoření DMT s vysokým prostorovým rozlišením. Příklad v kapitole
+:ref:`create-dmr5g-spline`.
+
+**4. Vytvoření TIN reprezentace**
+
+Vytvoření TIN (:wikipedia-en:`Triangulated irregular network`)
+reprezentace na základě vstupních bodových dat. Většina navazujících
+nástrojů pro analýzu topografického povrchu v systému GRASS podporuje
+pouze rastrovou reprezentaci digitálního modelu reliéfu či
+povrchu. Vhodné při exportu TIN a navazující operace již mimo systém
+GRASS GIS. Příklad v kapitole :ref:`create-dmr5g-tin`.
+
+.. _create-dmr4g:
+   
+Vytvoření DMR převzetím hodnot pravidelné mřížky bodových dat DMR4G
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 V prvním kroku zjistíme hraniční souřadnice importovaných dat, viz
 kapitola :ref:`import dat <lidar-import-scan>`.
@@ -82,19 +108,23 @@ kapitola :ref:`import dat <lidar-import-scan>`.
 
 Na základě toho nastavíme výpočetní region a to tak, aby střed buňky
 odpovídal vstupní pravidelné mřížce bodů. Prostorové rozlišení
-nastavíme na 5m, což odpovídá vzdálenosti bodů DMR4G.
+nastavíme na 5m, což odpovídá vzdálenosti bodů DMR4G. 
 
 .. code-block:: bash
    
    g.region n=-1088005 s=-1090000 e=-625005 w=-627500 b=461.5 t=554.31
    g.region n=n+2.5 s=s-2.5 w=w-2.5 e=e+2.5 res=5
 
-Následně na to, data do nastaveného výpočetního regionu naimportujeme.
+Následně na to data do nastaveného výpočetního regionu naimportujeme.
 
 .. code-block:: bash
 
    r.in.xyz input=HLIN04_4g.xyz separator=space output=HLIN04_4g
 
+.. note:: Podobný postup by bylo možné aplikovat na binární vstupní
+   data ve formátu LAS/LAZ a modul :grasscmd:`r.in.lidar`, 
+   viz kapitola :ref:`import dat <lidar-las-raster-steps>`.
+          
 .. figure:: images/dmr4g.png
                
    Ukázka výsledného produktu digitálního modelu reliéfu vytvořeno na
@@ -102,44 +132,141 @@ Následně na to, data do nastaveného výpočetního regionu naimportujeme.
    ilustraci vykreslena vstupní pravidelná síť bodů DMR4G a výstupní
    mřížka rastrové mapy.
 
-Vytvoření vysoce podrobného DMT metodou spline na základě DMR5G
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Nastavíme výpočetní region na základě vstupní bodové vektorové mapy,
-prostorové rozlišení zarovnáme (přepínač :option:`-a`) na požadované
-rozlišení, viz kapitola :ref:`import dat <lidar-import-align>`.
-
-.. note:: Zvolené prostorové rozlišení může vycházet z průměrné vzdálenosti
-   vstupních bodů, tuto statistiku spočítáme pomocí modulu
-   :grasscmd:`v.lidar.edgedetection`.
+.. tip:: Zájmové území by nemělo obsahovat místa bez dat. To můžeme
+   zkontrolovat pomocí modulu :grasscmd:`r.univar`.
 
    .. code-block:: bash
 
-      v.lidar.edgedetection -e input=HLIN04_5g
+      r.univar HLIN04_4g
 
    ::
+      
+      ...
+      total null cells: 0
+      ...
 
-      Estimated point density: 0.1102
-      Estimated mean distance between points: 3.012
-
-   Pokud používáte verzi GRASS 7.2.1 a nižší, je nutné přidat
-   ještě parametr :option:`output` a to i přestože modul žádný
-   výstup nevytváří.
+.. figure:: images/dmr4g-3d.png
+   :class: middle
+           
+   Vizualizace terénu na bázi DMR4G ve 3D pohledu.
+      
+.. _create-dmr5g-holes:
    
+Vytvoření DMR kombinací převzetí hodnot DMR5G a interpolací chybějících hodnot
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-V našem případě zvolíme prostorové rozlišení 1m.
+.. _create-dmr5g-spline:
+
+Začneme obdobně jako v :ref:`předchozí kapitole <create-dmr4g>`
+importem vstupních dat do rastrové reprezentace podle toho, zda jsou
+vstupní data dostupná v :ref:`textovém <lidar-xyz-raster>` nebo
+:ref:`binárním <lidar-las-raster>` formátu. Příklad níže ukazuje
+postup pro textová data.
+
+.. code-block:: bash
+
+   r.in.xyz -sg input=HLIN04_5g.xyz separator=space
+   g.region n=-1088000.076 s=-1090000.059 e=-624999.829 w=-627499.828 b=461.312 t=554.334
+
+.. _dmr5g_res:
+   
+V našem případě nastavíme prostorové rozlišení na 3 metry (vycházíme z
+průměrné hustoty vstupních bodů, viz :ref:`poznámky k importu
+vektorových dat <v-outlier>`). Předtím je samozřejmě nutné importovat
+data do vektorové reprezentace, postup je uveden v kapitole
+:ref:`create-dmr5g-spline`.
+
+.. code-block::
+   v.outlier -e input=HLIN04_5g
+
+::
+   
+   Estimated point density: 0.1102
+   Estimated mean distance between points: 3.012
+
+.. code-block::
+   
+   g.region res=3 -a
+
+Poté data naimportujeme:
+
+.. code-block:: bash
+                
+   r.in.xyz input=HLIN04_5g.xyz separator=space output=HLIN04_5g
+
+Rastrová mapa bude vzhledem k povaze dat DMR5G obsahovat místa bez dat
+(no-data). V našem případě jde téměř o polovinu buněk(!) Tato místa se
+bude snažit v dalším kroku vyplnit na základně interpolovaných hodnot.
+
+.. code-block:: bash
+
+   r.univar map=HLIN04_5g
+
+::
+   
+   total null and non-null cells: 557112
+   total null cells: 249326
+
+.. figure:: images/dmr5g-holes.png
+
+   Importovaná dlaždice DMR5G do rastrové reprezentace.
+
+Pro vyplnění chybějících hodnot DMR použijeme modul
+:grasscmd:`r.fillnulls`. Modul podporuje tři různé metody interpolace:
+*rst* (:wikipedia:`spline`, tj. metoda použitá v kapitole
+:ref:`create-dmr5g-spline`), *bilinear* (:wikipedia:`bilinear`),
+*bicubic* (:wikipedia:`bicubic <Bikubická interpolace>`). Pro DMR je
+vhodná metoda spline (*rst*). Nicnémě vzhledem k její časové
+náročnosti (desítky minut na uvedené dlaždici) zvolíme v tomto případě
+akceptovatelnou bikubickou interpolaci (*bicubic*).
+
+.. code-block:: bash
+
+   r.fillnulls input=HLIN04_5g output=HLIN04_5g_filled method=bicubic
+
+.. figure:: images/dmr5g-filled.png
+
+   Importovaná dlaždice DMR5G po interpolaci chybějících
+   hodnot. Barevná tabulka nastavena na *elevation*.
+
+.. figure:: images/dmr5g-3d.png
+   :class: middle
+           
+   Vizualizace terénu na bázi DMR5G ve 3D pohledu.
+            
+Velmi dobrou alternativou k výše uvedenému modulu je
+:grasscmd:`r.fill.stats`. Ten je určen k rychlému doplnění chybějících
+hodnot na základě statistiky vstupních dat. Výchozí metoda (*wmean*) v
+podstatě odpovídá interpolační metodě :wikipedia:`IDW`, *mean* poté
+aplikaci "low-pass filru". Dále jsou dostupné metody *median*,
+*mode*. Modul je ideální pro zpracovaní velkého objemu dat ve velmi
+vysokém rozlišení. Na rozdíl od :grasscmd:`r.fillnulls` interpoluje
+chybějící hodnoty pouze v daném okolí definovaném parametrem
+:option:`cells` (výchozí je okolí 8 buněk). Tento postup je vhodný v
+případě, že místa s chybějícími hodnotami tvoří menší celky. Což není
+náš případ, kdy počet chybějících hodnot dosahuje téměř 50%.
+
+.. _create-dmr5g-spline:
+
+Vytvoření DMR metodou spline na základě DMR5G
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Lidarová data importujeme do vektorové reprezentace, postup pro
+:ref:`textový <lidar-import-xyz-vektor>` a :ref:`binární
+<lidar-import-las-vektor>` formát v kapitole :doc:`import`. Příklad
+níže ukazuje import dat v textovém formátu.
+
+.. code-block:: bash
+                
+   v.in.ascii input=HLIN04_5g.xyz output=HLIN04_5g separator=space z=3 -tbz
+
+V našem případě zvolíme prostorové rozlišení 3 metry (odvozené z
+průměrné hustoty vstupních bodů, viz :ref:`předchozí kapitola
+<dmr5g_res>`).
    
 .. code-block:: bash
 
-   g.region vector=HLIN04_5g res=1 -a
-
-.. note:: Pokud používáte GRASS verze 7.2.0 a nižší, tak naimportujte
-   vstupní data včetně topologie (tj. vynechte přepínač :option:`-b` v
-   případě importních modulů :ref:`v.in.ascii
-   <lidar-import-xyz-vektor>` a :ref:`v.in.lidar
-   <lidar-import-las-vektor>`). V opačném případě nebude výše uvedený
-   příkaz pro nastavení výpočetního regionu fungovat.
-
+   g.region vector=HLIN04_5g res=3 -a
    
 Poté spustíme proces interpolace:
 
@@ -147,70 +274,46 @@ Poté spustíme proces interpolace:
                 
    v.surf.rst input=HLIN04_5g elevation=HLIN04_5g
 
-.. important:: Modul :grasscmd:`v.surf.rst` poskytuje dobré výsledky,
-         bohužel je ale velmi pomalý. Na testovacím PC trvala
-         interpolace pro výše zmíněná data 3hod 14min!
+.. important:: Modul :grasscmd:`v.surf.rst` patří mezi extrémně
+   výpočetně náročné nástroje. Na testovacím PC trvala interpolace pro
+   výše zmíněná data 30 min.
 
-         Od verze GRASS 7.3 (aktuální vývojová větev) podporuje modul
-         paralelizaci výpočtu, což může vést k signifikantnímu
-         zrychlení výpočtu. V našem případě rozložení výpočtu na 8
-         jader CPU (parametr :option:`nprocs=8`) vedlo ke snížení
-         výpočetního času na 30 min.
+   Od verze GRASS 7.4 podporuje modul paralelizaci výpočtu, což může
+   vést k signifikantnímu zrychlení výpočtu. V našem případě rozložení
+   výpočtu na 3 jadra CPU (parametr :option:`nprocs=3`) vedlo ke
+   snížení výpočetního času na XX min.
 
-         .. code-block:: bash
+   .. code-block:: bash
 
-            v.surf.rst input=HLIN04_5g elevation=HLIN04_5g nprocs=8
+      v.surf.rst input=HLIN04_5g elevation=HLIN04_5g nprocs=3
    
 .. figure:: images/dmr5g.png
-
+   :class: middle
+           
    Ukázka výsledného produktu digitálního modelu reliéfu vytvořeno na
-   bázi DMR5G metodou spline s rozlišením 1m.
+   bázi DMR5G metodou spline s rozlišením 3m.
 
 .. figure:: images/dmr4g-vs-5g.png
 
    Porovnání vytvořených DMR převzetím hodnot DMR4G při rozlišení 5m a
-   interpolací spline v rozlišení 1m.
-   
-Digitální model povrchu
------------------------
+   interpolací spline v rozlišení 3 metry.
 
-Data pro :wikipedia:`digitální model povrchu <Digitální model
-povrchu>` (DMP), tj. digitální reprezentaci modelu reliéfu *včetně*
-umělých a přírodních objektů (např. vegetace nebo budovy) poskytuje
-ČÚZK v současnosti v jedné verzi a to jako:
+.. todo:: aktualizovat screenshot
 
-* **DMP1G** - diskrétní body v nepravidelné sítě výškových bodů
-  (TIN) s úplnou střední chybou výšky 0,4 m pro přesně vymezené
-  objekty (budovy) a 0,7 m pro objekty přesně neohraničené (lesy a
-  další prvky rostlinného pokryvu). Další informace `zde
-  <http://geoportal.cuzk.cz/(S(kle1ef454jwgniffefmzxmed))/Default.aspx?lng=CZ&mode=TextMeta&side=vyskopis&metadataID=CZ-CUZK-DMP1G-V&mapid=8&menu=303>`__.
-
-Souřadnice X,Y jsou podobně jako v případě DMR4/5G referencovány v
-souřadnicovém systému S-JTSK (:epsg:`5514`), souřadnice H (nadmořská
-výška) ve výškovém referenčním systému Balt po vyrovnání (Bpv).
-
-Produkt DMP vytvoříme obdobně jako v případě DMR interpolací spline:
-
-.. code-block:: bash
-
-   v.in.ascii input=HLIN04_1g.xyz output=HLIN04_1g separator=space z=3 -tbz
-   g.region vector=HLIN04_1g res=1 -a
-   v.surf.rst input=HLIN04_1g elevation=HLIN04_1g nprocs=8
-
-.. note:: Pokud zpracováváte DMR a DMP současně pro stejné území, je
-          vhodné zachovat stejný výpočetní region. Ten můžete nastavit
-          na základě více vektorových map současně, v tomto případě
-          DMR5G a DMP1G:
-
-          .. code-block:: bash
-
-             g.region vector=HLIN04_1g,HLIN04_5g res=1 -a
-          
 .. figure:: images/dsm-cuzk.png
 
    Ukázka výsledného produktu digitálního modelu povrchu vytvořeného
-   spline interpolací v prostorovém rozlišení 1m.
+   spline interpolací v prostorovém rozlišení 3 metry.
 
+.. todo:: porovnat modely
+          
+.. _create-dmr5g-tin:
+   
+Vytvoření DMR v podobě TIN reprezentace
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. todo:: TBD
+   
 Dávkové zpracování dlaždic DMR/DMP a vytvoření výsledné mozaiky
 ---------------------------------------------------------------
 
