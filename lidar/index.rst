@@ -15,8 +15,6 @@ objektů. Po aplikaci filtrů je možné z mračna bodů získat
 :wikipedia:`digitální model terénu <Digitální model terénu>`
 (DMT/DMR). (citováno z :wikipedia:`české wikipedie <Lidar>`)
 
-.. warning:: Tato část je aktuálně ve výstavbě!
-             
 .. rubric:: Témata
    :class: secnotoc
                     

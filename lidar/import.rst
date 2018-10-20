@@ -5,17 +5,23 @@ Před importem dat je potřeba vytvořit příslušnou lokaci, viz kapitola
 :skoleni:`struktura dat
 <grass-gis-zacatecnik/intro/struktura-dat.html>` a :skoleni:`tvorba
 lokace <grass-gis-zacatecnik/data/tvorba-lokace.html>` ze školení
-:skoleni:`GRASS GIS pro začátečníky <grass-gis-zacatecnik>`. V případě
-textového formátu, který neobsahuje informaci o souřadnicovém připojení,
-vytvoříme typicky lokaci :skoleni:`na základě EPSG kódu
-<grass-gis-zacatecnik/data/tvorba-lokace.html#priklad-vytvoreni-lokace-pro-data-v-souradnicovem-systemu-s-jtsk>`. U
-binarního formátu LAS/LAZ je možné, vzhledem k tomu, že tento formát
-obvykle obsahuje tuto informaci, vytvořit lokaci
-:skoleni:`na základě vstupního souboru
-<grass-gis-zacatecnik/data/tvorba-lokace.html#lokace-srtm>`.
+:skoleni:`GRASS GIS pro začátečníky <grass-gis-zacatecnik>`. Lokaci
+pro import dat v textovém či binárním formátu lidarových dat vytvoříme
+typicky :skoleni:`na základě EPSG kódu
+<grass-gis-zacatecnik/data/tvorba-lokace.html#lokace-sjtsk>`.
+
+..
+    U binarního formátu LAS/LAZ je možné, vzhledem k tomu, že tento
+    formát obvykle obsahuje tuto informaci (i když to není nutně
+    pravidlem), vytvořit lokaci :skoleni:`na základě vstupního souboru
+    <grass-gis-zacatecnik/data/tvorba-lokace.html#lokace-srtm>`.
 
 Obecně řečeno lze vstupní lidarová data importovat do systému GRASS
-jako vektorová nebo rastrová data.
+jako :skoleni:`vektorová <grass-gis-zacatecnik/intro/vektor.html>`
+nebo :skoleni:`rastrová <grass-gis-zacatecnik/intro/rastr.html>`
+data. V případě importu lidarových dat do rastrové reprezentace hraje
+zásadní roli :skoleni:`výpočetní region
+<grass-gis-zacatecnik/_build/html/intro/region.html>`.
 
 Textový formát XYZ
 ------------------
@@ -25,11 +31,13 @@ Vstupní soubor obsahuje souřadnice *x,y,z* pro každý bod na jednom
 nebo tabulátor. Pro vytvoření rastrového výstupu lze použít modul
 :grasscmd:`r.in.xyz`, resp. :grasscmd:`v.in.ascii` v případě výstupu
 vektorového. Druhý uvedený modul importuje bodová data tak, jak jsou
-uvedena na vstupu. Modul :grasscmd:`r.in.lidar` se chová odlišně,
+uvedena na vstupu. Modul :grasscmd:`r.in.xyz` se chová odlišně,
 vytvoří na základě agregace načtených bodů do rastrových buněk
 aktuálního výpočetního regionu dle zvolené statistické metody
 (parametr :option:`method`, výchozí je průměrná hodnota - *mean*)
 novou rastrovou mapu.
+
+.. _lidar-xyz-raster:
 
 Rastrová reprezentace
 ^^^^^^^^^^^^^^^^^^^^^
@@ -65,9 +73,9 @@ přepínače :option:`-sg`.
           parametr :option:`output`, a to i přestože modul žádný výstup
           v tomto případě nevytváří.
       
-Výsledek nám poslouží pro nastavení rozsahu výpočetního regionu, na
-nás bude zvolit vhodné prostorové rozlišení. V našem případě zvolíme 1
-metr.
+Výsledek nám poslouží pro nastavení rozsahu výpočetního regionu pomocí
+:grasscmd:`g.region`, na nás bude zvolit vhodné prostorové
+rozlišení. V našem případě zvolíme 1 metr.
 
 .. code-block:: bash
 
@@ -170,98 +178,115 @@ Binární formát LAS/LAZ
 Data v binárním formátu `LAS
 <https://www.asprs.org/committee-general/laser-las-file-format-exchange-activities.html>`__
 či komprimované formě LAZ lze do systému GRASS naimportovat podobně
-jako data v textovém formátu jako rastrovou mapu a to pomocí modulu
-:grasscmd:`r.in.lidar` anebo jako mapu vektorovou pomocí
-:grasscmd:`v.in.lidar`.
+jako data v textovém formátu, a to jako rastrovou mapu
+(:grasscmd:`r.in.lidar`) anebo jako mapu vektorovou
+(:grasscmd:`v.in.lidar`).
 
 Rastrová reprezentace
 ^^^^^^^^^^^^^^^^^^^^^
 
-Modul :grasscmd:`r.in.lidar` funguje obdobně jako :grasscmd:`r.in.xyz`
-s tím, že nejprve zjistíme rozsah dat a podle toho nastavíme výpočetní
-region. V tomto regionu dojde k agregaci vstupních bodů na základě
-zvolené statistické metody (parametr :option:`method`, výchozí metoda
-je průměrná hodnota *mean*).
+Modul :grasscmd:`r.in.lidar` podobně jako :grasscmd:`r.in.xyz` (viz
+:ref:`Textový formát XYZ <lidar-xyz-raster>`) provádí agregaci
+vstupních bodů v aktuálním výpočetním regionu, a to na základě zvolené
+statistické metody (parametr :option:`method`, výchozí metoda je
+průměrná hodnota *mean*).
 
-.. code-block: bash
+Na rozdíl od výše zmíněného modulu umožňuje :grasscmd:`r.in.lidar`
+nastavit výpočetní region pro import automaticky na základě vstupních
+dat. K tomu slouží přepínač :option:`-e`. V tomto ohledu se hodí
+použít ještě přepínač :option:`-n`, který nastaví po importu výpočetní
+region na základě vstupních dat. Prostorové rozlišení regionu
+nastavíme parametrem :option:`resolution`.
+   
+.. code-block:: bash
 
-   r.in.lidar input=pr_TANV37_5g.laz -sg
+   r.in.lidar input=pr_TANV37_5g.laz output=pr_TANV37_5g resolution=1 -ne
 
-.. note:: Je možné, že vstupní soubor nebude obsahovat informace o
-   souřadnicovém připojení. V tomto případě příkaz skončí chybou:
+.. important:: V případě, že vstupní soubor neobsahuje informace o
+   souřadnicovém připojení, tak příkaz skončí chybou:
 
    ::
-
+      
       ERROR: Projection of dataset does not appear to match current location.
 
       GRASS LOCATION PROJ_INFO is:
-      name: WGS 84 / UTM zone 33N
-      datum: wgs84
-      ellps: wgs84
-      proj: utm
-      zone: 33
+      name: S-JTSK / Krovak East North
+      datum: S_JTSK
+      ellps: bessel
+      proj: krovak
+      lat_0: 49.5
+      lon_0: 24.83333333333333
+      alpha: 30.28813972222222
+      k: 0.9999
+      x_0: 0
+      y_0: 0
       no_defs: defined
+      towgs84: 570.8,85.7,462.8,4.998,1.587,5.261,3.56
 
       Import dataset PROJ_INFO is:
       Dataset proj = 0 (unreferenced/unknown)
-      
-      In case of no significant differences in the projection definitions, use the -o flag...
-      Consider generating a new location with 'location' parameter from input data set.
 
-   V tomto případě, přidejte přepínač :option:`-o`, který kontrolu
-   souřadnicového systému přeskočí. V našem případě ještě použijeme
-   přepínač :option:`--quiet`, tak abychom potlačili všechny zprávy
-   modulu.
+      In case of no significant differences in the projection definitions,
+      use the -o flag to ignore them and use current location definition.
+      Consider generating a new location with 'location' parameter from
+      input data set.
+
+   V tomto případě, pokud jste si jisti, že vstupní data jsou
+   lokalizována v souřadnicovém systému aktuální GRASS lokace,
+   přidejte přepínač :option:`-o`, který kontrolu souřadnicového
+   systému přeskočí.
+
+   .. tip:: Rozsah souřadnic vstupních dat lze zjistit pomocí
+      přepínače :option:`-p`.
+
+      .. code-block:: bash
+                      
+         r.in.lidar input=pf_VIMP27_g.laz -p
+
+      ::
+
+         Using LAS Library Version 'libLAS 1.8.1 with GeoTIFF 1.4.2 LASzip 2.0.1'
+         ...
+         Number of Point Records:           4997968
+         ...
+         Min X Y Z:                         -807500 -1.156e+06 804.294
+         Max X Y Z:                         -805000 -1.154e+06 1061.49
+         ...
+
+      Z výše uvedeného je zřejmé, že jsou vstupní data v souřadnicovém
+      systému S-JTSK :epsg:`5514`.
+      
+.. note:: Pokud si přejete větší kontrolu nad procesem importu, tak
+   lze podobně jako v případě importu :ref:`textových dat
+   <lidar-xyz-raster>` rozložit proces do dvou kroků. Nejprve určit
+   nastavení výpočetního regionu na základě vstupních dat a poté
+   provést samotný import.
 
    .. code-block:: bash
 
-      r.in.lidar input=pr_TANV37_5g.laz -sgo --quiet
+      r.in.lidar input=pf_VIMP27_g.laz -sgo
 
-Výsledek, v našem případě
+   Výsledek, v našem případě
 
-::
+   ::
    
-   n=5627727.26 s=5625597.55 e=534548.84 w=531815.05 b=925.35 t=1292.54
+      n=-1154000.000000 s=-1155999.999000 e=-805000.000000 w=-807499.998000 b=804.294000 t=1061.487000
 
-použijeme pro nastavení výpočetního regionu včetně požadovaného
-rozlišení (parametr :option:`res`).
 
-.. code-block:: bash
+   použijeme pro nastavení výpočetního regionu včetně požadovaného
+   rozlišení (parametr :option:`res`). Nezapomene na přepínač
+   :option:`-a`, který zarovná nastavení právě podle hodnoty
+   prostorového rozlišení.
 
-   g.region n=5627727.26 s=5625597.55 e=534548.84 w=531815.05 b=925.35 t=1292.54 res=1
+   .. code-block:: bash
+                     
+      g.region n=-1154000.000 s=-1155999.999 e=-805000.000 w=-807499.998 b=804.294 t=1061.487 res=1 -a
 
-Poté již provedeme import:
+   Poté již provedeme import:
 
-.. code-block:: bash
+   .. code-block:: bash
 
-   r.in.lidar input=pr_TANV37_5g.laz output=pr_TANV37_5g -o
-
-.. tip:: Modul :grasscmd:`r.in.lidar` umožňuje výpočetní region
-         nastavit automaticky na základě vstupních dat. K tomu slouží
-         přepínač :option:`-e`. V tomto ohledu se hodí použít ještě
-         přepínač :option:`-n`, který aktuální výpočetní region
-         nastaví na základě vstupních dat. Prostorové rozlišení
-         regionu nastavíme parametrem :option:`resolution`.
-   
-         .. code-block:: bash
-
-            r.in.lidar input=pr_TANV37_5g.laz output=pr_TANV37_5g resolution=1 -one
-
-         Výsledný výpočetní region bude v tomto případě schodný s
-         příkazem (preference rozlišení):
-
-         .. code-block:: bash
-
-            g.region n=5627727.26 s=5625597.55 e=534548.84 w=531815.05 b=925.35 t=1292.54 res=1 -a
-
-         ::
-      
-            north:      5627728
-            south:      5625597
-            west:       531815
-            east:       534549
-            nsres:      1
-            ewres:      1
+      r.in.lidar input=pf_VIMP27_g.laz output=pf_VIMP27_g -o
 
 .. _lidar-import-las-vektor:
 
@@ -273,17 +298,17 @@ Pro vytvoření vektorové mapy na základě vstupních dat slouží modul
 
 .. code-block:: bash
 
-   v.in.lidar input=pr_TANV37_5g.laz output=pr_TANV37_5g
+   v.in.lidar input=pf_VIMP27_g.laz output=pf_VIMP27_g
 
-.. tip:: Podobně jako v případě importu textových dat lze proces
-   urychlit tím, že nebudeme vytvářet atributová data (pokud je
-   nepotřebujeme, což je typicky u již klasifikovaných dat určených
-   pro tvorbu digitálního modelu terénu, viz kapitola
-   :doc:`dmr-dmp-cuzk`) a přeskočíme tvorbu topologie, která u
-   bodových dat stejně nedává smysl. V našem případě ještě použijeme
-   přepínač :option:`-o`, který přeskočí kontrolu souřadnicového
-   systému.
+.. tip:: Podobně jako v případě importu :ref:`textových dat
+   <lidar-import-xyz-vektor>` lze proces urychlit tím, že nebudeme
+   vytvářet atributová data (pokud je nepotřebujeme, např. v případě
+   již klasifikovaných dat určených pro tvorbu digitálního modelu
+   terénu, viz kapitola :doc:`dmr-dmp-cuzk`) a současně přeskočíme
+   tvorbu topologie, která u bodových dat stejně nedává smysl. V našem
+   případě ještě použijeme přepínač :option:`-o`, který přeskočí
+   kontrolu souřadnicového systému.
 
    .. code-block:: bash
 
-      v.in.lidar input=pr_TANV37_5g.laz output=pr_TANV37_5g  -otb
+      v.in.lidar input=pf_VIMP27_g.laz output=pf_VIMP27_g  -otb
