@@ -256,6 +256,8 @@ Lidarová data importujeme do vektorové reprezentace, postup pro
 <lidar-import-las-vektor>` formát v kapitole :doc:`import`. Příklad
 níže ukazuje import dat v textovém formátu.
 
+.. _lidar-import-v-in-ascii:
+   
 .. code-block:: bash
                 
    v.in.ascii input=HLIN04_5g.xyz output=HLIN04_5g separator=space z=3 -tbz
@@ -296,14 +298,13 @@ Poté spustíme proces interpolace:
 .. figure:: images/dmr4g-vs-5g.png
 
    Porovnání vytvořených DMR převzetím hodnot DMR4G při rozlišení 5m a
-   interpolací spline v rozlišení 3 metry.
-
-.. todo:: aktualizovat screenshot
+   interpolací spline v rozlišení 3m.
 
 .. figure:: images/dsm-cuzk.png
-
+   :class: middle
+           
    Ukázka výsledného produktu digitálního modelu povrchu vytvořeného
-   spline interpolací v prostorovém rozlišení 3 metry.
+   spline interpolací v prostorovém rozlišení 2.5m.
 
 .. todo:: porovnat modely
           
@@ -312,7 +313,22 @@ Poté spustíme proces interpolace:
 Vytvoření DMR v podobě TIN reprezentace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. todo:: TBD
+Vstupní data importujeme do vektorové mapy podobně jako v
+:ref:`předcházejícím případě <lidar-import-v-in-ascii>`. Pomocí modulu
+:grasscmd:`v.delaunay` vytvoříme na základě :wikipedia-en:`Delaunayho
+triangulace <Delaunay triangulation>` nepravidelnou trojuhelníkovou
+síť (TIN). Import vstupních bodů provedeme s menší úpravou, a to bez
+přepínače :option:`-b`. Modul :grasscmd:`v.delaunay` totiž vyžaduje
+pro svůj běh topologické informace vstupních dat.
+
+.. code-block:: bash
+
+   v.in.ascii input=HLIN04_5g.xyz output=HLIN04_5g separator=space z=3 -tz
+   v.delaunay input=HLIN04_5g output=HLIN04_5g_TIN
+
+.. figure:: images/tin.png
+
+   TIN reprezentace DMR.
    
 Dávkové zpracování dlaždic DMR/DMP a vytvoření výsledné mozaiky
 ---------------------------------------------------------------
@@ -384,13 +400,7 @@ Komentáře:
   dlaždic, viz ``offset`` jako desetinásobek zadaného rozlišení na
   řádce :lcode:`1-2`.
 
-.. warning:: Třída :class:`MultiModule` je v současnosti dostupná
-             pouze ve vývojové verzi systému GRASS 7.3, viz
-             `dokumentace
-             <https://grass.osgeo.org/grass73/manuals/libpython/pygrass.modules.interface.html#pygrass.modules.interface.module.MultiModule>`__.
-                       
-.. todo:: Dopsat scénář řešení v nižších verzích bez třídy
-   MultiModule.
+.. note:: Třída :class:`MultiModule` je dostupná od verze GRASS 7.4.
 
 Výsledná mozaika DMT jednotlivých dlaždic může být vytvořena modulem
 :grasscmd:`r.series` a vhodnou statistickou metodou, viz
@@ -409,11 +419,13 @@ CPU, výpočet trval přes hodinu a 20 minut):
 
 .. code-block:: bash
 
-   create-dmt.py input=VYSKOPIS elevation=HLIN_5g pattern=*5g* resolution=1 nprocs=4 rst_nprocs=3
+   create-dmt.py input=VYSKOPIS elevation=HLIN_5g pattern=*5g* resolution=3 nprocs=4 rst_nprocs=3
    
 Výsledná verze skriptu ke stažení `zde
 <../_static/skripty/create-dmt.py>`_.
 
+.. note:: aktualizovat screenshot v rozliseni 3m
+          
 .. figure:: images/dmr5g_ortofoto_3d.png
 
    Ukázka vizualizace výsledného DMT složeného jako mozaika ze čtyř
