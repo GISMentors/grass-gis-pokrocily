@@ -280,12 +280,12 @@ Poté spustíme proces interpolace:
 
    Od verze GRASS 7.4 podporuje modul paralelizaci výpočtu, což může
    vést k signifikantnímu zrychlení výpočtu. V našem případě rozložení
-   výpočtu na 3 jadra CPU (parametr :option:`nprocs=3`) vedlo ke
-   snížení výpočetního času na XX min.
+   výpočtu na 12 jader CPU (parametr :option:`nprocs=12`) vedlo ke
+   snížení výpočetního času na 10 min.
 
    .. code-block:: bash
 
-      v.surf.rst input=HLIN04_5g elevation=HLIN04_5g nprocs=3
+      v.surf.rst input=HLIN04_5g elevation=HLIN04_5g nprocs=12
    
 .. figure:: images/dmr5g.png
    :class: middle
@@ -304,7 +304,7 @@ Poté spustíme proces interpolace:
    Ukázka výsledného produktu digitálního modelu povrchu vytvořeného
    spline interpolací v prostorovém rozlišení 2.5m.
 
-.. todo:: porovnat modely
+.. todo:: porovnat modely spline vs. bicubic
           
 .. _create-dmr5g-tin:
    
