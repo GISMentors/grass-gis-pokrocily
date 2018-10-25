@@ -202,7 +202,7 @@ nastavíme parametrem :option:`resolution`.
    
 .. code-block:: bash
 
-   r.in.lidar input=pr_TANV37_5g.laz output=pr_TANV37_5g resolution=1 -ne
+   r.in.lidar input=pf_VIMP27_g.laz output=pf_VIMP27_g resolution=1 -ne
 
 .. important:: V případě, že vstupní soubor neobsahuje informace o
    souřadnicovém připojení, tak příkaz skončí chybou:
@@ -358,7 +358,7 @@ Základní metadata můžeme vypsat pomocí modulu :grasscmd:`v.info`.
 .. _v-outlier:      
 
 Hustotu importovaných bodů můžeme ověřit pomocí modulu
-:grasscmd:`v.outlier`. Vzhledem k tomu, že tento modul používá pro
+:grasscmd:`v.lidar.edgedetection`. Vzhledem k tomu, že tento modul používá pro
 výpočet nastavení aktualního výpočetního region, je potřeba jej
 nejprve nastavit pomocí :grasscmd:`g.region` (nastavení regionu může
 trvat několik sekund neboť chybí u vstupních dat topologie a modul
@@ -367,7 +367,7 @@ musí rozsah souřadnic spočítat přímo z bodových dat).
 .. code-block:: bash
 
    g.region vector=pf_VIMP27_g
-   v.outlier -e input=pf_VIMP27_g
+   v.lidar.edgedetection -e input=pf_VIMP27_g
 
 ::
 

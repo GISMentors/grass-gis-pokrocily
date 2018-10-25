@@ -155,8 +155,6 @@ Následně na to data do nastaveného výpočetního regionu naimportujeme.
 Vytvoření DMR kombinací převzetí hodnot DMR5G a interpolací chybějících hodnot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. _create-dmr5g-spline:
-
 Začneme obdobně jako v :ref:`předchozí kapitole <create-dmr4g>`
 importem vstupních dat do rastrové reprezentace podle toho, zda jsou
 vstupní data dostupná v :ref:`textovém <lidar-xyz-raster>` nebo
@@ -177,7 +175,7 @@ data do vektorové reprezentace, postup je uveden v kapitole
 :ref:`create-dmr5g-spline`.
 
 .. code-block::
-   v.outlier -e input=HLIN04_5g
+   v.lidar.edgedetection -e input=HLIN04_5g
 
 ::
    
