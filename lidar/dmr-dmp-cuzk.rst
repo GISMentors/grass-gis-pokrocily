@@ -166,6 +166,14 @@ postup pro textová data.
    r.in.xyz -sg input=HLIN04_5g.xyz separator=space
    g.region n=-1088000.076 s=-1090000.059 e=-624999.829 w=-627499.828 b=461.312 t=554.334
 
+.. note:: ZÚ poskytuje výškopisná data po dlaždicích SM5 (2x2.5 km). V
+   tomto kontextu by bylo vhodnější načíst data do výpočetního regionu
+   zarovnaného dle kladu SM5, tj. na celá čísla:
+
+   .. code-block:: bash
+		   
+      g.region n=-1088000 s=-1090000 e=-625000 w=-627500 b=461.312 t=554.334
+   
 .. _dmr5g_res:
    
 V našem případě nastavíme prostorové rozlišení na 3 metry (vycházíme z
