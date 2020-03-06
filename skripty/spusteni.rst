@@ -1,16 +1,28 @@
 Spuštění skriptu
 ================
 
-Začneme jednoduchým skriptem, který vypíše výměru města
-:wikipedia:`Pardubice` v hektarech. K tomu použijeme vektorovou mapu
-:map:`obce` z mapsetu :mapset:`ruian`.
+..
+   Začneme jednoduchým skriptem, který vypíše výměru města
+   :wikipedia:`Pardubice` v hektarech. K tomu použijeme vektorovou mapu
+   :map:`obce` z mapsetu :mapset:`ruian`.
 
-.. literalinclude:: ../_static/skripty/obce_vymera-v1.py
+   .. literalinclude:: ../_static/skripty/obce_vymera-v1.py
+      :language: python
+
+   Tento soubor (ke stažení `zde
+   <../_static/skripty/obce_vymera-v1.py>`_) uložte kamkoliv na
+   disk.
+
+Začneme jednoduchým skriptem, který vypíše statistiku rastrové mapy. V
+našem případě digitálního modelu terénu (:map:`dmt`).
+
+.. literalinclude:: ../_static/skripty/rastr_stats.py
    :language: python
-
-Tento soubor (ke stažení `zde
-<../_static/skripty/obce_vymera-v1.py>`_) uložte kamkoliv na
-disk. Bližší popis kódu nechme na kapitolu :doc:`ndvi-python` a
+                               
+Soubor (ke stažení `zde <../_static/skripty/rastr_stats.py>`_) uložte
+na disk.
+   
+Bližší popis kódu nechme na kapitolu :doc:`ndvi-python` a
 :doc:`PyGRASS <../pygrass/index>`.
 
 Spuštění z GUI
@@ -65,8 +77,8 @@ Skript se poté spustí, výpis je přesměrován do okna správce vrstev.
 
    .. code-block:: bash
 
-      chmod +x obce_vymera-v1.py
-      ./obce_vymera-v1.py
+      chmod +x rastr_stats.py
+      ./rastr_stats.py
 
    Předpokládejme, že adresář se skriptem není ve spouštěcí cestě,
    spustíme jej tedy přes ``./``.
@@ -104,7 +116,7 @@ Skript se poté spustí, výpis je přesměrován do okna správce vrstev.
 
           .. code-block:: bash
 
-             obce_vymera-v1.py
+             rastr_stats.py
 
 Spuštění jako batch job
 -----------------------
@@ -117,14 +129,14 @@ Příklad pro Linux:
 
 .. code-block:: bash
                 
-   export GRASS_BATCH_JOB=/home/martin/skripty/obce_vymera-v1.py 
+   export GRASS_BATCH_JOB=/home/martin/skripty/rastr_stats.py 
    grass /opt/grassdata/gismentors/user1
 
 Příklad pro MS Windows (spuštěno z *OSGeo4W Shell*):
 
 .. code-block:: bash
                 
-   set GRASS_BATCH_JOB=C:\users\martin\skripty\obce_vymera-v1.py 
+   set GRASS_BATCH_JOB=C:\users\martin\skripty\rastr_stats.py 
    grass C:\users\martin\grassdata\gismentors\user1
 
 .. todo:: otestovat
@@ -134,15 +146,31 @@ Příklad pro MS Windows (spuštěno z *OSGeo4W Shell*):
    GRASS spustí skript v posledně navštíveném mapsetu.
 
 Výstup může vypadat následovně:
+
 ::
 
-   Starting GRASS GIS...
-   Cleaning up temporary files...
-   Executing </home/martin/skripty/obce_vymera-v1.py> ...
-   Pardubice: 8263.98 ha
-   Execution of </home/martin/skripty/obce_vymera-v1.py> finished.
-   Cleaning up default sqlite database ...
-   Cleaning up temporary files...
+    Starting GRASS GIS...
+    Cleaning up temporary files...
+    Executing </home/martin/skripty/rastr_stats.py> ...
+     100%
+    total null and non-null cells: 220941666
+    total null cells: 94752766
+
+    Of the non-null cells:
+    ----------------------
+    n: 126188900
+    minimum: 49.3714
+    maximum: 1580.95
+    range: 1531.57
+    mean: 451.515
+    mean of absolute values: 451.515
+    standard deviation: 182.075
+    variance: 33151.4
+    variation coefficient: 40.3254 %
+    sum: 56976182855.044
+    Execution of </home/martin/skripty/rastr_stats.py> finished.
+    Cleaning up default sqlite database ...
+    Cleaning up temporary files...
 
 Proměnnou prostředí deaktivujeme pomocí příkazu :program:`unset` (pro
 Linux).
@@ -168,13 +196,13 @@ Varianta pro Linux:
 
 .. code-block:: bash
 
-   grass --exec /home/martin/skripty/obce_vymera-v1.py /opt/grassdata/gismentors/user1
+   grass --exec /home/martin/skripty/rastr_stats.py /opt/grassdata/gismentors/user1
 
 Varianta pro MS Windows (v *OSGeo4W Shell*):
 
 .. code-block:: cmd
 
-   grass --exec C:\users\martin\skripty\obce_vymera-v1.py C:\users\martin\grassdata\gismentors\user1
+   grass --exec C:\users\martin\skripty\rastr_stats.py C:\users\martin\grassdata\gismentors\user1
 
 .. todo:: test
 
@@ -197,11 +225,17 @@ systému GRASS (proměnná prostředí :envvar:`GISBASE`) a datům
    
    sys.path.insert(0, os.path.join(os.environ['GISBASE'], 'etc', 'python'))
    import grass.script.setup as gsetup
-   from grass.pygrass.vector import VectorTopo
-
+ 
    gsetup.init(os.environ['GISBASE'], '/opt/grassdata', 'gismentors', 'user1')
    
    ...
+
+Po této úpravě lze skript spustit přímo bez nutnosti spouštět GRASS
+GIS jako takový.
+
+.. code-block:: bash
+
+   python3 /home/martin/skripty/rastr_stats.py
 
 Pod MS Windows nahraďte defici ``gisbase`` a cestu k lokaci:
 
@@ -211,6 +245,14 @@ Pod MS Windows nahraďte defici ``gisbase`` a cestu k lokaci:
    ...
    gsetup.init(os.environ['GISBASE'], r'C:\users\martin\grassdata', 'gismentors', 'user1')
 
+Skript je nutné spustit z *OSGeo4W Shell* (před spustěním skriptu je
+nutné zavolat ``py3_env``, který nastaví prostředí pro Python 3):
+
+.. code-block:: bash
+
+   py3_env
+   python3 C:\users\martin\skripty\rastr_stats.py
+   
 .. todo:: test
 
 .. todo:: pridat pycharm
