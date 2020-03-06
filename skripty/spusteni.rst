@@ -255,4 +255,12 @@ nutné zavolat ``py3_env``, který nastaví prostředí pro Python 3):
    
 .. todo:: test
 
-.. todo:: pridat pycharm
+Spuštění v textovém editoru (PyCharm, MS Windows)
+-------------------------------------------------
+
+Následuje návod pro textový editor PyCharm. Postup nastavení editoru
+pro prostředí OSGeo4W v operačním systému MS Windows je součástí
+školení :skoleni:`GeoPython pro začátečníky
+<geopython-zacatecnik/ruzne/editor.html>`.
+
+.. todo:: dokončit
