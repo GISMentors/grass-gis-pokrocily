@@ -49,8 +49,8 @@ License)`.  Tato licence nejenže umožňuje software použít k libovolným
 účelům včetně komerčních, dovoluje také studovat jeho zdrojový kód,
 upravovat ho a tyto změny či opravy šířit dál.
 
-.. important:: Školení je zaměřeno na aktuální verzi `GRASS 7.4
-               <http://grass.osgeo.org/download/software/#g74x>`_ a do
+.. important:: Školení je zaměřeno na aktuální verzi `GRASS 7.8
+               <http://grass.osgeo.org/download/software>`_ a do
                jisté míry navazuje na školení :skoleni:`GRASS GIS pro
                začátečníky <grass-gis-zacatecnik>`.
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from grass.pygrass.modules import Module
 from subprocess import PIPE
@@ -7,7 +7,7 @@ mesto='pardubice'
 nazev='Pardubice'
 
 # atributovy dotaz
-Module('v.extract', input='obce_polygon@ruian', output=mesto,
+Module('v.extract', input='obce@ruian', output=mesto,
        where="nazev='{}'".format(nazev), overwrite=True, quiet=True)
 # vypocet vymery
 cat, area = Module('v.to.db', map=mesto,

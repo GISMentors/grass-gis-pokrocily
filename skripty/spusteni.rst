@@ -1,9 +1,9 @@
 Spuštění skriptu
 ================
 
-Mějme jednoduchý skript, který vypíše výměru města
+Začneme jednoduchým skriptem, který vypíše výměru města
 :wikipedia:`Pardubice` v hektarech. K tomu použijeme vektorovou mapu
-:map:`obce_polygon` z mapsetu :mapset:`ruian`.
+:map:`obce` z mapsetu :mapset:`ruian`.
 
 .. literalinclude:: ../_static/skripty/obce_vymera-v1.py
    :language: python
@@ -17,16 +17,12 @@ Spuštění z GUI
 --------------
 
 Nejjednodušší cestou je spustit skript z grafického uživatelského
-rozhraní a to z menu správce vrstev :menuselection:`File -->
-Launch script` anebo z nástrojové lišty.
-
-.. figure:: images/lmgr-launch-script.png
-
-   Spuštění skriptu z nástrojové lišty správce vrstev.
+rozhraní, a to z menu správce vrstev :menuselection:`File --> Launch
+script` anebo z nástrojové lišty |grass-script-load|.
 
 Po výběru skriptu si GRASS zkontroluje, zda je skript *spustitelný* a
 zda je tzv. v *spouštěcí cestě*. V připadě, že tomu tak není, tak se
-objeví příslušné dialogy, které potvrdíme.
+objeví příslušné dialogy, které potvrdíme (:item:`Yes`).
 
 .. figure:: images/launch-permission.png
    :class: small
@@ -38,32 +34,34 @@ objeví příslušné dialogy, které potvrdíme.
 
    Dialog pro přidání adresáře se skriptem do spouštěcí cesty.
 
+.. note:: Přidání skriptu do spouštěcí cesty má tu výhodu, že lze
+   skript znovu spustit z příkazové řádky správce vrstev jako
+   kterýkoliv modul systému GRASS.
+   
 Skript se poté spustí, výpis je přesměrován do okna správce vrstev.
 
 .. figure:: images/launch-output.png
 
    Výsledek spuštění skriptu v okně správce vrstev.
 
-Skript můžete také spustit zadáním úplné cesty v přikazové řádce
-správce vrstev.
+.. tip::
 
-.. figure:: images/lmgr-launch-cmd.png
+   Cesta ke skriptu je součástí historie příkazové řádky. Z ní můžeme
+   vyvolat skript opakovaně.
 
-   Spuštění skriptu z příkazové řádky správce vrstev.
+   .. figure:: images/lmgr-launch-cmd.png
+
+      Spuštění skriptu z příkazové řádky správce vrstev.
 
 ..
-     .. note:: Přidání skriptu do spouštěcí cesty má tu výhodu, že lze
-               skript znovu spustit z příkazové řádky správce vrstev jako
-               kterýkoliv modul systému GRASS.
-            
-Spuštění z příkazové řádky
---------------------------
+   Spuštění z příkazové řádky
+   --------------------------
 
-Nejprve nastavíme právo spustitelnosti pomocí příkazu :program:`chmod`
-(jde o Unixový nástroj, pod Windows použijeme správce souborů) a poté
-skript spustíme.
+   Nejprve nastavíme právo spustitelnosti pomocí příkazu :program:`chmod`
+   (jde o Unixový nástroj, pod Windows použijeme správce souborů) a poté
+   skript spustíme.
 
-.. notecmd:: Návod nastavení spustitelnosti a spuštění skriptu
+   .. notecmd:: Návod nastavení spustitelnosti a spuštění skriptu
 
    .. code-block:: bash
 
@@ -73,7 +71,7 @@ skript spustíme.
    Předpokládejme, že adresář se skriptem není ve spouštěcí cestě,
    spustíme jej tedy přes ``./``.
 
-.. note:: Pro přidání adresáře do spouštěcí cesty můžete použít
+   .. note:: Pro přidání adresáře do spouštěcí cesty můžete použít
           :grasscmd:`proměnnou prostředí <variables>`
           :envvar:`GRASS_ADDON_PATH`. Pokud je tato proměnná
           definována před spuštěním systému GRASS, tak se její obsah
@@ -115,33 +113,70 @@ Pokud je definována proměnná prostředí :envvar:`GRASS_BATCH_JOB`, tak
 GRASS spustí soubor uvedený jako hodnota této proměnné. Po doběhnutí
 skriptu se GRASS sám ukončí.
 
+Příklad pro Linux:
+
 .. code-block:: bash
                 
    export GRASS_BATCH_JOB=/home/martin/skripty/obce_vymera-v1.py 
-   grass70 /opt/grassdata/gismentors/user1
+   grass /opt/grassdata/gismentors/user1
 
+Příklad pro MS Windows (spuštěno z *OSGeo4W Shell*):
+
+.. code-block:: bash
+                
+   set GRASS_BATCH_JOB=C:\users\martin\skripty\obce_vymera-v1.py 
+   grass C:\users\martin\grassdata\gismentors\user1
+
+.. todo:: otestovat
+          
 .. note:: GRASS v tomto případě spouštíme s mapsetem :mapset:`user1` v
-   lokaci `gismentors` umístěné v adresáři ``/opt/grassdata``. Pokud
-   bysme tento parametr vynechali, tak GRASS spustí skript v posledně
-   navštíveném mapsetu.
+   lokaci `gismentors`. Pokud bysme tento parametr vynechali, tak
+   GRASS spustí skript v posledně navštíveném mapsetu.
 
 Výstup může vypadat následovně:
 ::
 
-   Cleaning up temporary files...
    Starting GRASS GIS...
-   Executing '/home/martin/grassbin/obce_vymera-v1.py' ...
+   Cleaning up temporary files...
+   Executing </home/martin/skripty/obce_vymera-v1.py> ...
    Pardubice: 8263.98 ha
-   Execution of '/home/martin/grassbin/obce_vymera-v1.py' finished.
+   Execution of </home/martin/skripty/obce_vymera-v1.py> finished.
+   Cleaning up default sqlite database ...
    Cleaning up temporary files...
 
-Proměnnou prostředí deaktivujeme pomocí příkazu :program:`unset`.
+Proměnnou prostředí deaktivujeme pomocí příkazu :program:`unset` (pro
+Linux).
 
 .. code-block:: bash
 
    unset GRASS_BATCH_JOB
 
+Pod MS Windows pomůže trik s prázdnout hodnotou:
+
+.. code-block:: bash
+
+   set GRASS_BATCH_JOB=
+
+.. todo:: test
+          
 Poté se GRASS bude chovat po startu již standardně.
+
+Od verze GRASS GIS 7.6 lze použít místo proměnné prostředí
+:envvar:`GRASS_BATCH_JOB` elegatnější cestu přes přepínač ``--exec``.
+
+Varianta pro Linux:
+
+.. code-block:: bash
+
+   grass --exec /home/martin/skripty/obce_vymera-v1.py /opt/grassdata/gismentors/user1
+
+Varianta pro MS Windows (v *OSGeo4W Shell*):
+
+.. code-block:: cmd
+
+   grass --exec C:\users\martin\skripty\obce_vymera-v1.py C:\users\martin\grassdata\gismentors\user1
+
+.. todo:: test
 
 Spuštění explicitně
 -------------------
@@ -153,17 +188,29 @@ systému GRASS (proměnná prostředí :envvar:`GISBASE`) a datům
 
 .. code-block:: python
 
-   #!/usr/bin/env python
+   #!/usr/bin/env python3
    
    import os
    import sys
 
-   gisbase = os.environ['GISBASE'] = '/usr/lib/grass70'
+   os.environ['GISBASE'] = '/usr/lib/grass78'
    
-   sys.path.insert(0, os.path.join(gisbase, 'etc', 'python'))
+   sys.path.insert(0, os.path.join(os.environ['GISBASE'], 'etc', 'python'))
    import grass.script.setup as gsetup
    from grass.pygrass.vector import VectorTopo
 
-   gsetup.init(gisbase, '/opt/grassdata', 'gismentors', 'user1')
+   gsetup.init(os.environ['GISBASE'], '/opt/grassdata', 'gismentors', 'user1')
    
    ...
+
+Pod MS Windows nahraďte defici ``gisbase`` a cestu k lokaci:
+
+.. code-block:: python
+
+   gisbase = os.environ['GISBASE'] = r'C:\OSGeo4W64\apps\grass\grass78'
+   ...
+   gsetup.init(os.environ['GISBASE'], r'C:\users\martin\grassdata', 'gismentors', 'user1')
+
+.. todo:: test
+
+.. todo:: pridat pycharm
