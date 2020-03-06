@@ -1,6 +1,3 @@
-Python
-======
-
 Základní verze skriptu
 ----------------------
 

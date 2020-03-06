@@ -1,49 +1,52 @@
-Výpočet normalizovaného vegetačního diferečního indexu
-======================================================
+Ukázka skriptu (NDVI)
+=====================
 
-:wikipedia-en:`Normalizovaný vegetační difereční index <NDVI>` (NDVI)
-lze určit na základě viditelného červeného a blízkého infračerveného
-kanálu satelitních dat.
+V následující úkázce se zaměříme na :wikipedia-en:`normalizovaný
+vegetační difereční index <NDVI>` (NDVI), který lze určit na základě
+viditelného červeného a blízkého infračerveného kanálu satelitních
+dat.
 
-    .. math::
+.. math::
         
-         NDVI = (NIR - VIS) / (NIR  + VIS)
+   NDVI = (NIR - VIS) / (NIR  + VIS)
 
 .. note:: Použijeme data :wikipedia:`Landsat` 8 z mapsetu
-          `gismentors-lansat
-          <http://training.gismentors.eu/geodata/grass/gismentors-landsat.zip>`_
-          (985 MB). V případě Landsat 8 je červený kanál v pořadí
-          *čtvrtý*, blízký infračernený *pátý*, viz
-          :wikipedia-en:`wikipedia <Landsat_8#Operational_Land_Imager>`.
+   `gismentors-lansat
+   <http://training.gismentors.eu/geodata/grass/gismentors-landsat.zip>`_
+   (985 MB). V případě Landsat 8 je červený kanál v pořadí
+   *čtvrtý*, blízký infračernený *pátý*, viz
+   :wikipedia-en:`wikipedia <Landsat_8#Operational_Land_Imager>`.
 
 **Postup výpočtu**
 
 
-#. Mapset *landsat* vložíme do :skoleni:`vyhledávací cesty
-   <grass-gis-zacatecnik/intro/struktura-dat.html#vyhledavaci-cesta>`
-   pomocí modulu :grasscmd:`g.mapsets`
 #. Rastr :map:`ndvi` vypočteme pomocí nástoje :skoleni:`mapové algebry
-   <grass-gis-zacatecnik/rastrova_data/rastrova-algebra>`
+   <grass-gis-zacatecnik/rastrova_data/rastrova-algebra.html>`
    :grasscmd:`r.mapcalc`
 #. :skoleni:`Reklasifikaci
-   <grass-gis-zacatecnik/rastrova_data/reklasifikace>` do třech tříd
-   provedeme pomocí modulu :grasscmd:`r.recode` (jedná o data s
+   <grass-gis-zacatecnik/rastrova_data/reklasifikace.html>` do třech
+   tříd provedeme pomocí modulu :grasscmd:`r.recode` (jedná o data s
    :skoleni:`plovoucí desetinnou čárkou
-   <grass-gis-zacatecnik/intro/rastr.html#typy-rastrovych-map>`,
-   jinak by bylo vhodnější použít přímo :grasscmd:`r.reclass`).
+   <grass-gis-zacatecnik/intro/rastr.html#raster-types>`, jinak by
+   bylo vhodnější použít přímo :grasscmd:`r.reclass`).
 #. Dále nastavíme :skoleni:`popisky
-   <grass-gis-zacatecnik/rastrova_data/reklasifikace#r-recode>` jednotlivých
-   kategorií pomocí modulu :grasscmd:`r.category`
+   <grass-gis-zacatecnik/rastrova_data/reklasifikace.html#r-recode>`
+   jednotlivých kategorií pomocí modulu :grasscmd:`r.category`
 #. Nastavíme vhodnou :skoleni:`tabulku barev
-   <grass-gis-zacatecnik/rastrova_data/tabulka-barev>` pro reklasifikovaná data
-   :grasscmd:`r.colors`
+   <grass-gis-zacatecnik/rastrova_data/tabulka-barev.html>` pro
+   reklasifikovaná data :grasscmd:`r.colors`
 #. Nakonec vypíšeme pro jednotlivé kategorie NDVI jejich percentuální pokrytí
    a to pomocí modulu :grasscmd:`r.stats`
 
+.. tip:: Namísto obecného modulu mapové algebry :grasscmd:`r.mapcalc`
+   bychom mohli použít specializovaný :grasscmd:`i.vi`.
+         
 **Implementace**
    
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    ndvi-python
+
+..
    ndvi-posix
