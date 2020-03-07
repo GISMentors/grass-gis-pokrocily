@@ -139,7 +139,10 @@ Příklad pro MS Windows (spuštěno z *OSGeo4W Shell*):
    set GRASS_BATCH_JOB=C:\users\martin\skripty\rastr_stats.py 
    grass78 C:\users\martin\grassdata\gismentors\user1
 
-.. todo:: otestovat
+.. important:: Tento způsob nemusí být pod MS Windows funkční v
+   případě, že je nainstalován v OS systémový Python (např. díky Esri
+   ArcGIS). V tomto případě doporučujeme postup popsaný :ref:`níže
+   <exec>`.
           
 .. note:: GRASS v tomto případě spouštíme s mapsetem :mapset:`user1` v
    lokaci `gismentors`. Pokud bysme tento parametr vynechali, tak
@@ -185,11 +188,9 @@ Pod MS Windows pomůže trik s prázdnout hodnotou:
 
    set GRASS_BATCH_JOB=
 
-.. important:: Tento způsob není pod MS Windows funkční v případě, že
-   je nainstalován v OS další systémový Python (např. díky Esri
-   ArcGIS). V tomto případě doporučujeme postup popsaný níže.
-          
 Poté se GRASS bude chovat po startu již standardně.
+
+.. _exec:
 
 Od verze GRASS GIS 7.6 lze použít místo proměnné prostředí
 :envvar:`GRASS_BATCH_JOB` elegatnější cestu přes přepínač ``--exec``.
@@ -206,6 +207,10 @@ Varianta pro MS Windows (v *OSGeo4W Shell*):
 
    grass78 --exec python3 C:\users\martin\skripty\rastr_stats.py C:\users\martin\grassdata\gismentors\user1
 
+.. figure:: images/windows-exec.png
+
+   Spuštění skriptu z příkazové řádky OSGeo4W.
+   
 Spuštění explicitně
 -------------------
 
@@ -241,7 +246,7 @@ Pod MS Windows nahraďte defici ``gisbase`` a cestu k lokaci:
 
 .. code-block:: python
 
-   gisbase = os.environ['GISBASE'] = r'C:\OSGeo4W64\apps\grass\grass78'
+   os.environ['GISBASE'] = r'C:\OSGeo4W64\apps\grass\grass78'
    ...
    gsetup.init(os.environ['GISBASE'], r'C:\users\martin\grassdata', 'gismentors', 'user1')
 
@@ -252,15 +257,20 @@ nutné zavolat ``py3_env``, který nastaví prostředí pro Python 3):
 
    py3_env
    python3 C:\users\martin\skripty\rastr_stats.py
-   
-.. todo:: test
+
+.. figure:: images/windows-exec.png
+
+   Spuštění skriptu z příkazové řádky OSGeo4W.
 
 Spuštění v textovém editoru (PyCharm, MS Windows)
 -------------------------------------------------
 
-Následuje návod pro textový editor PyCharm. Postup nastavení editoru
-pro prostředí OSGeo4W v operačním systému MS Windows je součástí
-školení :skoleni:`GeoPython pro začátečníky
+Následuje návod pro textový editor :program:`PyCharm`. Postup
+nastavení editoru pro prostředí OSGeo4W v operačním systému MS Windows
+je součástí školení :skoleni:`GeoPython pro začátečníky
 <geopython-zacatecnik/ruzne/editor.html>`.
 
-.. todo:: dokončit
+.. figure:: images/windows-pycharm.png
+   :class: large
+
+   Spuštění skriptu z textového editoru PyCharm.
