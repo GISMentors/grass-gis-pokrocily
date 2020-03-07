@@ -130,14 +130,14 @@ Příklad pro Linux:
 .. code-block:: bash
                 
    export GRASS_BATCH_JOB=/home/martin/skripty/rastr_stats.py 
-   grass /opt/grassdata/gismentors/user1
+   grass78 /opt/grassdata/gismentors/user1
 
 Příklad pro MS Windows (spuštěno z *OSGeo4W Shell*):
 
 .. code-block:: bash
                 
    set GRASS_BATCH_JOB=C:\users\martin\skripty\rastr_stats.py 
-   grass C:\users\martin\grassdata\gismentors\user1
+   grass78 C:\users\martin\grassdata\gismentors\user1
 
 .. todo:: otestovat
           
@@ -185,7 +185,9 @@ Pod MS Windows pomůže trik s prázdnout hodnotou:
 
    set GRASS_BATCH_JOB=
 
-.. todo:: test
+.. important:: Tento způsob není pod MS Windows funkční v případě, že
+   je nainstalován v OS další systémový Python (např. díky Esri
+   ArcGIS). V tomto případě doporučujeme postup popsaný níže.
           
 Poté se GRASS bude chovat po startu již standardně.
 
@@ -196,15 +198,13 @@ Varianta pro Linux:
 
 .. code-block:: bash
 
-   grass --exec /home/martin/skripty/rastr_stats.py /opt/grassdata/gismentors/user1
+   grass78 --exec /home/martin/skripty/rastr_stats.py /opt/grassdata/gismentors/user1
 
 Varianta pro MS Windows (v *OSGeo4W Shell*):
 
 .. code-block:: cmd
 
-   grass --exec C:\users\martin\skripty\rastr_stats.py C:\users\martin\grassdata\gismentors\user1
-
-.. todo:: test
+   grass78 --exec python3 C:\users\martin\skripty\rastr_stats.py C:\users\martin\grassdata\gismentors\user1
 
 Spuštění explicitně
 -------------------
