@@ -20,23 +20,26 @@ dat.
 **Postup výpočtu**
 
 
-#. Rastr :map:`ndvi` vypočteme pomocí nástoje :skoleni:`mapové algebry
+#. Rastrovou vrstvu :map:`ndvi` vypočteme pomocí nástoje
+   :skoleni:`mapové algebry
    <grass-gis-zacatecnik/rastrova_data/rastrova-algebra.html>`
    :grasscmd:`r.mapcalc`
 #. :skoleni:`Reklasifikaci
    <grass-gis-zacatecnik/rastrova_data/reklasifikace.html>` do třech
-   tříd provedeme pomocí modulu :grasscmd:`r.recode` (jedná o data s
-   :skoleni:`plovoucí desetinnou čárkou
-   <grass-gis-zacatecnik/intro/rastr.html#raster-types>`, jinak by
-   bylo vhodnější použít přímo :grasscmd:`r.reclass`).
-#. Dále nastavíme :skoleni:`popisky
-   <grass-gis-zacatecnik/rastrova_data/reklasifikace.html#r-recode>`
-   jednotlivých kategorií pomocí modulu :grasscmd:`r.category`
+   tříd (1:bez vegetace, vodni plochy; 2:plochy s minimalni vegetaci;
+   3:plochy pokryte vegetaci) provedeme pomocí modulu
+   :grasscmd:`r.recode` (jedná o data s :skoleni:`plovoucí desetinnou
+   čárkou <grass-gis-zacatecnik/intro/rastr.html#raster-types>`, jinak
+   by bylo vhodnější použít přímo :grasscmd:`r.reclass`).
 #. Nastavíme vhodnou :skoleni:`tabulku barev
    <grass-gis-zacatecnik/rastrova_data/tabulka-barev.html>` pro
    reklasifikovaná data :grasscmd:`r.colors`
-#. Nakonec vypíšeme pro jednotlivé kategorie NDVI jejich percentuální pokrytí
-   a to pomocí modulu :grasscmd:`r.stats`
+#. Nakonec vypíšeme pro jednotlivé kategorie NDVI jejich percentuální
+   pokrytí, a to pomocí modulu :grasscmd:`r.stats`
+..
+   #. Dále nastavíme :skoleni:`popisky
+   <grass-gis-zacatecnik/rastrova_data/reklasifikace.html#r-recode>`
+   jednotlivých kategorií pomocí modulu :grasscmd:`r.category`
 
 .. tip:: Namísto obecného modulu mapové algebry :grasscmd:`r.mapcalc`
    bychom mohli použít specializovaný :grasscmd:`i.vi`.

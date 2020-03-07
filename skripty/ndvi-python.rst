@@ -2,12 +2,12 @@ Základní verze skriptu
 ----------------------
 
 Začneme verzí skriptu *bez vstupní parametrů*, názvy vstupních a
-výstupních rastrových map jsou uvedeny na řádcích :lcode:`7-12`.
+výstupních rastrových map jsou uvedeny na řádcích :lcode:`7-11`.
 
 Na řádku :lcode:`3` importuje z knihovny :doc:`../pygrass/index` třídu
-:pygrass-modules:`Module`, která nám umožní z prostředí jazyka Python spouštět
-moduly systému GRASS jako je např. :grasscmd:`g.mapsets` (viz řádek :lcode:`7`) a
-další.
+:pygrass-modules:`Module`, která nám umožní z prostředí jazyka Python
+spouštět moduly systému GRASS jako je např. :grasscmd:`g.region` (viz
+řádek :lcode:`14`).
 
 .. note:: Spouštět moduly systému GRASS z jazyka Python umožňuje také
           knihovna :grasscmd:`GRASS Python Scripting Library
@@ -17,7 +17,7 @@ další.
 .. literalinclude:: ../_static/skripty/ndvi-v1.py
    :language: python
    :linenos:
-   :emphasize-lines: 3, 7-12, 15, 18, 22-24, 35-36, 44-45, 53-54, 58
+   :emphasize-lines: 3, 7-8, 10-11, 14, 18-20, 31-32, 40-41, 45
 
 Skript je ke stažení `zde <../_static/skripty/ndvi-v1.py>`__.
 
