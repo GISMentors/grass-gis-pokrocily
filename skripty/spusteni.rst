@@ -274,3 +274,51 @@ je součástí školení :skoleni:`GeoPython pro začátečníky
    :class: large
 
    Spuštění skriptu z textového editoru PyCharm.
+
+.. tip:: Do skriptu, který nastavuje prostředí, můžete přidat definici
+   cest pro instalaci GRASS GIS. Po této úpravě již nemusíte ve
+   vašich skriptech pro GRASS GIS uvádět následujícící řádky:
+
+   .. code-block:: python
+
+      os.environ['GISBASE'] = r'C:\OSGeo4W64\apps\grass\grass78'
+      sys.path.insert(0, os.path.join(os.environ['GISBASE'], 'etc', 'python'))
+
+   Otevřete soubor :file:`C:\\OSGeo4W64\\bin\\python-qgis.bat` (nebo
+   :file:`python-qgis-ltr.bat`) a přidejte na jeho konec dvě následující řádky:
+
+   .. code-block:: bat
+      
+      set GISBASE=C:\OSGeo4W64\apps\grass\grass78
+      set PYTHONHOME=%GISBASE\etc\python;%PYTHONHOME%
+
+   Ideálně uložte toto nastavení mimo soubor
+   :file:`python-qgis.bat`. Vyhnete se tak tomu, že při další
+   aktualizaci QGISu o tyto úpravy přijdete.
+
+Spuštění pomocí BAT souboru pod MS Windows
+------------------------------------------
+
+Skript lze spustit i přímo pomocí řídícího BAT souboru, který nastaví
+prostředí nutné pro běh systému GRASS. Minimalistický příklad níže.
+
+.. code-block:: bat
+
+   @echo off
+
+   SET OSGEO4W_ROOT=C:\OSGeo4W64
+
+   call %OSGEO4W_ROOT%\bin\o4w_env.bat
+   call %OSGEO4W_ROOT%\bin\py3_env.bat
+   
+   SET GISBASE=%OSGEO4W_ROOT%\apps\grass\grass78
+   SET PYTHONHOME=%GISBASE\etc\python;%PYTHONHOME%
+
+   python rastr_stats.py
+
+Ze samotného Python skriptu vypadnou přebytečné dvě řádky:
+
+.. code-block:: python
+
+   os.environ['GISBASE'] = r'C:\OSGeo4W64\apps\grass\grass78'
+   sys.path.insert(0, os.path.join(os.environ['GISBASE'], 'etc', 'python'))
