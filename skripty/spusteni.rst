@@ -28,9 +28,20 @@ Bližší popis kódu nechme na kapitolu :doc:`ndvi-python` a
 Spuštění z GUI
 --------------
 
-Nejjednodušší cestou je spustit skript z grafického uživatelského
-rozhraní, a to z menu správce vrstev :menuselection:`File --> Launch
-script` anebo z nástrojové lišty |grass-script-load|.
+Nejjednodušší cestou jak vytvořit a spustit skript, je použít nástroje
+grafického uživatelského rozhraní systému GRASS. Otevřeme integrovaný
+textový editor dostupný z menu :menuselection:`File --> Simple Python
+editor` anebo z nástrojové lišty |grass-python|.
+
+.. figure:: images/python-editor.png
+   :class: middle
+
+   Nativní Python editor systému GRASS. Skript spustíme pomocí
+   tlačítka |grass-execute|.
+
+Již hotový skript lze spustit přímo z menu správce vrstev
+:menuselection:`File --> Launch script` anebo z nástrojové lišty
+|grass-script-load|.
 
 Po výběru skriptu si GRASS zkontroluje, zda je skript *spustitelný* a
 zda je tzv. v *spouštěcí cestě*. V připadě, že tomu tak není, tak se
@@ -289,8 +300,8 @@ je součástí školení :skoleni:`GeoPython pro začátečníky
 
    .. code-block:: bat
       
-      set GISBASE=C:\OSGeo4W64\apps\grass\grass78
-      set PYTHONHOME=%GISBASE\etc\python;%PYTHONHOME%
+      set GISBASE=%OSGEO4W_ROOT%\apps\grass\grass78
+      set PYTHONPATH=%GISBASE%\etc\python;%PYTHONPATH%
 
    Ideálně uložte toto nastavení mimo soubor
    :file:`python-qgis.bat`. Vyhnete se tak tomu, že při další
@@ -306,15 +317,17 @@ prostředí nutné pro běh systému GRASS. Minimalistický příklad níže.
 
    @echo off
 
-   SET OSGEO4W_ROOT=C:\OSGeo4W64
+   set OSGEO4W_ROOT=C:\OSGeo4W64
 
    call %OSGEO4W_ROOT%\bin\o4w_env.bat
    call %OSGEO4W_ROOT%\bin\py3_env.bat
    
-   SET GISBASE=%OSGEO4W_ROOT%\apps\grass\grass78
-   SET PYTHONHOME=%GISBASE\etc\python;%PYTHONHOME%
+   set GISBASE=%OSGEO4W_ROOT%\apps\grass\grass78
+   set PYTHONPATH=%GISBASE%\etc\python;%PYTHONPATH%
 
    python rastr_stats.py
+
+   pause
 
 Ze samotného Python skriptu vypadnou přebytečné dvě řádky:
 

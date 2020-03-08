@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from grass.pygrass.modules import Module
 from subprocess import PIPE
@@ -6,12 +6,13 @@ from subprocess import PIPE
 # vstup
 vis="LC81920252013215LGN00_B4@landsat"
 nir="LC81920252013215LGN00_B5@landsat"
+aoi="obce@ruian_praha"
 # vysledek
 ndvi="ndvi"
 r_ndvi= "r_{}".format(ndvi)
 
 # 0. nastavit vypocetni region
-Module('g.region', raster=vis)
+Module('g.region', align=vis, vector=aoi)
 
 # 1. vypocet NDVI
 print("VIS: {0} ; NIR: {1}".format(vis, nir))
@@ -45,8 +46,7 @@ print("Generuji report...")
 report = Module('r.stats', flags='pl', input=r_ndvi, separator=':', stdout_=PIPE)
 
 print('-' * 80)
-for trida, label, procento in map(
-        lambda x: x.split(':'), report.outputs.stdout.splitlines()
-):
-    print ("Trida {0} ({1:28s}): {2:>7}".format(trida, label, procento))
+for line in report.outputs.stdout.splitlines():
+    trida, popisek, procento = line.split(':')
+    print("Trida {}: {}".format(trida, procento))
 print('-' * 80)

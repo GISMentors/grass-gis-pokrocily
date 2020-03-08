@@ -49,7 +49,8 @@ dat.
 .. toctree::
    :maxdepth: 1
 
-   ndvi-python
+   ndvi-python-v1
+   ndvi-python-v2   
 
 ..
    ndvi-posix
