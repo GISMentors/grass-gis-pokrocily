@@ -21,7 +21,7 @@ obce.open('r')
 for o in obce:
     x, y = coor2pixel(o.coords(), region)
     value = dmt[int(x)][int(y)]
-    print (u'{:40}: {:.0f}'.format(o.attrs['nazev'], value))
+    print ('{:40}: {:.0f}'.format(o.attrs['nazev'], value))
 
 obce.close()
 dmt.close()

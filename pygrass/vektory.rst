@@ -8,8 +8,8 @@ K vektorovým datům lze přistupovat ve dvou režimech:
   přístup zajišťuje třída :pygrass-vector:`Vector`
 * *včetně topologie*, viz třída :pygrass-vector:`VectorTopo`
 
-Další informace v `dokumentaci PyGRASS
-<http://grass.osgeo.org/grass70/manuals/libpython/pygrass_vector.html>`_.
+Další informace v :grasscmd:`dokumentaci PyGRASS
+<libpython/pygrass_vector>`.
 
 Průchod vektorovými prvky bez topologie
 ---------------------------------------
@@ -49,8 +49,9 @@ Výpis skriptu může vypadat následovně:
    Cejle                    : -677975 -1132017
    Drahonice                : -781273 -1137206
    ...
-          
-.. note:: Pokud skript v GUI končí chybou
+
+..    
+   .. note:: Pokud skript v GUI končí chybou
 
    ::
 
@@ -76,8 +77,7 @@ Přístup k topologii vektorových prvků zajišťuje třída
 systému GRASS najdete ve :skoleni:`školení pro začátečníky
 <grass-gis-zacatecnik/intro/vektor.html#topologicky-model>`.
 
-V následující ukázce vypíšeme *pro každý okres počet jeho sousedních
-okresů*.
+V následující ukázce vypíšeme *pro každý okres počet jeho sousedů*.
 
 #. Na řádku :lcode:`5` vytvoříme instaci třídy
    :pygrass-vector:`VectorTopo` odkazující na zvolenou vektorovou mapu,
@@ -94,10 +94,6 @@ okresů*.
    :linenos:
    :emphasize-lines: 5-6, 8, 10, 11
 
-.. warning:: Mezi verzemi GRASS 7.1 a GRASS 7.0 se API PyGRASS
-             částečně změnilo. Místo funkce ``get_left_right()``
-             (:lcode:`11`) použijte v GRASS 7.1 ``read_area_ids()``.
-
 Skript ke stažení `zde <../_static/skripty/okresy.py>`_.
 
 Výpis skriptu může vypadat následovně:
@@ -110,9 +106,6 @@ Výpis skriptu může vypadat následovně:
    Vyškov              : 6
    ...
 
-.. warning:: Tento skript je funkční pouze ve verzi GRASS 7.0.1 a
-             vyšší.
-                   
 Nalezení nejbližších prvků, zápis nových prvků
 ----------------------------------------------
 

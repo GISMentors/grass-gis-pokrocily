@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from grass.pygrass.vector import VectorTopo
 
@@ -20,7 +20,7 @@ for z in zachranka:
     if u is None:
         continue
     nespravny = z.attrs['ulicekod'] != u.attrs['kod']
-    print (u'{:10} {:1} {}'.format(z.attrs['kod'], nespravny, u.attrs['nazev']))
+    print ('{:10} {:1} {}'.format(z.attrs['kod'], nespravny, u.attrs['nazev']))
     zu.write(z, (z.attrs['kod'], u.attrs['nazev'], nespravny))
     if u.cat not in seznam:
         zu.write(u, (None, u.attrs['nazev'], None))
