@@ -3,9 +3,15 @@
 #%module
 #% description: Creates reclassified NDVI based on given AOI.
 #%end
-#%option G_OPT_M_MAPSET
-#% required: yes
-#% answer: landsat
+#%option G_OPT_R_MAP
+#% key: red
+#% description: Name of red channel
+#% answer: LC81920252013215LGN00_B4@landsat
+#%end
+#%option G_OPT_R_MAP
+#% key: nir
+#% description: Name of nir channel
+#% answer: LC81920252013215LGN00_B5@landsat
 #%end
 #%option G_OPT_V_MAP
 #% key: aoi
@@ -19,41 +25,33 @@
 import sys
 from subprocess import PIPE
 
-from grass.script import parser, fatal
+from grass.script import parser, fatal, message
 
 from grass.pygrass.modules import Module
-from grass.pygrass.gis import Mapset
-from grass.pygrass.messages import Messenger
 
 def main():
-    mapset = options['mapset']
+    vis = options['red']
+    nir = options['nir']
     aoi = options['aoi']
     if '@' in aoi:
         aoi_name = aoi.split('@')[0]
     else:
         aoi_name = aoi
     
-    try:
-        vis = Mapset(mapset).glist('raster', pattern='*B4')[0] + '@' + mapset
-        nir = Mapset(mapset).glist('raster', pattern='*B5')[0] + '@' + mapset
-    except IndexError:
-        fatal("Nelze najit vstupni kanaly")
     ndvi = "ndvi_{}".format(aoi_name)
     r_ndvi= "r_ndvi_{}".format(aoi_name)
 
-    msgr = Messenger()
-    
     # 0. nastavit vypocetni region
     Module('g.region', align=vis, vector=aoi)
     
     # 1. vypocet NDVI
-    msgr.message("VIS: {0} ; NIR: {1}".format(vis, nir))
+    message("VIS: {0} ; NIR: {1}".format(vis, nir))
     Module('r.mapcalc',
            expression="{o} = float({n} - {v}) / ({n} + {v})".format(o=ndvi, v=vis, n=nir),
            overwrite=True)
     
     # 2. reklasifikace (1,2,3)
-    msgr.message("Reklasifikuji...")
+    message("Reklasifikuji...")
     # r.reclass umi reklasifikovat pouze celociselne rastry, proto pouzime
     # r.recode
     if not options['classes']:
@@ -84,14 +82,14 @@ def main():
                rules='-', quiet=True, stdin_=colors)
     
     # 4. vypsat vysledek
-    msgr.message("Generuji report...")
+    message("Generuji report...")
     report = Module('r.stats', flags='pl', input=r_ndvi, separator=':', stdout_=PIPE)
     
-    msgr.message('-' * 80)
+    message('-' * 80)
     for line in report.outputs.stdout.splitlines():
         trida, popisek, procento = line.split(':')
-        msgr.message("Trida {}: {}".format(trida, procento))
-    msgr.message('-' * 80)
+        message("Trida {}: {}".format(trida, procento))
+    message('-' * 80)
         
     return 0
 
