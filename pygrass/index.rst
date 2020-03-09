@@ -18,3 +18,7 @@ datům.
 
    rastry
    vektory
+
+.. tip::
+   Další úkázky PyGRASS jsou součástí školení :skoleni:`Jena GRASS GIS
+   Workshop <grass-gis-workshop-jena/units/13.html>`.

@@ -47,3 +47,6 @@ i pro POSIX.
 
    ndvi
 
+.. tip:: Další úkázky možnosti skriptování jsou součástí školení
+   :skoleni:`Jena GRASS GIS Workshop
+   <grass-gis-workshop-jena/units/10.html>`.
