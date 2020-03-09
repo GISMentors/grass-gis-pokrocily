@@ -19,11 +19,11 @@
 import sys
 from subprocess import PIPE
 
-from grass.script import parser
+from grass.script import parser, fatal
 
 from grass.pygrass.modules import Module
 from grass.pygrass.gis import Mapset
-#from grass.pygrass.messages import Messenger
+from grass.pygrass.messages import Messenger
 
 def main():
     mapset = options['mapset']
@@ -34,10 +34,10 @@ def main():
         aoi_name = aoi
     
     try:
-        vis = Mapset(mapset).glist('raster', pattern='*B4')[0]
-        nir = Mapset(mapset).glist('raster', pattern='*B5')[0]
+        vis = Mapset(mapset).glist('raster', pattern='*B4')[0] + '@' + mapset
+        nir = Mapset(mapset).glist('raster', pattern='*B5')[0] + '@' + mapset
     except IndexError:
-        grass.fatal("Nelze najit vstupni kanaly")
+        fatal("Nelze najit vstupni kanaly")
     ndvi = "ndvi_{}".format(aoi_name)
     r_ndvi= "r_ndvi_{}".format(aoi_name)
 
