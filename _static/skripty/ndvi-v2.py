@@ -85,11 +85,9 @@ def main():
     message("Generuji report...")
     report = Module('r.stats', flags='pl', input=r_ndvi, separator=':', stdout_=PIPE)
     
-    message('-' * 80)
     for line in report.outputs.stdout.splitlines():
         trida, popisek, procento = line.split(':')
         print("Trida {}: {}".format(trida, procento))
-    message('-' * 80)
         
     return 0
 

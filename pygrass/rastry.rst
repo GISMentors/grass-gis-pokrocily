@@ -7,22 +7,21 @@ Přístup k rastrovým datům umožňuje PyGRASS ve třech režimech:
 * :pygrass-raster:`RasterRowIO` (čtení po řádcích z vyrovnávací paměti, sekvenční zápis)
 * :pygrass-raster:`RasterSegment` (náhodné čtení a zápis po dlaždicích)
 
-Další informace v `dokumentaci PyGRASS
-<http://grass.osgeo.org/grass70/manuals/libpython/pygrass_raster.html>`_.
+Další informace v :grasscmd:`dokumentaci PyGRASS
+<libpython/pygrass_raster>`.
 
 .. warning:: GRASS při čtení rastrových dat vždy data převzorkuje podle
-             aktuálního výpočetního regionu. Manipulaci s regionem má
-             v PyGRASS na starost třída :pygrass-gis:`Region
-             <region.Region>` anebo lze přímo použít modul
-             :grasscmd:`g.region`.
+   aktuálního výpočetního regionu. Manipulaci s regionem má
+   v PyGRASS na starost třída :pygrass-gis:`Region
+   <region.Region>` anebo lze přímo použít modul
+   :grasscmd:`g.region`.
    
-Statistika rastrových dat, převzorkování
-----------------------------------------
+Statistika rastrových dat
+-------------------------
 
-V následující ukázce vypíšeme statistiku převzorkovaného rastru:
+V následující ukázce vypíšeme statistiku rastru:
 
-#. Před načtením dat je změněn aktuální region na prostorové rozlišení
-   1km (řádek :lcode:`9`).
+#. Před načtením dat je nastaven výpočetní region (řádek :lcode:`9`).
 #. Rastrová data jsou načtena pomocí třídy :pygrass-raster:`RasterRow`
    (řádek :lcode:`11-12`).
 #. Jednotlivé řádky a sloupce rastru jsou procházeny cyklem ``for``
@@ -30,17 +29,13 @@ V následující ukázce vypíšeme statistiku převzorkovaného rastru:
 #. Na konci skriptu nezapomeneme rastrovou mapu korektně uzavřít
    :lcode:`30`.
        
-.. literalinclude:: ../_static/skripty/dmt.py
+.. literalinclude:: ../_static/skripty/rastr_stats_pygrass.py
    :language: python
    :linenos:
    :emphasize-lines: 9, 11-12, 16-17, 30
 
-Skript ke stažení `zde <../_static/skripty/dmt.py>`__.
+Skript ke stažení `zde <../_static/skripty/rastr_stats_pygrass.py>`__.
                      
-.. important:: Rastrová data budou v tomto případě převzorkována
-               metodou :wikipedia-en:`nejblížšího souseda <Nearest
-               neighbour interpolation>`.
-
 Výpis může vypadat následovně:
 
 ::

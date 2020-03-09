@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from grass.pygrass.raster import RasterRow
 from grass.pygrass.vector import Vector
