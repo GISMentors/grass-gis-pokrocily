@@ -1,23 +1,23 @@
-NDVI - Pokročilejší verze skriptu
+\NDVI - Pokročilejší verze skriptu
 ---------------------------------
 
 Pokročilejší verze skriptu je rozšířena o:
 
-* uživatelské rozhraní, řádky :lcode:`3-19`
-* vstupní parametry (:option:`mapset`, :option:`output_postfix` a
-  :option:`classes`), viz řádky :lcode:`6-19`
+* uživatelské rozhraní, řádky :lcode:`3-23`
+* vstupní parametry (:option:`red`, :option:`nir`, :option:`aoi` a
+  :option:`classes`), viz řádky :lcode:`6-23`
 * uživatelské rozhraní je zpracováno funkcí ``parse()`` (řádek
-  :lcode:`102`), která je součástí balíčku ``grass.script`` (řádek
-  :lcode:`24`)
-* hodnoty parametrů jsou na řádku :lcode:`102` uloženy do proměnné
+  :lcode:`97`), která je součástí balíčku ``grass.script`` (řádek
+  :lcode:`28`)
+* hodnoty parametrů jsou na řádku :lcode:`97` uloženy do proměnné
   ``options``, přepínače do proměnné ``flags``, ty jsou dále použity
-  na řádcích :lcode:`30-31,57`
-* celý kód je vložen do funkce ``main()`` (řádek :lcode:`29`)
+  na řádcích :lcode:`33-35,57,75`
+* celý kód je vložen do funkce ``main()`` (řádek :lcode:`32`)
     
 .. literalinclude:: ../_static/skripty/ndvi-v2.py
    :language: python
    :linenos:
-   :emphasize-lines: 3-19, 24, 29, 30-31, 57, 102
+   :emphasize-lines: 3-23, 28, 32, 33-35, 57, 75, 97
 
 Výsledná verze skriptu ke stažení `zde
 <../_static/skripty/ndvi-v2.py>`_.
@@ -37,29 +37,15 @@ Výsledná verze skriptu ke stažení `zde
 Poznámky k uživatelskému rozhraní
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Příklad parametru :option:`output_postfix`
-
-.. literalinclude:: ndvi-v2.py
-   :language: python
-   :lines: 10-15
-
-který definuje jeho
-
-* název (``key``)
-* popisek (``description``)
-* výchozí hodnotu (``answer``)
-* a typ parametru (``type``)
-
-U dalších parametrů jsou použity tzv. `standardizované volby
+Parametry jsou definovány pomocí tzv. `standardizovaných voleb
 <http://grass.osgeo.org/programming7/parser__standard__options_8c.html>`__,
-např. ``G_OPT_M_MAPSET`` definuje parametr pro volbu mapsetu. V našem
-případě nastavíme parametr skriptu jako povinný (``required: yes``) a
-doplníme výchozí volbu (mapset :mapset:`landsat`), viz
-:numref:`wxgui-ndvi-v2-0`.
+např. ``G_OPT_R_MAP`` definující parametr pro volbu rastrové mapy. V
+našem případě změníme potřebné vlastnosti (``key``, ``description``) a
+zvolíme výchozí hodnotu parametru pro snažší testování (``answer``).
 
 .. literalinclude:: ndvi-v2.py
    :language: python
-   :lines: 6-9
+   :lines: 6-10
 
 Ve výsledku se skript chová jako standardní modul systému GRASS,
 přepínačem :option:`--help` obdržíme informace o jeho syntaxi.
@@ -70,28 +56,20 @@ přepínačem :option:`--help` obdržíme informace o jeho syntaxi.
 
 ::
       
-    Description:
-     Creates reclassified NDVI.
-
+    Creates reclassified NDVI based on given AOI.
     Usage:
-     ndvi-v2.py mapset=name [output_postfix=string] [classes=name] [--help]
+     ndvi-v2.py red=name nir=name aoi=name [classes=name]
+    [--help]
        [--verbose] [--quiet] [--ui]
-
-    Flags:
-     --h   Print usage summary
-     --v   Verbose module output
-     --q   Quiet module output
-     --ui  Force launching GUI dialog
-
     Parameters:
-              mapset   Name of mapset (default: current search path)
-                        '.' for current mapset
-                       default: landsat
-      output_postfix   Postfix for output maps
-                       default: ndvi
-             classes   Name of input file
-        
-           
+          red   Name of red channel
+                default: LC81920252013215LGN00_B4@landsat
+          nir   Name of nir channel
+                default: LC81920252013215LGN00_B5@landsat
+          aoi   Name of vector map
+                default: obce@ruian_praha
+      classes   Name of input file
+  
 Poznámky k vypisování informačních zpráv
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -100,13 +78,13 @@ funkcí ``message()`` z balíčku ``grass.script``.
 
 .. literalinclude:: ../_static/skripty/ndvi-v1.py
    :language: python
-   :lines: 27
+   :lines: 18
 
 přepsáno na
       
 .. literalinclude:: ../_static/skripty/ndvi-v2.py
    :language: python
-   :lines: 53
+   :lines: 48
 
 Díky tomu budou fungovat globální přepínače :option:`--quiet` a
 :option:`--verbose` pro tichý, resp. upovídaný mód.  Např. při použítí
@@ -115,32 +93,14 @@ zprávy o průběhu výpočtu budou skryty.
 
 .. code-block:: bash
 
-   ndvi-v2.py mapset=landsat --q
+   ndvi-v2.py red=LC81920252013215LGN00_B4@landsat nir=LC81920252013215LGN00_B5@landsat aoi=obce@ruian_praha --q
 
 ::
       
-    --------------------------------------------------------------------------------
-    Trida 1 (bez vegetace, vodni plochy  ):   0.28%
-    Trida 2 (plochy s minimalni vegetaci ):  30.24%
-    Trida 3 (plochy pokryte vegetaci     ):  21.00%
-    Trida * (no data                     ):  48.49%
-    --------------------------------------------------------------------------------
+   Trida 1: 1.30%
+   Trida 2: 72.33%
+   Trida 3: 26.37%
 
-Poznámky k hledání vstupních rastrových dat
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Pro nalezení rastrových map končících na *B4* a *B5* použijeme funkci
-:pygrass-gis:`glist <Mapset.glist>` třídy :pygrass-gis:`Mapset`. Třída
-:pygrass-gis:`Mapset` je součástí balíčku ``pygrass.gis``.
-
-.. literalinclude:: ndvi-v2.py
-   :language: python
-   :lines: 27, 36-40
-
-.. note:: Blokem ``try/except`` zachytíme chybu v případě, že rastrové mapy
-          nebudou nalezeny. Potom zavoláme funkci ``fatal()`` z
-          knihovny ``grass.script``, která skript ukončí.
-      
 Poznámky ke spuštění modulu
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -151,28 +111,22 @@ podobné ostatním modulům systému GRASS.
         
    Vygenerovaný grafický dialog skriptu.
 
-.. note:: **Spuštění skriptu s parametrem classes**
+Mějme soubor `classes.txt` s odlišným rozdělením tříd:
 
-   Mějme soubor `classes.txt` s odlišným rozdělením tříd:
+.. literalinclude:: ../_static/skripty/classes.txt
 
-   .. literalinclude:: ../_static/skripty/classes.txt
+Soubor ke stažení `zde <../_static/skripty/classes.txt>`_.
 
-   Soubor ke stažení `zde <../_static/skripty/classes.txt>`_.
-   
    Spuštění skriptu bude vypadat následovně
-
-   .. code-block:: bash
-                
-      ndvi-v2.py map=landsat classes=classes.txt
-
-   s výsledkem:
-
-   ::
-      
-        --------------------------------------------------------------------------------
-        Trida 1 (bez vegetace, vodni plochy  ):   0.68%
-        Trida 2 (plochy s minimalni vegetaci ):  38.43%
-        Trida 3 (plochy pokryte vegetaci     ):  12.39%
-        Trida * (no data                     ):  48.49%
-       --------------------------------------------------------------------------------
    
+.. code-block:: bash
+   
+   ndvi-v2.py red=LC81920252013215LGN00_B4@landsat nir=LC81920252013215LGN00_B5@landsat aoi=obce@ruian_praha classes=classes.txt
+
+s výsledkem:
+
+::
+
+   Trida 1: 4.70%
+   Trida 2: 79.37%
+   Trida 3: 15.93%

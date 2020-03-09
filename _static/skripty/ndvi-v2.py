@@ -88,7 +88,7 @@ def main():
     message('-' * 80)
     for line in report.outputs.stdout.splitlines():
         trida, popisek, procento = line.split(':')
-        message("Trida {}: {}".format(trida, procento))
+        print("Trida {}: {}".format(trida, procento))
     message('-' * 80)
         
     return 0
