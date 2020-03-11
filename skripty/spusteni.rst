@@ -270,7 +270,7 @@ nutné zavolat ``py3_env``, který nastaví prostředí pro Python 3):
    py3_env
    python3 C:\users\martin\skripty\rastr_stats.py
 
-.. figure:: images/windows-exec.png
+.. figure:: images/windows-launch.png
 
    Spuštění skriptu z příkazové řádky OSGeo4W.
 
