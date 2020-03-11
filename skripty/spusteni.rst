@@ -210,13 +210,14 @@ Varianta pro Linux:
 
 .. code-block:: bash
 
-   grass78 --exec /home/martin/skripty/rastr_stats.py /opt/grassdata/gismentors/user1
+   grass78 /opt/grassdata/gismentors/user1 --exec /home/martin/skripty/rastr_stats.py
 
 Varianta pro MS Windows (v *OSGeo4W Shell*):
 
 .. code-block:: cmd
 
-   grass78 --exec python3 C:\users\martin\skripty\rastr_stats.py C:\users\martin\grassdata\gismentors\user1
+   py3_env
+   grass78 C:\users\martin\grassdata\gismentors\user1 --exec python3 C:\users\martin\skripty\rastr_stats.py
 
 .. figure:: images/windows-exec.png
 
