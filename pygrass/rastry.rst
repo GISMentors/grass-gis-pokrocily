@@ -61,19 +61,19 @@ Dotazování na rastrová data
 Skript vypisuje *pro definiční body obcí v ČR jejich nadmořské výšky*
 odvozené z digitálního modelu terénu (rastrová mapa :map:`dmt`).
 
-#. Před načtením rastrových dat na řádku :lcode:`11` je podle rastrové
-   mapy :map:`dmt` nastaven výpočetní region.
+#. Před načtením rastrových dat na řádcích :lcode:`10-12` je na
+   základě rastrové mapy :map:`dmt` nastaven výpočetní region.
 #. Rastrová mapa :map:`dmt` je načtena třídou
-   :pygrass-raster:`RasterRow` (řádka :lcode:`15-16`).
+   :pygrass-raster:`RasterRow` (řádka :lcode:`14-15`).
 #. Jelikož se jedná u vstupní vektorové mapy o data bodová, tak stačí
-   mapu otevřít bez topologie (řádky :lcode:`18-19`).
+   mapu otevřít bez topologie (řádky :lcode:`17-18`).
 #. Souřadnice definičních bodů obcí jsou převedeny na souřadnice rastru
-   funkcí ``coor2pixel`` (řádek :lcode:`22`)
+   funkcí ``coor2pixel`` (řádek :lcode:`21`)
 
 .. literalinclude:: ../_static/skripty/obce_dmt.py
    :language: python
    :linenos:
-   :emphasize-lines: 11, 15-16, 18-19, 22
+   :emphasize-lines: 10-12, 14-15, 17-18, 21
 
 Skript ke stažení `zde <../_static/skripty/obce_dmt.py>`_.
                      
@@ -92,4 +92,4 @@ Výpis může vypadat následovně:
 
    .. code-block:: bash
 
-      v.what.rast -p map=obce_bod@ruian raster=dmt
+      v.what.rast -p map=obce_bod@ruian raster=dmt@PERMANENT

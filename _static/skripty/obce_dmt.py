@@ -4,15 +4,14 @@ from grass.pygrass.raster import RasterRow
 from grass.pygrass.vector import Vector
 from grass.pygrass.gis.region import Region
 from grass.pygrass.utils import coor2pixel
-from grass.pygrass.modules import Module
 
-rast = 'dmt@PERMANENT'
+name = 'dmt@PERMANENT'
 
-Module('g.region', raster=rast)
+reg = Region()
+reg.from_rast(name)
+reg.set_current()
 
-region = Region()
-
-dmt = RasterRow(rast)
+dmt = RasterRow(name)
 dmt.open('r')
 
 obce = Vector('obce_bod')
