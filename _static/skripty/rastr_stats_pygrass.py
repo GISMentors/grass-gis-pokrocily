@@ -4,16 +4,20 @@ import numpy as np
 from grass.pygrass.raster import RasterRow
 from grass.pygrass.modules import Module
 
-rast = 'dmt@PERMANENT'
+from grass.pygrass.gis.region import Region
+
+name = 'dmt100'
+
+reg = Region()
+reg.from_rast(name)
+reg.set_current()
 
-Module('g.region', raster=rast, res=1000)
-
-dmt = RasterRow(rast)
-dmt.open('r')
+rast = RasterRow(name)
+rast.open('r')
 
 min = max = None
 count = ncount = 0
-for row in dmt:
+for row in rast:
     for value in row:
         if np.isnan(value):
             ncount += 1
@@ -27,7 +31,6 @@ for row in dmt:
                     max = value
         count += 1
 
-dmt.close()
+rast.close()
 
-print ("min={:.2f} max={:.2f} count={} (no-data: {})".format(min, max, count, ncount))
-
+print("min={:.2f} max={:.2f} count={} (no-data: {})".format(min, max, count, ncount))
