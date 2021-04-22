@@ -4,13 +4,13 @@ import numpy as np
 from grass.pygrass.raster import RasterRow
 from grass.pygrass.modules import Module
 
-from grass.pygrass.gis.region import Region
-
-name = 'dmt100'
-
-reg = Region()
-reg.from_rast(name)
-reg.set_current()
+from grass.pygrass.gis.region import Region
+
+name = 'dmt@PERMANENT'
+
+reg = Region()
+reg.from_rast(name)
+reg.set_current()
 
 rast = RasterRow(name)
 rast.open('r')
@@ -33,4 +33,6 @@ for row in rast:
 
 rast.close()
 
-print("min={:.2f} max={:.2f} count={} (no-data: {})".format(min, max, count, ncount))
+print("min={:.2f} max={:.2f} count={} (no-data: {})".format(
+    min, max, count, ncount)
+)

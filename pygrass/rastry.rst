@@ -21,18 +21,18 @@ Statistika rastrových dat
 
 V následující ukázce vypíšeme statistiku rastru:
 
-#. Před načtením dat je nastaven výpočetní region (řádek :lcode:`9`).
+#. Před načtením dat je nastaven výpočetní region (řádek :lcode:`11-13`).
 #. Rastrová data jsou načtena pomocí třídy :pygrass-raster:`RasterRow`
-   (řádek :lcode:`11-12`).
+   (řádek :lcode:`15-16`).
 #. Jednotlivé řádky a sloupce rastru jsou procházeny cyklem ``for``
-   (řádky :lcode:`16-17`).
+   (řádky :lcode:`20-21`).
 #. Na konci skriptu nezapomeneme rastrovou mapu korektně uzavřít
-   :lcode:`30`.
+   :lcode:`34`.
        
 .. literalinclude:: ../_static/skripty/rastr_stats_pygrass.py
    :language: python
    :linenos:
-   :emphasize-lines: 9, 11-12, 16-17, 30
+   :emphasize-lines: 11-13, 15-16, 20-21, 34
 
 Skript ke stažení `zde <../_static/skripty/rastr_stats_pygrass.py>`__.
                      
@@ -42,10 +42,19 @@ Výpis může vypadat následovně:
 
    min=53.80 max=1530.51 count=138116 (no-data: 59244)
                
-.. note:: Tento skript berte jako ilustrační, rozhodně jej nelze
-          považovat za optimální cestu pro zjištění extremních hodnot
-          v rastru (viz porovnání s modulem :grasscmd:`r.univar`).
-                         
+.. note:: Tento skript berte jako **ilustrační**, rozhodně jej *nelze
+   považovat za optimální cestu* pro zjištění extremních hodnot v
+   rastru. Porovnejte s modulem :grasscmd:`r.univar` a verzí skriptu
+   založené na knihovně `NumPy <https://numpy.org>`__
+   (:lcode:`17-18`).
+ 
+   .. literalinclude:: ../_static/skripty/rastr_stats_pygrass_numpy.py
+      :language: python
+      :linenos:
+      :emphasize-lines: 17-18
+
+   Skript ke stažení `zde <../_static/skripty/rastr_stats_pygrass_numpy.py>`__.
+   
 Dotazování na rastrová data
 ---------------------------
 
