@@ -20,7 +20,7 @@ for prvek in obce.viter('areas'):
             obec_id = prvek.id
             
         for b in prvek.boundaries():
-            for n in b.get_left_right():
+            for n in b.read_area_ids():
                 if n != -1 and n != obec_id:
                     obce_psc.add(n)
 obce_psc.add(obec_id)
