@@ -3,41 +3,38 @@ Vypublikování skriptu jako WPS procesu
 
 Skript upravíme následovně:
 
-#. Vytvoříme třídu :class:`Process` s rodičovskou třídou
-   :class:`WPSProcess`, která je definována v rámci PyWPS (řádky
-   :lcode:`17, 19` a :lcode:`21-28`).
-#. Definujeme vstupní (řádky :lcode:`30-32`) a výstupní (řádky
-   :lcode:`34-37`) parametry WPS procesu
-#. Implementujeme funkce ``export()`` (:lcode:`39`), která výstupní
-   vektorovou mapu exportuje do souboru ve formátu ESRI Shapefile,
-   který bude zkomprimován a poslán klientovi.
-#. Implementujeme funkci ``execute()`` (:lcode:`61`), která se vykoná
+#. Vytvoříme třídu :class:`ObcePsc`, která dědí vlastnosti z třídy
+   :class:`Process` (řádky :lcode:`11` a :lcode:`29-39`).
+#. Definujeme vstupní (řádky :lcode:`13-19`) a výstupní (řádky
+   :lcode:`20-27`) parametry WPS procesu
+#. Implementujeme funkci ``_handler()`` (:lcode:`55`), která se vykoná
    v okamžiku, kdy od klienta dorazí na server dotaz typu
    ``request=execute``.
-#. Vlastní tělo původního skriptu vnoříme do funkce ``run()``
-   (:lcode:`66`).
+#. Vlastní tělo původního skriptu vnoříme do funkce ``obce_psc()``
+   (:lcode:`44`).
       
 .. literalinclude:: ../_static/skripty/obce_psc_wps.py
    :language: python
    :linenos:
-   :emphasize-lines: 17, 19, 21-28, 30-32, 34-37, 39, 61, 66
+   :emphasize-lines: 11, 13-19, 20-27, 29-39, 44, 55
 
 Skript ke stažení `zde <../_static/skripty/obce_psc_wps.py>`__.
 
-Ukázka vypublikovaného procesu
-------------------------------
+..
+   Ukázka vypublikovaného procesu
+   ------------------------------
 
-**GetCapabilities**
+   **GetCapabilities**
 
-* http://geo102.fsv.cvut.cz/services/yfsgwps?service=wps&request=getcapabilities
+   * http://geo102.fsv.cvut.cz/services/yfsgwps?service=wps&request=getcapabilities
 
-**DescribeProcess**
-  
-* http://geo102.fsv.cvut.cz/services/yfsgwps?service=wps&request=describeprocess&version=1.0.0&identifier=obce_psc
+   **DescribeProcess**
 
-**Execute**
+   * http://geo102.fsv.cvut.cz/services/yfsgwps?service=wps&request=describeprocess&version=1.0.0&identifier=obce_psc
 
-*
-  `http://geo102.fsv.cvut.cz/services/yfsgwps?service=wps&request=execute&identifier=obce_psc&version=1.0.0&datainputs=[psc=41115]
-  <http://geo102.fsv.cvut.cz/services/yfsgwps?service=wps&request=execute&identifier=obce_psc&version=1.0.0&datainputs=[psc=41115]>`_
+   **Execute**
+
+   *
+     `http://geo102.fsv.cvut.cz/services/yfsgwps?service=wps&request=execute&identifier=obce_psc&version=1.0.0&datainputs=[psc=41115]
+     <http://geo102.fsv.cvut.cz/services/yfsgwps?service=wps&request=execute&identifier=obce_psc&version=1.0.0&datainputs=[psc=41115]>`_
       

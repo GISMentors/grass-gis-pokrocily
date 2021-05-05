@@ -61,11 +61,11 @@ class ObcePsc(Process):
           LOGGER.debug("Computation finished")
 
           LOGGER.debug("Export started")
-          os.chdir(self.workdir)
           Module('v.out.ogr',
                  input=map_name,
                  format='GML',
-                 output='output.gml')
+                 output='output.gml',
+                 overwrite=True)
           
           response.outputs["output"].file = "output.gml"
           return response
