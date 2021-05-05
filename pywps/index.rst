@@ -1,6 +1,6 @@
-****************************
-Publikování jako WPS procesu
-****************************
+***********************
+Publikování WPS procesu
+***********************
 
 V této kapitole si ukážeme způsob publikace Python skriptu pro GRASS
 GIS jako webovou geoprocessingovou službu dle standardu OGC `Web
