@@ -57,8 +57,7 @@ obsahovat dva sloupce: kód obce a PSČ.
 
 .. code-block:: bash
                 
-   db.execute sql="create table obce_psc as select o.kod,z.psc from obce as o \
-    join zv_pcobc_dbf as z on o.okreskod = z.KODOKRESU and o.nazev = z.NAZOBCE"
+   db.execute sql="create table obce_psc as select o.kod,z.psc from obce as o join zv_pcobc_dbf as z on o.okreskod = z.KODOKRESU and o.nazev = z.NAZOBCE"
 
 .. note:: Tento postup je nutný, neboť databáze SQLite (která je pro
           systém GRASS vychozí při ukládání atributových dat, viz
