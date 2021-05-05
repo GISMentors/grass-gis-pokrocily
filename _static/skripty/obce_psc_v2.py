@@ -15,7 +15,7 @@ vystup.open('w', tab_cols=[('cat',       'INTEGER PRIMARY KEY'),
 obec_id = None
 obce_psc = set()
 for prvek in obce.viter('areas'):
-    if prvek.attrs['psc'] == psc:
+    if prvek.attrs is None or prvek.attrs['psc'] == psc:
         if obec_id is None:
             obec_id = prvek.id
             

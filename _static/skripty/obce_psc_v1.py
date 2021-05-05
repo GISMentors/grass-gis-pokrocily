@@ -10,7 +10,7 @@ obce.open('r')
 print("Seznam obci s PSC {}:".format(psc))
 obce_psc = set()
 for prvek in obce.viter('areas'):
-    if prvek.attrs['psc'] != psc:
+    if prvek.attrs is None or prvek.attrs['psc'] != psc:
         continue
     obce_psc.add(prvek.id)
     print("{0}: {1}".format(psc, prvek.attrs['nazev']))
