@@ -43,22 +43,52 @@ class ObcePsc(Process):
           os.environ['HOME'] = tempfile.gettempdir() # needed by G_home()
 
      def obce_psc(psc):
-          map_name = 'obce_psc_{}'.format(psc)
-          
-          Module('v.extract', input='obce', output='obce1',
-                 where="psc = '{}'".format(psc))
-          Module('v.select', ainput='obce', binput='obce1',
-                 output=map_name,
-                 operator='overlap', overwrite=True)
+          obce = VectorTopo('obce')
+          obce.open('r')
 
-          return map_name
-          
+          vystup = VectorTopo('obce_psc_{}'.format(psc))
+          vystup.open('w', tab_cols=[('cat',       'INTEGER PRIMARY KEY'),
+                                     ('nazev',     'TEXT'),
+                                     ('psc',       'INTEGER')])
+
+          obec_id = None
+          obce_psc = set()
+          for prvek in obce.viter('areas'):
+              if prvek.attrs is None:
+                  continue
+              if prvek.attrs['psc'] == psc:
+                  if obec_id is None:
+                      obec_id = prvek.id
+
+                  for b in prvek.boundaries():
+                      for n in b.read_area_ids():
+                          if n != -1 and n != obec_id:
+                              obce_psc.add(n)
+          obce_psc.add(obec_id)
+
+          hranice = list()
+          for prvek in obce.viter('areas'):
+              if prvek.id not in obce_psc:
+                  continue
+
+              for b in prvek.boundaries():
+                  if b.id not in hranice:
+                      hranice.append(b.id)
+                      vystup.write(b, attrs=(None, None))
+
+              vystup.write(prvek.centroid(), attrs=(prvek.attrs['nazev'], prvek.attrs['psc']))
+
+          vystup.table.conn.commit()
+
+          vystup.close()
+          obce.close()
+
      def _handler(self, request, response):
           psc = request.inputs['psc'][0].data
 
           LOGGER.debug("Computation started")
-
-          map_name = obce_psc(psc)
+          map_name = 'obce_psc_{}'.format(psc)
+          obce_psc(psc)
           LOGGER.debug("Computation finished")
 
           LOGGER.debug("Export started")
