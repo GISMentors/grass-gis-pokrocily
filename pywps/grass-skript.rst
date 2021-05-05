@@ -8,8 +8,8 @@ Příprava dat
 ------------
 
 Vektorová mapa :map:`obce_polygon` z mapsetu :mapset:`ruian`
-neobsahuje v atributové tabulce informace o PSČ. Tuto informaci budeme
-muset nejprve doplnit. PSČ obcí ke stažení `zde
+neobsahuje v atributové tabulce PSČ. Tuto informaci budeme muset
+nejprve doplnit. PSČ obcí ke stažení `zde
 <http://training.gismentors.eu/geodata/db_pcobc.zip>`__ jako DBF
 tabulka.
 
@@ -29,19 +29,17 @@ naimportujeme:
    db.in.ogr input=zv_pcobc.dbf encoding=cp852
 
 .. note:: Modul předpokládá kódování znaků UTF-8. Vzhledem k tomu, že
-   jsou vstupní data v kódování CP852, je nutné jej definovat
+   jsou vstupní data v kódování CP852 (DOS), je nutné jej definovat
    parametrem :option:`encoding`.
 
-   .. important::
-   
-          Ve verzích GRASS 7.0.2 a nižší modul :grasscmd:`db.in.ogr`
-          parametr :option:`encoding` nemá. V tomto případě definujeme
-          kódování pomocí proměnné prostředí
-          :envvar:`SHAPE_ENCODING`.
+   Ve verzích GRASS 7.0.2 a nižší modul :grasscmd:`db.in.ogr`
+   parametr :option:`encoding` nemá. V tomto případě definujeme
+   kódování pomocí proměnné prostředí
+   :envvar:`SHAPE_ENCODING`.
 
-          .. code-block:: bash
+   .. code-block:: bash
 
-             SHAPE_ENCODING=cp852 db.in.ogr input=zv_pcobc.dbf
+      SHAPE_ENCODING=cp852 db.in.ogr input=zv_pcobc.dbf
 
 Tabulka bohužel neobsahuje kód obce, podle kterého bysme mohli data
 pohodlně pomocí modulu :grasscmd:`v.db.join` připojit k atributové
@@ -99,17 +97,12 @@ Podrobnější informace v kapitole :doc:`../pygrass/vektory`.
 .. literalinclude:: ../_static/skripty/obce_psc_v1.py
    :language: python
    :linenos:
-   :emphasize-lines: 24
-
-.. warning:: Mezi verzemi GRASS 7.1 a GRASS 7.0 se API PyGRASS
-             částečně změnilo. Místo funkce ``get_left_right()``
-             (:lcode:`24`) použijte v GRASS 7.1 ``read_area_ids()``.
 
 .. note:: Skript je koncipován jako ukázka, uvedená implementace má
           vážné nedostatky, např. nepoužívá vůbec prostorový
           index. Místo toho všechny prvky prochází sekvenčně.
                        
-Skript ke stažení `zde <../_static/skripty/obce_psc_v1.py>`_.
+Skript ke stažení `zde <../_static/skripty/obce_psc_v1.py>`__.
 
 Výstup může vypadat následovně:
 
@@ -145,19 +138,14 @@ Druhá verze skriptu
 -------------------
 
 Druhá verze skriptu se bude lišit od první tím, že namísto textového
-výpisu, vytvoří novou vektorovou mapu se spojeným polygonem obcí s
+výpisu vytvoří novou vektorovou mapu se spojeným polygonem obcí s
 definovaným PSČ a zároveň bude obsahovat sousední obce.
 
 .. literalinclude:: ../_static/skripty/obce_psc_v2.py
    :language: python
    :linenos:
-   :emphasize-lines: 38
 
-.. warning:: Mezi verzemi GRASS 7.1 a GRASS 7.0 se API PyGRASS
-   částečně změnilo. Místo funkce ``get_centroid()`` (:lcode:`38`)
-   použijte v GRASS 7.1 ``centroid()``.
-
-Skript ke stažení `zde <../_static/skripty/obce_psc_v2.py>`_.
+Skript ke stažení `zde <../_static/skripty/obce_psc_v2.py>`__.
       
 .. figure:: images/obce_psc.png
    :class: middle
@@ -175,4 +163,4 @@ kombinací standardních modulů systému GRASS :grasscmd:`v.extract` a
    :language: python
    :linenos:
    
-Skript ke stažení `zde <../_static/skripty/obce_psc_v3.py>`_.
+Skript ke stažení `zde <../_static/skripty/obce_psc_v3.py>`__.
