@@ -5,7 +5,6 @@ import sys
 import tempfile
 
 from grass.pygrass.modules import Module
-from grass.pygrass.vector import VectorTopo
 
 from pywps import Process, LiteralInput, ComplexOutput, LOGGER, Format
 
