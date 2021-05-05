@@ -21,7 +21,9 @@ Skript upravíme následovně:
    :language: python
    :linenos:
    :emphasize-lines: 17, 19, 21-28, 30-32, 34-37, 39, 61, 66
-                        
+
+Skript ke stažení `zde <../_static/skripty/obce_psc_wps.py>`__.
+
 Ukázka vypublikovaného procesu
 ------------------------------
 
