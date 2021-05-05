@@ -41,7 +41,7 @@ class ObcePsc(Process):
           os.environ['GRASS_SKIP_MAPSET_OWNER_CHECK'] = '1'
           os.environ['HOME'] = tempfile.gettempdir() # needed by G_home()
 
-     def obce_psc(psc):
+     def obce_psc(self, psc):
           map_name = 'obce_psc_{}'.format(psc)
           
           Module('v.extract', input='obce', output='obce1',
@@ -57,7 +57,7 @@ class ObcePsc(Process):
 
           LOGGER.debug("Computation started")
 
-          map_name = obce_psc(psc)
+          map_name = self.obce_psc(psc)
           LOGGER.debug("Computation finished")
 
           LOGGER.debug("Export started")
