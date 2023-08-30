@@ -1,0 +1,284 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Přístup k vektorovým datům &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Publikování WPS procesu" href="../pywps/index.html" />
+    <link rel="prev" title="Přístup k rastrovým datům" href="rastry.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="rastry.html" title="Přístup k rastrovým datům"
+             accesskey="P">předchozí</a> |
+          <a href="../pywps/index.html" title="Publikování WPS procesu"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="pristup-k-vektorovym-datum">
+<h1>Přístup k vektorovým datům<a class="headerlink" href="#pristup-k-vektorovym-datum" title="Permalink to this heading">¶</a></h1>
+<p>K vektorovým datům lze přistupovat ve dvou režimech:</p>
+<ul class="simple">
+<li><p><em>bez topologie</em> (ala jednoduché geoprvky, viz OGC standard <a class="reference external" href="http://www.opengeospatial.org/standards/sfa">Simple
+Features</a>), tento
+přístup zajišťuje třída <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass.vector.html#pygrass.vector.Vector">Vector</a></p></li>
+<li><p><em>včetně topologie</em>, viz třída <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass.vector.html#pygrass.vector.VectorTopo">VectorTopo</a></p></li>
+</ul>
+<p>Další informace v <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass_vector.html">dokumentaci PyGRASS</a>.</p>
+<section id="pruchod-vektorovymi-prvky-bez-topologie">
+<h2>Průchod vektorovými prvky bez topologie<a class="headerlink" href="#pruchod-vektorovymi-prvky-bez-topologie" title="Permalink to this heading">¶</a></h2>
+<p>Skript níže <em>vypisuje souřadnice definičních bodů</em> z mapy
+<span class="map">obce_bod</span> mapsetu <span class="mapset">ruian</span> spolu s jejich názvy.</p>
+<ol class="arabic simple">
+<li><p>Nejprve na řádku <span class="lcode">5</span> vytvoříme instaci třídy
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass.vector.html#pygrass.vector.Vector">Vector</a> odkazující na zvolenou vektorovou mapu,
+kterou na následujícím řádku otevřeme v režimu čtení.</p></li>
+<li><p>Jednotlivé prvky procházíme sekvenčně v cyklu <code class="docutils literal notranslate"><span class="pre">for</span></code> na řádku
+<span class="lcode">8</span>.</p></li>
+<li><p>Na konci skriptu nezapomeneme vektorovou mapu korektně uzavřít
+<span class="lcode">11</span>.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">grass.pygrass.vector</span> <span class="kn">import</span> <span class="n">Vector</span>
+<span class="linenos"> 4</span>
+<span class="hll"><span class="linenos"> 5</span><span class="n">obce</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="s1">&#39;obce_bod&#39;</span><span class="p">,</span> <span class="n">mapset</span><span class="o">=</span><span class="s1">&#39;ruian&#39;</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos"> 6</span><span class="n">obce</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+</span><span class="linenos"> 7</span>
+<span class="hll"><span class="linenos"> 8</span><span class="k">for</span> <span class="n">prvek</span> <span class="ow">in</span> <span class="n">obce</span><span class="p">:</span>
+</span><span class="linenos"> 9</span>    <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">{:&lt;25}</span><span class="s2">: </span><span class="si">{:.0f}</span><span class="s2"> </span><span class="si">{:.0f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prvek</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;nazev&#39;</span><span class="p">],</span> <span class="n">prvek</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">prvek</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
+<span class="linenos">10</span>    
+<span class="hll"><span class="linenos">11</span><span class="n">obce</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></pre></div>
+</div>
+<p>Skript ke stažení <a class="reference external" href="../_static/skripty/obce_body.py">zde</a>.</p>
+<div class="admonition important">
+<p class="admonition-title">Důležité</p>
+<p>Tímto způsobem (bez topologie) lze procházet v mapě
+pouze základní geometrická primitiva jako jsou <em>body</em>, <em>linie</em>,
+<em>hraniční linie</em> a <em>centroidy</em>, viz kapitola
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/vektor.html#topologicky-model">Topologický model</a> ze školení pro
+začátečníky. Přístup ke složeným typům jako jsou <em>plochy</em> již
+vyžaduje topologii.</p>
+</div>
+<p>Výpis skriptu může vypadat následovně:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="n">Božejov</span>                  <span class="p">:</span> <span class="o">-</span><span class="mi">700917</span> <span class="o">-</span><span class="mi">1129944</span>
+<span class="n">Cejle</span>                    <span class="p">:</span> <span class="o">-</span><span class="mi">677975</span> <span class="o">-</span><span class="mi">1132017</span>
+<span class="n">Drahonice</span>                <span class="p">:</span> <span class="o">-</span><span class="mi">781273</span> <span class="o">-</span><span class="mi">1137206</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="pristup-k-topologii">
+<h2>Přístup k topologii<a class="headerlink" href="#pristup-k-topologii" title="Permalink to this heading">¶</a></h2>
+<p>Přístup k topologii vektorových prvků zajišťuje třída
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass.vector.html#pygrass.vector.VectorTopo">VectorTopo</a>. Více informací o topologickém modelu
+systému GRASS najdete ve <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/vektor.html#topologicky-model">školení pro začátečníky</a>.</p>
+<p>V následující ukázce vypíšeme <em>pro každý okres počet jeho sousedů</em>.</p>
+<ol class="arabic simple">
+<li><p>Na řádku <span class="lcode">5</span> vytvoříme instaci třídy
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass.vector.html#pygrass.vector.VectorTopo">VectorTopo</a> odkazující na zvolenou vektorovou mapu,
+kterou na následujícím řádku otevřeme v režimu topologického čtení.</p></li>
+<li><p>Jednotlivé prvky (tj. okresy) procházíme sekvenčně v cyklu <code class="docutils literal notranslate"><span class="pre">for</span></code>
+na řádku <span class="lcode">8</span>. Pro průchod složených topologických primitiv,
+jako jsou v tomto případě plochy, musíme použít funknci <code class="docutils literal notranslate"><span class="pre">viter()</span></code>.</p></li>
+<li><p>Pro každou plochu okresu projdeme její hraniční linie <span class="lcode">10</span> a
+zjistíme jaká plocha je od této linie nalevo a napravo <span class="lcode">11</span>
+(<code class="docutils literal notranslate"><span class="pre">-1</span></code> představuje žádný prvek).</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">grass.pygrass.vector</span> <span class="kn">import</span> <span class="n">VectorTopo</span>
+<span class="linenos"> 4</span>
+<span class="hll"><span class="linenos"> 5</span><span class="n">okresy</span> <span class="o">=</span> <span class="n">VectorTopo</span><span class="p">(</span><span class="s1">&#39;okresy&#39;</span><span class="p">,</span> <span class="n">mapset</span><span class="o">=</span><span class="s1">&#39;ruian&#39;</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos"> 6</span><span class="n">okresy</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+</span><span class="linenos"> 7</span>
+<span class="hll"><span class="linenos"> 8</span><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">okresy</span><span class="o">.</span><span class="n">viter</span><span class="p">(</span><span class="s1">&#39;areas&#39;</span><span class="p">):</span>
+</span><span class="linenos"> 9</span>    <span class="n">sousede</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="hll"><span class="linenos">10</span>    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">boundaries</span><span class="p">():</span>
+</span><span class="hll"><span class="linenos">11</span>        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">read_area_ids</span><span class="p">():</span>
+</span><span class="linenos">12</span>            <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">o</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+<span class="linenos">13</span>                <span class="n">sousede</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="linenos">14</span>    
+<span class="linenos">15</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:20}</span><span class="s1">: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;nazev&#39;</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">sousede</span><span class="p">)))</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="n">okresy</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Skript ke stažení <a class="reference external" href="../_static/skripty/okresy.py">zde</a>.</p>
+<p>Výpis skriptu může vypadat následovně:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="n">Blansko</span>             <span class="p">:</span> <span class="mi">5</span>
+<span class="n">Brno</span><span class="o">-</span><span class="n">město</span>          <span class="p">:</span> <span class="mi">1</span>
+<span class="n">Vyškov</span>              <span class="p">:</span> <span class="mi">6</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="nalezeni-nejblizsich-prvku-zapis-novych-prvku">
+<h2>Nalezení nejbližších prvků, zápis nových prvků<a class="headerlink" href="#nalezeni-nejblizsich-prvku-zapis-novych-prvku" title="Permalink to this heading">¶</a></h2>
+<p>K nalezení nejbližších prvků je vyžadován přístup k topologii. V
+následujícím příkladu budeme <em>hledat nejbližší ulici k dané
+záchrance</em>. Dále zkontrolujeme, zda je záchrance přiřazen korektní kód
+ulice (dle <a class="reference external" href="http://cs.wikipedia.org/wiki/RÚIAN">RÚIAN</a>).</p>
+<p>Záchranky jsou společně s nejbližšími ulicemi zapsány do nové
+vektorové mapy <span class="map">zachranka_ulice</span> (řádky
+<span class="lcode">10, 15,24,26</span>). Atributová tabulka pro výstupní vektorovou mapu
+je definována na řádcích <span class="lcode">11-14</span>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">grass.pygrass.vector</span> <span class="kn">import</span> <span class="n">VectorTopo</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="n">zachranka</span> <span class="o">=</span> <span class="n">VectorTopo</span><span class="p">(</span><span class="s1">&#39;adresnimista_zachranka&#39;</span><span class="p">,</span> <span class="n">mapset</span><span class="o">=</span><span class="s1">&#39;ruian_praha&#39;</span><span class="p">)</span>
+<span class="linenos"> 6</span><span class="n">zachranka</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="linenos"> 7</span><span class="n">ulice</span> <span class="o">=</span> <span class="n">VectorTopo</span><span class="p">(</span><span class="s1">&#39;ulice&#39;</span><span class="p">,</span> <span class="n">mapset</span><span class="o">=</span><span class="s1">&#39;ruian_praha&#39;</span><span class="p">)</span>
+<span class="linenos"> 8</span><span class="n">ulice</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="linenos"> 9</span>
+<span class="hll"><span class="linenos">10</span><span class="n">zu</span> <span class="o">=</span> <span class="n">VectorTopo</span><span class="p">(</span><span class="s1">&#39;zachranka_ulice&#39;</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">11</span><span class="n">cols</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span>       <span class="s1">&#39;INTEGER PRIMARY KEY&#39;</span><span class="p">),</span>
+</span><span class="hll"><span class="linenos">12</span>        <span class="p">(</span><span class="s1">&#39;kod&#39;</span><span class="p">,</span>       <span class="s1">&#39;INTEGER&#39;</span><span class="p">),</span>
+</span><span class="hll"><span class="linenos">13</span>        <span class="p">(</span><span class="s1">&#39;ulice&#39;</span><span class="p">,</span>     <span class="s1">&#39;TEXT&#39;</span><span class="p">),</span>
+</span><span class="hll"><span class="linenos">14</span>        <span class="p">(</span><span class="s1">&#39;nespravny&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER&#39;</span><span class="p">)]</span>
+</span><span class="hll"><span class="linenos">15</span><span class="n">zu</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">tab_cols</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
+</span><span class="linenos">16</span>
+<span class="linenos">17</span><span class="n">seznam</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">18</span><span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">zachranka</span><span class="p">:</span>
+<span class="linenos">19</span>    <span class="n">u</span> <span class="o">=</span> <span class="n">ulice</span><span class="o">.</span><span class="n">find</span><span class="p">[</span><span class="s1">&#39;by_point&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">geo</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">maxdist</span><span class="o">=</span><span class="mf">1000.</span><span class="p">)</span>
+<span class="linenos">20</span>    <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">21</span>        <span class="k">continue</span>
+<span class="linenos">22</span>    <span class="n">nespravny</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;ulicekod&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">u</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;kod&#39;</span><span class="p">]</span>
+<span class="linenos">23</span>    <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{:10}</span><span class="s1"> </span><span class="si">{:1}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;kod&#39;</span><span class="p">],</span> <span class="n">nespravny</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;nazev&#39;</span><span class="p">]))</span>
+<span class="hll"><span class="linenos">24</span>    <span class="n">zu</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;kod&#39;</span><span class="p">],</span> <span class="n">u</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;nazev&#39;</span><span class="p">],</span> <span class="n">nespravny</span><span class="p">))</span>
+</span><span class="linenos">25</span>    <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">cat</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seznam</span><span class="p">:</span>
+<span class="hll"><span class="linenos">26</span>        <span class="n">zu</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;nazev&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">))</span>
+</span><span class="linenos">27</span>        <span class="n">seznam</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">cat</span><span class="p">)</span>
+<span class="linenos">28</span>
+<span class="hll"><span class="linenos">29</span><span class="n">zu</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span> <span class="c1"># nutne pro zapis atributu !!!</span>
+</span><span class="linenos">30</span>
+<span class="linenos">31</span><span class="n">zu</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos">32</span><span class="n">zachranka</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos">33</span><span class="n">ulice</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Skript ke stažení <a class="reference external" href="../_static/skripty/zachranka_ulice.py">zde</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Varování</p>
+<p>Velmi důležitý řádek je <span class="lcode">29</span>, kde dochází k zápisu
+atributů do atributové tabulky. Pokud nezavoláte funkci
+<code class="docutils literal notranslate"><span class="pre">commit()</span></code>, tak do výstupní vektorové mapy <strong>nezapíší</strong>
+žádné atributy!</p>
+</div>
+<p>Skript současně vypisuje na výstup kód záchranky, 0 nebo 1 podle toho,
+zda se nalezená nejbližší ulice shoduje s údajem z RÚIANu a nakonec
+adresu této ulice. Výpis může vypadat následovně:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">40432211</span> <span class="mi">0</span> <span class="n">Chrpová</span>
+<span class="mi">40432408</span> <span class="mi">1</span> <span class="n">Strašnická</span>
+<span class="mi">40433048</span> <span class="mi">0</span> <span class="n">Práčská</span>
+</pre></div>
+</div>
+<figure class="align-center" id="id2">
+<img alt="../_images/zachranka_ulice.png" src="../_images/zachranka_ulice.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 14 </span><span class="caption-text">Zvýraznění úseků ulic nejbližších dané záchrance.</span><a class="headerlink" href="#id2" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">PyGRASS</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="rastry.html">Přístup k rastrovým datům</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Přístup k vektorovým datům</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="rastry.html" title="Přístup k rastrovým datům"
+              >předchozí</a> |
+            <a href="../pywps/index.html" title="Publikování WPS procesu"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

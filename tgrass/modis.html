@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>MODIS &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Landsat" href="landsat.html" />
+    <link rel="prev" title="Časoprostorové analýzy" href="index.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="index.html" title="Časoprostorové analýzy"
+             accesskey="P">předchozí</a> |
+          <a href="landsat.html" title="Landsat"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="modis">
+<h1>MODIS<a class="headerlink" href="#modis" title="Permalink to this heading">¶</a></h1>
+<p>GRASS lokace s daty MODIS je ke stažení <a class="reference external" href="http://training.gismentors.eu/geodata/grass/modis.zip">zde</a> (233MB).</p>
+<section id="vytvoreni-casoprostoroveho-datasetu">
+<h2>Vytvoření časoprostorového datasetu<a class="headerlink" href="#vytvoreni-casoprostoroveho-datasetu" title="Permalink to this heading">¶</a></h2>
+<p>Dataset sestavíme v několika krocích. Nejprve vytvoříme prázdný
+dataset pomocí modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/t.create.html">t.create</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.create<span class="w"> </span><span class="nv">output</span><span class="o">=</span>modis<span class="w"> </span><span class="nv">title</span><span class="o">=</span><span class="s2">&quot;MODIS 2002&quot;</span><span class="w"> </span><span class="nv">desc</span><span class="o">=</span><span class="s2">&quot;Ukazkovy casoprostorovy dataset MODIS&quot;</span>
+</pre></div>
+</div>
+<p>Do kterého posléze modulem <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/t.register.html">t.register</a> nahrajeme vstupní
+data, v našem případě rastrové data z projektu <a class="reference external" href="http://en.wikipedia.org/wiki/MODIS">MODIS</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.list<span class="w"> </span><span class="nv">type</span><span class="o">=</span>raster<span class="w"> </span><span class="nv">mapset</span><span class="o">=</span>.<span class="w"> </span><span class="nv">sep</span><span class="o">=</span>newline<span class="w"> </span><span class="nv">out</span><span class="o">=</span>maps.txt
+t.register<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis<span class="w"> </span><span class="nv">file</span><span class="o">=</span>maps.txt<span class="w"> </span><span class="nv">sep</span><span class="o">=</span>newline
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Tečka u parametru <code class="docutils literal notranslate"><span class="pre">mapset</span></code> představuje aktuální mapset.</p>
+</div>
+</section>
+<section id="zakladni-metadata">
+<h2>Základní metadata<a class="headerlink" href="#zakladni-metadata" title="Permalink to this heading">¶</a></h2>
+<p>Základní informace o časoprostorovém datasetu poskytuje modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/t.info.html">t.info</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.info<span class="w"> </span>modis
+</pre></div>
+</div>
+<p>Informace o časové topologii získáme voláním modulu
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/t.topology.html">t.topology</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.topology<span class="w"> </span>modis
+</pre></div>
+</div>
+<p>Příklad získání podrobných informací z daného časového rozsahu:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.topology<span class="w"> </span>-m<span class="w"> </span>modis<span class="w"> </span><span class="nv">where</span><span class="o">=</span><span class="s2">&quot;start_time &gt;= &#39;2002-07-15&#39; and start_time &lt; &#39;2002-07-17&#39;&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="casoprostorove-dotazovani">
+<h2>Časoprostorové dotazování<a class="headerlink" href="#casoprostorove-dotazovani" title="Permalink to this heading">¶</a></h2>
+<p>Dotazování rastrových dat umožňuje modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/t.rast.list.html">t.rast.list</a>
+včetně případných podmínek.</p>
+<p>Příklad pro vypsání dat z měsíce března:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.rast.list<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis<span class="w"> </span><span class="nv">order</span><span class="o">=</span>start_time<span class="w"> </span><span class="nv">where</span><span class="o">=</span><span class="s2">&quot;start_time &gt; &#39;2002-03-01&#39; and start_time &lt; &#39;2002-04-01&#39;&quot;</span>
+</pre></div>
+</div>
+<p>Základní statistiku rastrových map poskutuje modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/t.rast.univar.html">t.rast.univar</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.rast.univar<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis<span class="w"> </span><span class="nv">where</span><span class="o">=</span><span class="s2">&quot;start_time &gt; &#39;2002-03-01&#39; and start_time &lt; &#39;2002-04-01&#39;&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="agregace-dat">
+<h2>Agregace dat<a class="headerlink" href="#agregace-dat" title="Permalink to this heading">¶</a></h2>
+<p>Určení statististiky teplot pro jednotlivé měsíce pomocí modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/t.rast.aggregate.html">t.rast.aggregate</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.rast.aggregate<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis<span class="w"> </span><span class="nv">output</span><span class="o">=</span>modis_m<span class="w"> </span><span class="nv">basename</span><span class="o">=</span>ag<span class="w"> </span><span class="nv">granularity</span><span class="o">=</span><span class="s2">&quot;1 months&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Užitečný je parametr <code class="xref std std-option docutils literal notranslate"><span class="pre">nprocs</span></code> pomocí kterého můžeme
+výpočet agregace přenést na více jader počítače a tak
+jej značně urychlit.</p>
+</div>
+<p>Vytvoří se dvanáct rastrových map v měsíční periodě, viz</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.rast.list<span class="w"> </span>modis_m<span class="w"> </span><span class="nv">order</span><span class="o">=</span>start_time
+</pre></div>
+</div>
+<p>Statistiku pro všechny měsíce získáme pomocí <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/t.rast.univar.html">t.rast.univar</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.rast.univar<span class="w"> </span>modis_m
+</pre></div>
+</div>
+<p>Příklad statistiky pro červenec a srpen:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.rast.univar<span class="w"> </span>modis_m<span class="w"> </span><span class="nv">where</span><span class="o">=</span><span class="s2">&quot;start_time &gt; &#39;2002-07-01&#39; and start_time &lt; &#39;2002-09-01&#39;&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="vyber-dat-z-casoprostoroveho-datasetu">
+<h2>Výběr dat z časoprostorového datasetu<a class="headerlink" href="#vyber-dat-z-casoprostoroveho-datasetu" title="Permalink to this heading">¶</a></h2>
+<p>Vytvořit na základě výběru nový časoprostorový dataset umožňuje příkaz
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/t.rast.extract.html">t.rast.extract</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.rast.extract<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis<span class="w"> </span><span class="nv">where</span><span class="o">=</span><span class="s2">&quot;start_time &gt; &#39;2002-03-01&#39; and start_time &lt; &#39;2002-06-01&#39;&quot;</span><span class="w"> </span><span class="nv">output</span><span class="o">=</span>modis_spring
+t.rast.extract<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis<span class="w"> </span><span class="nv">where</span><span class="o">=</span><span class="s2">&quot;start_time &gt; &#39;2002-06-01&#39; and start_time &lt; &#39;2002-09-01&#39;&quot;</span><span class="w"> </span><span class="nv">output</span><span class="o">=</span>modis_summer
+t.rast.extract<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis<span class="w"> </span><span class="nv">where</span><span class="o">=</span><span class="s2">&quot;start_time &gt; &#39;2002-09-01&#39; and start_time &lt; &#39;2002-12-01&#39;&quot;</span><span class="w"> </span><span class="nv">output</span><span class="o">=</span>modis_autumn
+t.rast.extract<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis<span class="w"> </span><span class="nv">where</span><span class="o">=</span><span class="s2">&quot;start_time &gt; &#39;2002-12-01&#39; or start_time &lt; &#39;2002-03-01&#39;&quot;</span><span class="w"> </span><span class="nv">output</span><span class="o">=</span>modis_winter
+</pre></div>
+</div>
+<p>V následujících příkazech budeme sledovat trend změny teploty v
+jednotlivých ročních obdobích. K tomu použijeme modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/t.rast.series.html">t.rast.series</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.rast.series<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis_spring<span class="w"> </span><span class="nv">output</span><span class="o">=</span>modis_spring_avg<span class="w"> </span><span class="nv">method</span><span class="o">=</span>average
+t.rast.series<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis_summer<span class="w"> </span><span class="nv">output</span><span class="o">=</span>modis_summer_avg<span class="w"> </span><span class="nv">method</span><span class="o">=</span>average
+t.rast.series<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis_autumn<span class="w"> </span><span class="nv">output</span><span class="o">=</span>modis_autumn_avg<span class="w"> </span><span class="nv">method</span><span class="o">=</span>average
+t.rast.series<span class="w"> </span><span class="nv">input</span><span class="o">=</span>modis_winter<span class="w"> </span><span class="nv">output</span><span class="o">=</span>modis_winter_avg<span class="w"> </span><span class="nv">method</span><span class="o">=</span>average
+</pre></div>
+</div>
+<p>Vzniknou čtyři rastrové mapy zobrazující průměrné teploty v ročních
+obdobích. Průměrnou teplotu zjistíme pomocí modulu
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.univar.html">r.univar</a>, příklad pro jaro:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.univar<span class="w"> </span>modis_spring_avg
+</pre></div>
+</div>
+</section>
+<section id="vizualizace-casoprostrovych-dat">
+<h2>Vizualizace časoprostrových dat<a class="headerlink" href="#vizualizace-casoprostrovych-dat" title="Permalink to this heading">¶</a></h2>
+<p>Vizualizace časové řady umožňuje nástroj <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.gui.timeline.html">g.gui.timeline</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.gui.timeline<span class="w"> </span><span class="nv">inputs</span><span class="o">=</span>modis_spring,modis_summer,modis_autumn,modis_winter
+</pre></div>
+</div>
+<figure class="align-center" id="id1">
+<img alt="../_images/g-gui-timeline.png" src="../_images/g-gui-timeline.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 46 </span><span class="caption-text">Vizualizace čtyř časoprostorových datasetů na základě ročního období.</span><a class="headerlink" href="#id1" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Vizualizovat data časoprostorových datasetů umožňuje animační nástroj
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.gui.animation.html">g.gui.animation</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.gui.animation<span class="w"> </span><span class="nv">strds</span><span class="o">=</span>modis
+</pre></div>
+</div>
+<figure class="align-center" id="id2">
+<img alt="../_images/g-gui-animation.png" src="../_images/g-gui-animation.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 47 </span><span class="caption-text">wxGUI Animation Tool.</span><a class="headerlink" href="#id2" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Mezi další užitečné nástroje patří <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.gui.mapswipe.html">g.gui.mapswipe</a></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>t.rast.list<span class="w"> </span>modis_m<span class="w"> </span><span class="nv">where</span><span class="o">=</span><span class="s2">&quot;start_time &lt; &#39;2002-03-01&#39;&quot;</span>
+
+g.gui.mapswipe<span class="w"> </span><span class="nv">first</span><span class="o">=</span>ag_01<span class="w"> </span><span class="nv">second</span><span class="o">=</span>ag_02
+</pre></div>
+</div>
+<figure class="align-center" id="id3">
+<img alt="../_images/g-gui-mapswipe.png" src="../_images/g-gui-mapswipe.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 48 </span><span class="caption-text">Vizualizace agregovaných LTS dat pro první dva měsíce roku 2002.</span><a class="headerlink" href="#id3" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Časoprostorové analýzy</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MODIS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="landsat.html">Landsat</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="index.html" title="Časoprostorové analýzy"
+              >předchozí</a> |
+            <a href="landsat.html" title="Landsat"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

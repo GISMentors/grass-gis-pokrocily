@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>3D &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="prev" title="Práce s externími formáty" href="../formaty/index.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="../formaty/index.html" title="Práce s externími formáty"
+             accesskey="P">předchozí</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="d">
+<h1>3D<a class="headerlink" href="#d" title="Permalink to this heading">¶</a></h1>
+<p>GRASS umožňuje pracovat jak 2D tak 3D rastrovými a vektorovými daty.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://grass.osgeo.org/grass80/manuals/raster3dintro.html">3D rastrová data</a> - moduly s
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/raster3d.html">prefixem r3.*</a></p></li>
+<li><p>3D vektorová data - pouze <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/keywords.html#3D.html">několik modulů</a>
+umožňuje práci s 3D vektorovými daty</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Topologie vektorovývh dat je pouze 2D, pro 3D vektorová
+data je sestavena topologie průmětu do roviny XY.</p>
+</div>
+<section id="vizualizace-ve-3d">
+<span id="vizualizace-3d"></span><h2>Vizualizace ve 3D<a class="headerlink" href="#vizualizace-ve-3d" title="Permalink to this heading">¶</a></h2>
+<p>Vizualizovat 2D, 2.5D a 3D lze přímo v <em>mapovém okně</em>, kde je dostupný
+tzv. <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/wxGUI.nviz.html">3D viewer</a> (aka NVIZ).</p>
+<figure class="align-center">
+<img alt="../_images/map-window-3d-toolbar.png" class="middle" src="../_images/map-window-3d-toolbar.png" />
+</figure>
+<div class="admonition important">
+<p class="admonition-title">Důležité</p>
+<p>3D viewer respektuje při načítání rastrových dat
+aktuální výpočetní region, proto lze doporučit před
+spuštění 3D pohledu <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/region.html#nastaveni-vypocetniho-regionu">nastavit region</a>
+podle vybrané rastrové mapy.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Vzhledem k poměrně velkému prostorovému rozlišení rastrové
+mapy <span class="map">dmt</span> v lokaci pro školení (25m) nastavíme před načtením
+prostorové rozlišení na rozlišení menší, např. 100m.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>dmt<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">100</span>
+</pre></div>
+</div>
+</div>
+<figure class="align-center" id="id1">
+<img alt="../_images/dmt3d.png" class="large" src="../_images/dmt3d.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 73 </span><span class="caption-text">Ukázka vizualizace ve 3D - digitální model terénu a pořární stanice</span><a class="headerlink" href="#id1" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Vizualizovat data ve 3D umožňuje z příkazové řádky modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/m.nviz.image.html">m.nviz.image</a>.</p>
+</div>
+</section>
+<section id="d-rastrova-data">
+<h2>3D rastrová data<a class="headerlink" href="#d-rastrova-data" title="Permalink to this heading">¶</a></h2>
+<p>3D rastrová data (tzv. <em>volumes</em>) podporuje systém GRASS již od verze
+6, více informací v <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/raster3dintro.html">dokumentaci</a>.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://grass.osgeo.org/grass80/manuals/raster3d.html">Seznam modulů</a> pro práci s 3D rastrovými daty</p></li>
+</ul>
+<figure class="align-center" id="id2">
+<img alt="../_images/raster3d_layout.png" src="../_images/raster3d_layout.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 74 </span><span class="caption-text">3D rastrová data v systému GRASS (zdroj: <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/raster3dintro.html">GRASS manuál</a>)</span><a class="headerlink" href="#id2" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<section id="priklad">
+<h3>Příklad<a class="headerlink" href="#priklad" title="Permalink to this heading">¶</a></h3>
+<p>Nejprve vstupní data převzorkujeme na prostorové rozlišení 100m. Z DMT
+vytvoříme mapu sklonu svahu, viz školení <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/rastrova_data/analyzy-povrchu">GRASS GIS pro
+začátečníky</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>dmt<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">500</span>
+r.resamp.interp<span class="w"> </span><span class="k">in</span><span class="o">=</span>dmt<span class="w"> </span><span class="nv">out</span><span class="o">=</span>dmt500<span class="w"> </span><span class="nv">method</span><span class="o">=</span>bilinear
+r.slope.aspect<span class="w"> </span><span class="nv">elev</span><span class="o">=</span>dmt500<span class="w"> </span><span class="nv">slope</span><span class="o">=</span>slope500
+</pre></div>
+</div>
+<p>Před vytvoření 3D rastrové mapy z DMT a hodnot míry svahu nastavíme
+hodnoty a rozlišení ve směru osy <cite>Z</cite> výpočetního regionu.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">b</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">t</span><span class="o">=</span><span class="m">50</span><span class="w"> </span><span class="nv">res3</span><span class="o">=</span><span class="m">500</span><span class="w"> </span><span class="nv">tbres</span><span class="o">=</span><span class="m">1</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Nastavení 3D regionu můžeme vypsat pomocí přepínače
+<code class="xref std std-option docutils literal notranslate"><span class="pre">-3</span></code> modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.region.html">g.region</a>.</p>
+</div>
+<p>Pro vytvoření 3D rastrové mapy na základně DMT a hodnot míry svahu
+použijeme modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.to.rast3elev.html">r.to.rast3elev</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.to.rast3elev<span class="w"> </span><span class="nv">input</span><span class="o">=</span>slope500<span class="w"> </span><span class="nv">elevation</span><span class="o">=</span>dmt500<span class="w"> </span><span class="nv">output</span><span class="o">=</span>dmt_slope_3d<span class="w"> </span>--o
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">3D</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#vizualizace-ve-3d">Vizualizace ve 3D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#d-rastrova-data">3D rastrová data</a></li>
+</ul>
+</li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="../formaty/index.html" title="Práce s externími formáty"
+              >předchozí</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

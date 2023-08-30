@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Úvod do skriptování &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Spuštění skriptu" href="spusteni.html" />
+    <link rel="prev" title="Úvod" href="../index.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="../index.html" title="Úvod"
+             accesskey="P">předchozí</a> |
+          <a href="spusteni.html" title="Spuštění skriptu"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="uvod-do-skriptovani">
+<h1>Úvod do skriptování<a class="headerlink" href="#uvod-do-skriptovani" title="Permalink to this heading">¶</a></h1>
+<p>Na základní úrovni je možné psát vlastní nástroje pro systém GRASS v
+libovolném programovacím či skriptovacím jazyce, ze kterého lze volat
+nástroje systému GRASS, tzv. <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/moduly.html">moduly</a>. Může to být
+např. <a class="reference external" href="http://cs.wikipedia.org/wiki/Perl">Perl</a>, <a class="reference external" href="http://cs.wikipedia.org/wiki/Ruby (programovací jazyk)">Ruby</a>, <a class="reference external" href="http://cs.wikipedia.org/wiki/Java (programovací jazyk)">Java</a> či typicky
+<a class="reference external" href="http://cs.wikipedia.org/wiki/POSIX">POSIX</a> (shell), <a class="reference external" href="http://cs.wikipedia.org/wiki/Python">Python</a> a řada dalších.</p>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Cílem standardu <a class="reference external" href="http://cs.wikipedia.org/wiki/POSIX">POSIX</a> bylo vytvořit jednotné
+rozhraní, které bude zajišťovat přenositelnost programů mezi
+jednotlivými unixovými operačními systémy (OS). V POSIX se píše
+rychle a efektivně, na druhou stranu nejsou skripty přenositelné na
+ne-unixové OS např. na MS Windows. Pod Windows tak budete
+potřebovat prostředí, které bude POSIX emulovat,
+např. <a class="reference external" href="http://en.wikipedia.org/wiki/MinGW">MinGW</a> či <a class="reference external" href="http://en.wikipedia.org/wiki/Cygwin">Cygwin</a>. Z tohoto
+pohledu se jeví jako lepší volba rozšířený a zároveň
+multiplatformní jazyk Python s širokou škálou knihoven z oblasti
+GIS.</p>
+</div>
+<p>Nejširší podporu má systém GRASS pro programovací jazyk <strong>Python</strong>
+včetně vlastního rozhraní <a class="reference internal" href="../pygrass/index.html"><span class="doc">PyGRASS</span></a>. Kromě
+toho je Python podporován nejen systémem GRASS, ale i QGISem (<a class="reference external" href="http://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/">pyQGIS</a>)
+či proprietárním Esri <a class="reference external" href="http://cs.wikipedia.org/wiki/ArcGIS">ArcGIS</a> (<a class="reference external" href="https://pro.arcgis.com/en/pro-app/arcpy/get-started/what-is-arcpy-.htm">arcpy</a>).</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Více informací k programování v jazyku Python pro oblast GIS
+najdete ve specializovaném školení <a class="reference external" href="http://training.gismentors.eu/geopython-zacatecnik">GeoPython pro
+začátečníky</a>.</p>
+</div>
+<p>Nejprve si na ukážeme možnosti <em>spuštění uživatelského skriptu</em>:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="spusteni.html">Spuštění skriptu</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spusteni.html#spusteni-z-gui">Spuštění z GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spusteni.html#spusteni-jako-batch-job">Spuštění jako batch job</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spusteni.html#spusteni-explicitne">Spuštění explicitně</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spusteni.html#spusteni-v-textovem-editoru-pycharm-ms-windows">Spuštění v textovém editoru (PyCharm, MS Windows)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spusteni.html#spusteni-pomoci-bat-souboru-pod-ms-windows">Spuštění pomocí BAT souboru pod MS Windows</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>Poté si naimplementujeme vlastní skript, nejprve v jazyku Python a poté
+i pro POSIX.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ndvi.html">Ukázka skriptu (NDVI)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ndvi-python-v1.html">NDVI - Základní verze skriptu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ndvi-python-v2.html">NDVI - Pokročilejší verze skriptu</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Další úkázky možnosti skriptování jsou součástí školení
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-workshop-jena/units/10.html">Jena GRASS GIS Workshop</a>.</p>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Úvod do skriptování</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spusteni.html">Spuštění skriptu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ndvi.html">Ukázka skriptu (NDVI)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="../index.html" title="Úvod"
+              >předchozí</a> |
+            <a href="spusteni.html" title="Spuštění skriptu"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

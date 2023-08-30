@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Segmentace obrazu &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Práce s externími formáty" href="../formaty/index.html" />
+    <link rel="prev" title="Zpracování obrazových dat" href="index.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="index.html" title="Zpracování obrazových dat"
+             accesskey="P">předchozí</a> |
+          <a href="../formaty/index.html" title="Práce s externími formáty"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="segmentace-obrazu">
+<h1>Segmentace obrazu<a class="headerlink" href="#segmentace-obrazu" title="Permalink to this heading">¶</a></h1>
+<p>Segmentace obrazu je metoda, která slouží k automatickému rozdělení
+vlastního obrazu na oblasti se společnými vlastnostmi, které obvykle
+mají nějaký smysluplný význam. Výsledky segmentace jsou využitelné
+například při analýze obrazů získaných při dálkovém průzkumu Země
+(citace z <a class="reference external" href="http://cs.wikipedia.org/wiki/Segmentace obrazu">české wikipedie</a>).</p>
+<section id="vstupni-data">
+<h2>Vstupní data<a class="headerlink" href="#vstupni-data" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>letecké snímky viditelného (RGB) a blízkého
+infračerveného spektra (NIR)</p></li>
+<li><p>digitální model reliéfu (DMR) a povrchu (DMP)</p></li>
+<li><p>stíny (shadows)</p></li>
+</ul>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Najít otevřená data pro tuto úlohu.</p>
+</div>
+<section id="import-dat">
+<h3>Import dat<a class="headerlink" href="#import-dat" title="Permalink to this heading">¶</a></h3>
+<p>Po spuštění systému GRASS vytvoříme novou lokaci buď na
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/data/tvorba-lokace.html#lokace-srtm">základě vstupních dat</a> anebo
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/data/tvorba-lokace.html#lokace-sjtsk">pomocí EPSG kódu</a> (v našem
+případě jde o S-JTSK <a class="reference external" href="http://epsg.io/5514">EPSG:5514</a>).</p>
+<p>Vstupní data naimportujeme do mapsetu PERMANENT, viz
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/data/import.html#rastrova-data">poznámky k importu rastrových dat</a> ze školení
+GRASS GIS pro začátečníky.</p>
+<figure class="align-center" id="id2">
+<img alt="../_images/segment-import.png" src="../_images/segment-import.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 61 </span><span class="caption-text">Ukázka importu vstupních dat.</span><a class="headerlink" href="#id2" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>RGB snímek se po importu rozpadne na tři rastrové mapy
+(<span class="map">rgb.1</span>, <span class="map">rgb.2</span> a <span class="map">rgb.3</span>), které jsou
+registrovány v obrazové skupině <span class="map">rgb</span>, viz příkaz
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/i.group.html">i.group</a>. Jednotlivé obrazové kanály lze složit do
+barevné kompozice příkazem <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/d.rgb.html">d.rgb</a>, viz
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/zobrazeni-geodat.html#rastrova-data">vizualizace dat</a>.</p>
+<figure class="align-center" id="id3">
+<img alt="../_images/segment-rgb.png" class="large" src="../_images/segment-rgb.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 62 </span><span class="caption-text">Ukázka vizualizace vstupních dat, složení barevné syntézy v
+pravých (skutečných) barvách.</span><a class="headerlink" href="#id3" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="proces-segmentace-obrazu">
+<h2>Proces segmentace obrazu<a class="headerlink" href="#proces-segmentace-obrazu" title="Permalink to this heading">¶</a></h2>
+<p>Do segmentace obrazu bude vstupovat kromě pásem viditelného spektra
+(<span class="map">rgb.1</span>, <span class="map">rgb.2</span> a <span class="map">rgb.3</span>) také pásmo blízkého
+infračerveného spektra (<span class="map">nir</span>). Vytvoříme obrazovou skupinu,
+která bude tyto vrstvy obsahovat. Nástroj pro správu obrazových skupin
+je dostupný z menu <span class="menuselection">Imagery ‣ Develop images and
+groups ‣ Create/edit group</span> anebo jako příkaz <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/i.group.html">i.group</a>.</p>
+<figure class="align-center" id="id4">
+<img alt="../_images/segment-group.png" class="small" src="../_images/segment-group.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 63 </span><span class="caption-text">Vytvoření obrazové skupiny pro segmentaci dat. Zadání názvu
+(<span class="fignote">1</span>) a přidání rastrových map do skupiny (<span class="fignote">2</span>).</span><a class="headerlink" href="#id4" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition important">
+<p class="admonition-title">Důležité</p>
+<p>Před dalším výpočtem je nutné nastavit korektní
+<em>výpočetní region</em> (viz školení <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/region.html">GRASS GIS pro začátečníky</a>). Vzhledem k tomu, že mají
+vstupní vrstvy RGB a NIR stejné prostorové umístění a rozlišení,
+stačí zvolit libovolnou vrstvu, např. <span class="map">nir</span>.</p>
+<figure class="align-center">
+<img alt="../_images/segment-region.png" class="small" src="../_images/segment-region.png" />
+</figure>
+</div>
+<p>Nástroj pro segmentaci obrazu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/i.segment.html">i.segment</a>
+je dostupný v menu <span class="menuselection">Imagery ‣ Clasify image ‣
+Object segmentation</span>.</p>
+<p>Segmentaci obrazu budeme provádět v několika krocích. Výsledek prvního
+běhu s práhem (<code class="xref std std-option docutils literal notranslate"><span class="pre">threshold</span></code>) 0.01 použijeme pro další krok, kde
+navýšíme práh na hodnotu 0.05. Výsledky první segmetace využijeme v
+druhém běhu pomocí parametru <code class="xref std std-option docutils literal notranslate"><span class="pre">seeds</span></code>. Objekty se společnými
+spekrálními a geometrickými vlastnosti se spojí, jejich počet se
+zmenší, viz <a class="reference internal" href="#segment-1-2"><span class="std std-numref">Obr. 64</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># první běh (~ 4 350 000 objektů)</span>
+i.segment<span class="w"> </span><span class="nv">group</span><span class="o">=</span>seg<span class="w"> </span><span class="nv">output</span><span class="o">=</span>seg1<span class="w"> </span><span class="nv">threshold</span><span class="o">=</span><span class="m">0</span>.01
+<span class="c1"># druhý běh (~ 440 000 objektů)</span>
+i.segment<span class="w"> </span><span class="nv">group</span><span class="o">=</span>seg<span class="w"> </span><span class="nv">output</span><span class="o">=</span>seg2<span class="w"> </span><span class="nv">threshold</span><span class="o">=</span><span class="m">0</span>.05<span class="w"> </span><span class="nv">seeds</span><span class="o">=</span>seg1
+</pre></div>
+</div>
+<figure class="align-center" id="id5">
+<span id="segment-1-2"></span><img alt="../_images/segment-1-2.png" src="../_images/segment-1-2.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 64 </span><span class="caption-text">Porovnání objektů vzniklých po prvním a druhém běhu segmentace obrazu.</span><a class="headerlink" href="#id5" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Ve třetím kroku zvýšíme práh na hodnotu 0.09 a zároveň nastavíme
+minimální počet pixelů, které formují objekt na 15. Výsledek
+segmentace je znázorněn <a class="reference internal" href="#segment-3"><span class="std std-numref">Obr. 65</span></a>.</p>
+<figure class="align-center" id="id6">
+<span id="segment-3"></span><img alt="../_images/segment-rgb-3.png" src="../_images/segment-rgb-3.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 65 </span><span class="caption-text">Ukázka výsledku segmentace obrazu (třetí běh) a kanálu leteckého
+snímku.</span><a class="headerlink" href="#id6" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># třetí běh (~ 25 000 objektů)</span>
+i.segment<span class="w"> </span><span class="nv">group</span><span class="o">=</span>seg<span class="w"> </span><span class="nv">output</span><span class="o">=</span>seg3<span class="w"> </span><span class="nv">threshold</span><span class="o">=</span><span class="m">0</span>.09<span class="w"> </span><span class="nv">minsize</span><span class="o">=</span><span class="m">15</span><span class="w"> </span><span class="nv">seeds</span><span class="o">=</span>seg2
+</pre></div>
+</div>
+</section>
+<section id="filtrace-objektu">
+<h2>Filtrace objektů<a class="headerlink" href="#filtrace-objektu" title="Permalink to this heading">¶</a></h2>
+<p>Jako podkladové vrstvy pro filtraci objektů využijeme vrstvu
+normalizovaného diferečního vegetačního indexu (NDVI) vypočteného z
+vrstev červeného (<span class="map">rgb.1</span>) a blízkého infračerveného (<span class="map">nir</span>)
+pásma viz. <a class="reference internal" href="../skripty/ndvi.html"><span class="doc">návod na jeho výpočet</span></a>. Produkt
+NDVI můžeme vytvořit univerzálním nástrojem <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/rastrova_data/rastrova-algebra.html">mapové albegry</a> anebo
+přímo pomocí nástroje <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/i.vi.html">i.vi</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>i.vi<span class="w"> </span><span class="nv">red</span><span class="o">=</span>rgb.1<span class="w"> </span><span class="nv">output</span><span class="o">=</span>ndvi<span class="w"> </span><span class="nv">viname</span><span class="o">=</span>ndvi<span class="w"> </span><span class="nv">nir</span><span class="o">=</span>nir
+</pre></div>
+</div>
+<figure class="align-center" id="id7">
+<img alt="../_images/segment-ndvi.png" src="../_images/segment-ndvi.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 66 </span><span class="caption-text">Vrstva normalizovaného diferenčního vegetačního indexu.</span><a class="headerlink" href="#id7" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Dále pomocí nástroje <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/rastrova_data/rastrova-algebra.html">mapové albegry r.mapcalc</a>
+(<span class="menuselection">Raster ‣ Raster map calculator</span>) vypočteme
+rastrovou mapu rozdílu výšek digitalního modelu povrchu a terénu:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.mapcalc<span class="w"> </span><span class="nv">exp</span><span class="o">=</span><span class="s2">&quot;diff = dmp - dmr&quot;</span>
+</pre></div>
+</div>
+<figure class="align-center" id="id8">
+<img alt="../_images/segment-diff.png" src="../_images/segment-diff.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 67 </span><span class="caption-text">Rastrová mapa rozdílu výšek digitálního modelu povrchu a terénu
+(tabulka barev: differences).</span><a class="headerlink" href="#id8" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Statistiku objektů odvozenou z vrstev NDVI a rozdílu výšek určíme
+pomocí specializovaného modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/addons/i.segment.stats.html">i.segment.stats</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>i.segment.stats<span class="w"> </span><span class="nv">map</span><span class="o">=</span>seg3<span class="w"> </span><span class="nv">rasters</span><span class="o">=</span>ndvi,diff<span class="w"> </span><span class="nv">raster_statistics</span><span class="o">=</span>mean<span class="w"> </span><span class="nv">area_measures</span><span class="o">=</span>area<span class="w"> </span><span class="nv">vectormap</span><span class="o">=</span>seg3
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Nástroj <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/addons/i.segment.stats.html">i.segment.stats</a> není standardní
+součástí systému GRASS, ale je distrubován jako
+tzv. addons - rozšíření. Modul nainstalujeme z menu
+<span class="menuselection">Settings ‣ Addons extensions ‣ Install
+extensions from addons</span>.</p>
+<figure class="align-center" id="id9">
+<img alt="../_images/segment-stats-install.png" class="small" src="../_images/segment-stats-install.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 68 </span><span class="caption-text">Instalace nástroje i.segment.stats.</span><a class="headerlink" href="#id9" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/addons/i.segment.stats.html">i.segment.stats</a> pro svůj běž
+vyžaduje rozšíření <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/addons/r.object.geometry.html">r.object.geometry</a>,
+které je nutné nainstalovat taktéž.</p>
+</div>
+<figure class="align-center" id="id10">
+<img alt="../_images/segment-ndvi-diff.png" src="../_images/segment-ndvi-diff.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 69 </span><span class="caption-text">Objekty s atributy průměrné hodnoty NDVI a rozdílu výšek.</span><a class="headerlink" href="#id10" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Na základě těchto atributů můžeme provést jednoduchou klasifikaci objektů. Např.</p>
+<ul class="simple">
+<li><p>budovy</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">diff_mean</span> <span class="o">&gt;</span> <span class="mf">2.5</span> <span class="n">AND</span> <span class="n">ndvi_mean</span> <span class="o">&lt;</span> <span class="mf">0.1</span>
+</pre></div>
+</div>
+<p>Výběr objektů splňujících dané atributové podmínky můžeme provést pomocí
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik//intro/atributove-dotazy.html">správce atributových dat</a> anebo přímo
+modulem <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.extract.html">v.extract</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.extract<span class="w"> </span><span class="nv">input</span><span class="o">=</span>seg3<span class="w"> </span><span class="nv">where</span><span class="o">=</span><span class="s2">&quot;diff_mean &gt; 2.5 AND ndvi_mean &lt; 0.1&quot;</span><span class="w"> </span><span class="nv">output</span><span class="o">=</span>budovy
+</pre></div>
+</div>
+<figure class="align-center" id="id11">
+<img alt="../_images/segment-budovy.png" src="../_images/segment-budovy.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 70 </span><span class="caption-text">Vizualizace výsledku filtrace objektů budov na základě NDVI a rozdílu výšek.</span><a class="headerlink" href="#id11" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Zpracování obrazových dat</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Segmentace obrazu</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="index.html" title="Zpracování obrazových dat"
+              >předchozí</a> |
+            <a href="../formaty/index.html" title="Práce s externími formáty"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,547 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Metoda SCS CN &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Průměrná dlouhodobá ztráta půdy" href="usle.html" />
+    <link rel="prev" title="Hydrologie" href="index.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="index.html" title="Hydrologie"
+             accesskey="P">předchozí</a> |
+          <a href="usle.html" title="Průměrná dlouhodobá ztráta půdy"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="metoda-scs-cn">
+<h1>Metoda SCS CN<a class="headerlink" href="#metoda-scs-cn" title="Permalink to this heading">¶</a></h1>
+<section id="teoreticky-zaklad">
+<span id="scs-cn-teorie"></span><h2>Teoretický základ<a class="headerlink" href="#teoreticky-zaklad" title="Permalink to this heading">¶</a></h2>
+<p>Jde o výpočet přímého odtoku z povodí, který je tvořen tzv. povrchovým
+odtokem a hypodermeckým (podpovrchovým) odtokem. Metoda byla
+vypracovaná službou na ochranu půd <em>Soil Conservation Service</em>
+(<a class="reference external" href="http://cs.wikipedia.org/wiki/Metoda CN křivek">SCS CN</a>) v USA. Objem srážek je na
+objem odtoku převedený na základě hodnot odtokových křivek <cite>CN</cite>, které
+jsou tabelizovány na základě hydrologických vlastností půd. Metoda
+zohledňuje závislost retence (zadržování vody) hydrologických
+vlastností půd, počáteční nasycení a způsob využívaní půdy. Hodnota
+<cite>CN</cite> křivek reprezentuje vlastnost povodí a platí, že čím je
+hodnota <cite>CN</cite> vyšší, tím je vyšší pravděpodobnost, že při srážkové
+události dojde k přímému odtoku.</p>
+<p>Hodnota <cite>CN</cite> závisí na kombinaci hydrologické skupiny půd a způsobu
+využití území v daném místě. Kód hydrologické skupiny půd je získaný
+z dat hlavních půdních jednotek (přesnější způsob) anebo dat
+komplexního průzkumu půd (tam, kde informace o hlavních půdních
+jednotkách nejsou k dispozici).</p>
+</section>
+<section id="zakladni-symboly">
+<span id="scs-cn-symboly"></span><h2>Základní symboly<a class="headerlink" href="#zakladni-symboly" title="Permalink to this heading">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(CN\)</span> - hodnota odtokové křivky</p></li>
+<li><p><span class="math notranslate nohighlight">\(A\)</span> - maximalní potenciální ztráta z povodí, výška vody
+zadržané v povodí; ostatní je odtok (<span class="math notranslate nohighlight">\(mm\)</span>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(I_a\)</span> - počítaná ztráta z povodí, když ještě nedochází k odtoku
+(<span class="math notranslate nohighlight">\(mm\)</span>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(H_s\)</span> - návrhová výška srážky, zátěžový stav (<span class="math notranslate nohighlight">\(mm\)</span>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(H_o\)</span> - výška přímého odtoku (<span class="math notranslate nohighlight">\(mm\)</span>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(O_p\)</span> - objem přímého odtoku (<span class="math notranslate nohighlight">\(m^3\)</span>)</p></li>
+</ul>
+</div></blockquote>
+<p>Platí, že poměr mezi skutečnou a maximální ztrátou z povodí je stejný
+jako poměr odtoku a srážky, která je redukovaná o počáteční ztraty.</p>
+<div class="math notranslate nohighlight">
+\[\frac{O_p}{A}=\frac{H_o}{H_s-I_a}\]</div>
+</section>
+<section id="vstupni-data">
+<span id="scs-cn-vstupni-data"></span><h2>Vstupní data<a class="headerlink" href="#vstupni-data" title="Permalink to this heading">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="map">hpj.shp</span> - vektorová vrstva hlavních půdních jednotek z
+kodů BPEJ, <a class="reference internal" href="#hpj-kpp"><span class="std std-numref">Obr. 18</span></a> vlevo</p></li>
+<li><p><span class="map">kpp.shp</span> - vektorová vrstva komplexního průzkumu půd, <a class="reference internal" href="#hpj-kpp"><span class="std std-numref">Obr. 18</span></a> vpravo</p></li>
+<li><p><span class="map">landuse.shp</span> - vektorová vrstva využití území, <a class="reference internal" href="#lu-pov"><span class="std std-numref">Obr. 19</span></a> vlevo</p></li>
+<li><p><span class="map">povodi.shp</span> - vektorová vrstva povodí IV. řádu s návrhovými
+srážkami <span class="math notranslate nohighlight">\(H_s\)</span> (doba opakovaní 2, 5, 10, 20, 50 a 100 rokov), <a class="reference internal" href="#lu-pov"><span class="std std-numref">Obr. 19</span></a> vpravo</p></li>
+<li><p><span class="dbtable">hpj_hydrsk</span> - číselník s hydrologickými skupinami půd pro hlavní
+půdní jednotky, <a class="reference internal" href="#ciselniky1"><span class="std std-numref">Obr. 20</span></a> vlevo</p></li>
+<li><p><span class="dbtable">kpp_hydrsk</span> - číselník s hydrologickými skupinami půd pro vrstvu
+komplexního průzkumu půd, <a class="reference internal" href="#ciselniky1"><span class="std std-numref">Obr. 20</span></a> uprostřed</p></li>
+<li><p><span class="dbtable">lu_hydrsk_cn</span> - číselník s hodnotami CN pro kombinaci využití
+území a hydrologické skupiny, <a class="reference internal" href="#ciselniky1"><span class="std std-numref">Obr. 20</span></a> vpravo</p></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Vrstvu povodí je možno získat z volně dostupné databáze
+<a class="reference external" href="http://www.dibavod.cz">DIBAVOD</a>. Bonitované půdní
+ekologické jednotky - dvě číslice pětimístného kódu
+udávající hlavní půdní jednotku, informace o využití území
+<em>Land Parcel Identification System</em> a data komplexního
+průzkumu půd poskytuje většinou krajský úřad příslušného
+území. Návrhové srážky je možno získat z hydrometeorologického
+ústavu.</p>
+</div>
+</section>
+<section id="navrhovany-postup">
+<span id="scs-cn-postup"></span><h2>Navrhovaný postup<a class="headerlink" href="#navrhovany-postup" title="Permalink to this heading">¶</a></h2>
+<p><span class="xref std std-ref">1.</span>
+sjednocení hlavních půdních jednotek a komplexního průzkumu půd</p>
+<p><span class="xref std std-ref">2.</span>
+připojení informací o hydrologické skupině</p>
+<p><span class="xref std std-ref">3.</span>
+průnik vrstvy hydrologických skupin s vrstvou využití území</p>
+<p><span class="xref std std-ref">4.</span>
+připojení hodnot odtokové křivky <span class="math notranslate nohighlight">\(CN\)</span></p>
+<p><span class="xref std std-ref">5.</span>
+sjednocení průniku vrstvy hydrologických skupinami a využití území
+s vrstvou povodí</p>
+<p><span class="xref std std-ref">6.</span>
+výpočet výměry elementárních ploch, parametru <span class="math notranslate nohighlight">\(A\)</span> a parametru <span class="math notranslate nohighlight">\(I_a\)</span></p>
+<p><span class="xref std std-ref">7.</span>
+výpočet parametru <span class="math notranslate nohighlight">\(H_o\)</span> a parametru <span class="math notranslate nohighlight">\(O_p\)</span> pre každou elementární plochu</p>
+<p><span class="xref std std-ref">8.</span>
+vytvoření rastrových vrstev výšky a objemu přímého odtoku</p>
+<p><span class="xref std std-ref">9.</span>
+výpočet průměrných hodnot výšky a objemu přímého odtoku pro povodí</p>
+<figure class="align-center" id="id1">
+<span id="schema"></span><img alt="../_images/schema_scs-cn.png" class="middle" src="../_images/schema_scs-cn.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 17 </span><span class="caption-text">Grafické schéma postupu.</span><a class="headerlink" href="#id1" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Znázornění vstupních dat spolu s atributovými tabulkami je uvedeno na
+<a class="reference internal" href="#hpj-kpp"><span class="std std-numref">Obr. 18</span></a> a <a class="reference internal" href="#lu-pov"><span class="std std-numref">Obr. 19</span></a>. Tabulky s informacemi o hydrologické
+skupině půdy a o hodnotách CN pro kombinaci využití území a
+hydrologické skupiny, resp.  číselníky jsou na <a class="reference internal" href="#ciselniky1"><span class="std std-numref">Obr. 20</span></a>.</p>
+<figure class="align-center" id="id2">
+<span id="hpj-kpp"></span><img alt="../_images/hpjkpp.png" class="large" src="../_images/hpjkpp.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 18 </span><span class="caption-text">Hlavní půdní jednotky a podrobný průzkum půd spolu s jejich atributovými tabulkami.</span><a class="headerlink" href="#id2" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id3">
+<span id="lu-pov"></span><img alt="../_images/lupov.png" class="large" src="../_images/lupov.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 19 </span><span class="caption-text">Využití území a vrstva povodí IV. řádu spolu s jejich atributovými tabulkami.</span><a class="headerlink" href="#id3" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id4">
+<span id="ciselniky1"></span><img alt="../_images/ciselniky.png" class="middle" src="../_images/ciselniky.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 20 </span><span class="caption-text">Číselníky s informacemi o hydrologické skupině a hodnotami CN.</span><a class="headerlink" href="#id4" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="postup-zpracovani-v-grass-gis">
+<h2>Postup zpracování v GRASS GIS<a class="headerlink" href="#postup-zpracovani-v-grass-gis" title="Permalink to this heading">¶</a></h2>
+<section id="krok-1">
+<h3>Krok 1<a class="headerlink" href="#krok-1" title="Permalink to this heading">¶</a></h3>
+<p>V prvním kroku sjednotíme vrstvu hlavních půdních jednotek a
+komplexního průzkumu půd. Použijeme modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.overlay.html">v.overlay</a> a
+operaci překrytí <em>union</em>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.overlay<span class="w"> </span><span class="nv">ainput</span><span class="o">=</span>hpj<span class="w"> </span><span class="nv">binput</span><span class="o">=</span>kpp<span class="w"> </span><span class="nv">operator</span><span class="o">=</span>or<span class="w"> </span><span class="nv">output</span><span class="o">=</span>hpj_kpp
+</pre></div>
+</div>
+<p>Dále importujeme číselníky (<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.in.ogr.html">db.in.ogr</a>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.in.ogr<span class="w"> </span><span class="nv">input</span><span class="o">=</span>hpj_hydrsk.csv<span class="w"> </span><span class="nv">output</span><span class="o">=</span>hpj_hydrsk
+db.in.ogr<span class="w"> </span><span class="nv">input</span><span class="o">=</span>kpp_hydrsk.csv<span class="w"> </span><span class="nv">output</span><span class="o">=</span>kpp_hydrsk
+</pre></div>
+</div>
+<p>Zkontrolujeme obsah importovaných číselníků (tabulek) v prostředí
+GRASS GIS, případně aspoň jejich sloupů. Použijeme moduly
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.select.html">db.select</a> a <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.columns.html">db.columns</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.select<span class="w"> </span><span class="nv">table</span><span class="o">=</span>hpj_hydrsk
+db.select<span class="w"> </span><span class="nv">table</span><span class="o">=</span>kpp_hydrsk
+
+db.columns<span class="w"> </span><span class="nv">table</span><span class="o">=</span>hpj_hydrsk
+db.columns<span class="w"> </span><span class="nv">table</span><span class="o">=</span>kpp_hydrsk
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>V atributové tabulce hlavních půdních jednotek <span class="dbtable">hpj_hydrsk</span> je
+po importu datový typ atributu <span class="dbcolumn">HPJ</span> jako typ <em>DOUBLE
+PRECISION</em> (příkaz <code class="code docutils literal notranslate"><span class="pre">db.describe</span> <span class="pre">table=hpj_hydrsk</span></code>); je
+potřebné jej překonvertovat na celočíselný typ, t.j. <em>INTEGER</em>
+(kvůli spojení tabulek a číselníků pomocí
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.join.html">v.db.join</a>). Použijeme <span class="sqlcmd">ALTER</span> pro vytvorení
+atributu <span class="dbcolumn">HPJ_key</span> a <span class="sqlcmd">UPDATE</span> pro naplnění hodnot
+atributu.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.execute<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;alter table hpj_hydrsk add column HPJ_key int&quot;</span>
+db.execute<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;update hpj_hydrsk set HPJ_key = cast(HPJ as int)&quot;</span>
+</pre></div>
+</div>
+<p>Po úpravě tabulky <span class="dbtable">hpj_hydrsk</span> můžeme tuto tabulku připojit
+k atributům vektorové mapy <span class="map">hpj_kpp</span> pomocí klíče, konkrétně
+atributu <span class="dbcolumn">HPJ_key</span>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.join<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp<span class="w"> </span><span class="nv">column</span><span class="o">=</span>a_HPJ<span class="w"> </span><span class="nv">other_table</span><span class="o">=</span>hpj_hydrsk<span class="w"> </span><span class="nv">other_column</span><span class="o">=</span>HPJ
+</pre></div>
+</div>
+<p>Atributy v tabulce <span class="dbtable">hpj_kpp</span> po spojení zkontrolujeme či
+obsahují sloupce z číselníku a následně doplníme chybějící informace o
+hydrologické skupině <span class="dbcolumn">HydrSk</span> pomocí
+<span class="map">kpp_hydrsk</span>. Doplníme je ze sloupce <span class="dbcolumn">First_Hydr</span>
+vrstvy komplexního průzkumu půd. Využijeme modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.execute.html">db.execute</a> a SQL příkaz <span class="sqlcmd">JOIN</span>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.execute<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;UPDATE hpj_kpp SET HydrSk = (SELECT b.HydrSk FROM hpj_kpp AS a JOIN kpp_hydrsk as b ON a.b_KPP = b.KPP) WHERE HydrSk IS NULL&quot;</span>
+</pre></div>
+</div>
+<p>Obsah atributové tabulky <span class="map">hpj_kpp</span> zkontrolujeme pomocí <em>SQL
+Query Builder</em> a ověříme, zda všechny hodnoty hydrologické skupiny jsou
+vyplněné.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>SELECT<span class="w"> </span>cat,HydrSk<span class="w"> </span>FROM<span class="w"> </span>hpj_kpp<span class="w"> </span>WHERE<span class="w"> </span>HydrSk<span class="w"> </span>is<span class="w"> </span>NULL
+</pre></div>
+</div>
+<figure class="align-center" id="id5">
+<img alt="../_images/scs-cn-db-join.png" src="../_images/scs-cn-db-join.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 21 </span><span class="caption-text">Atributový dotaz s výsledkem hydrologické skupiny půd.</span><a class="headerlink" href="#id5" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Nastavíme <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/raster/tabulka-barev.html">tabulku barev</a> pro jednotlivé
+skupiny pomocí modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.colors.html">v.colors</a>. Kódy nelze použít, neboť
+tento modul podporuje pouze celočíselné hodnoty, proto je potřebné
+vytvořit nový atribut s jedinečnými hodnotami pro kódy. Nazveme ho
+<span class="dbcolumn">HydrSk_key</span> a bude obsahovat čísla 1 až 7 odpovídající
+kódům A až D. Použijeme moduly <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.addcolumn.html">v.db.addcolumn</a> a
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.execute.html">db.execute</a> a příkaz <span class="sqlcmd">UPDATE</span> jazyka
+<a class="reference external" href="http://cs.wikipedia.org/wiki/SQL">SQL</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.addcolumn<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp<span class="w"> </span><span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;HydrSk_key int&quot;</span>
+
+db.execute<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;update hpj_kpp set HydrSk_key = 1 where HydrSk = &#39;A&#39;;</span>
+<span class="s2">update hpj_kpp set HydrSk_key = 2 where HydrSk = &#39;AB&#39;;</span>
+<span class="s2">update hpj_kpp set HydrSk_key = 3 where HydrSk = &#39;B&#39;;</span>
+<span class="s2">update hpj_kpp set HydrSk_key = 4 where HydrSk = &#39;BC&#39;;</span>
+<span class="s2">update hpj_kpp set HydrSk_key = 5 where HydrSk = &#39;C&#39;;</span>
+<span class="s2">update hpj_kpp set HydrSk_key = 6 where HydrSk = &#39;CD&#39;;</span>
+<span class="s2">update hpj_kpp set HydrSk_key = 7 where HydrSk = &#39;D&#39;&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Nový sloupec je možné přidat i pomocí <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/vektorova_data/atributy.html">správce
+atributových dat</a>.</p>
+</div>
+<p>Do textového souboru <code class="file docutils literal notranslate"><span class="pre">colors.txt</span></code> vložíme pravidla vlastní
+barevné stupnice pro jednotlivé kategorie.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="m">1</span><span class="w"> </span>red
+<span class="m">2</span><span class="w"> </span>green
+<span class="m">3</span><span class="w"> </span>yellow
+<span class="m">4</span><span class="w"> </span>blue
+<span class="m">5</span><span class="w"> </span>brown
+<span class="m">6</span><span class="w"> </span>orange
+<span class="m">7</span><span class="w"> </span>purple
+</pre></div>
+</div>
+<p>Modulem <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.region.html">g.region</a> nastavíme výpočetní region na vektorovou
+mapu <span class="map">hpj_kpp</span> a konvertujeme vektorovou vrstvu na rastrovou,
+přiřadíme barevnou škálu a doplníme mimorámové údaje jako legendu a
+měřítko. Pro rasterizaci použijeme vhodné prostorové rozlišení, v
+našem případě 10m.</p>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Vektorovou vrstvu konvertujeme kvůli tomu, neboť zobrazit legendu je
+možné pouze pro rastrové data.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">vector</span><span class="o">=</span>hpj_kpp<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">10</span>
+v.to.rast<span class="w"> </span><span class="nv">input</span><span class="o">=</span>hpj_kpp<span class="w"> </span><span class="nv">output</span><span class="o">=</span>hpj_kpp_rst<span class="w"> </span><span class="nv">use</span><span class="o">=</span>attr<span class="w"> </span><span class="nv">attribute_column</span><span class="o">=</span>HydrSk_key
+</pre></div>
+</div>
+<figure class="align-center" id="id6">
+<img alt="../_images/1a.png" class="middle" src="../_images/1a.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 22 </span><span class="caption-text">Výsledná vizualizace hydrologických skupin půd (1: A, 2: AB, 3:
+B, 4: BC, 5: C, 6: CD a 7: D).</span><a class="headerlink" href="#id6" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p id="scs-cn-hpj-kpp-land">Přidáme informace o využití území pro každou plochu pomocí operace
+průniku <em>intersection</em> s datovou vrstvou využití území
+<span class="map">landuse</span>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.overlay<span class="w"> </span><span class="nv">ainput</span><span class="o">=</span>hpj_kpp<span class="w"> </span><span class="nv">binput</span><span class="o">=</span>landuse<span class="w"> </span><span class="nv">operator</span><span class="o">=</span>and<span class="w"> </span><span class="nv">output</span><span class="o">=</span>hpj_kpp_land
+</pre></div>
+</div>
+<p>Přidáme sloupec <span class="dbcolumn">LU_HydrSk</span> s informacemi o využití území a
+hydrologické skupině pro každou elementární plochu. Hodnoty budou ve
+tvaru <em>VyužitíÚzemí_KodHydrologickéSkupiny</em>, t.j. <em>LU_HydrSk</em>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.addcolumn<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;LU_HydrSk text&quot;</span>
+db.execute<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;update hpj_kpp_land set LU_HydrSk = b_LandUse || &#39;_&#39; || a_HydrSk&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Tuto operaci je možné provést i pomocí <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/vektorova_data/atributy.html">správce
+atributových dat</a> (<cite>Field
+Calculator</cite>)</p>
+</div>
+<p>Pomocí modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.select.html">db.select</a> anebo pomocí <em>správce atributových
+dat</em> vypíšeme počet všech kombinácí v sloupci <span class="dbcolumn">LU_HydrSk</span>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.select<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;select count(*) as comb_count from (select LU_HydrSk from hpj_kpp_land_1 group by LU_HydrSk)&quot;</span><span class="sb">`</span>
+</pre></div>
+</div>
+<figure class="align-center" id="id7">
+<img alt="../_images/2a.png" class="middle" src="../_images/2a.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 23 </span><span class="caption-text">Zobrazení části atributové tabulky a výpis počtu kombinací
+využití území a hydrologické skupiny.</span><a class="headerlink" href="#id7" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Určíme odpovídající hodnoty <span class="math notranslate nohighlight">\(CN\)</span>. Importujeme je do souboru
+<span class="dbtable">LU_CN.xls</span> a následně připojíme pomocí <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.join.html">v.db.join</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.in.ogr<span class="w"> </span><span class="nv">input</span><span class="o">=</span>lu_hydrsk_cn.csv<span class="w"> </span><span class="nv">output</span><span class="o">=</span>lu_hydrsk_cn
+v.db.join<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">column</span><span class="o">=</span>LU_HydrSk<span class="w"> </span><span class="nv">other_table</span><span class="o">=</span>lu_hydrsk_cn<span class="w"> </span><span class="nv">other_column</span><span class="o">=</span>LU_HydrSk<span class="w"> </span><span class="nv">subset_columns</span><span class="o">=</span>CN
+</pre></div>
+</div>
+<p>Výsledné informace jako kód hydrologické skupiny, kód využití území
+a kód <span class="math notranslate nohighlight">\(CN\)</span> zobrazíme v atributové tabulce SQL dotazem
+<code class="code docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">cat,a_HydrSk,b_LandUse,CN</span> <span class="pre">FROM</span> <span class="pre">hpj_kpp_land_1</span></code>.</p>
+<p>Následně vytvoříme rastrovou vrstvu s hodnotami <span class="math notranslate nohighlight">\(CN\)</span>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">vector</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">10</span>
+v.to.rast<span class="w"> </span><span class="nv">input</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">output</span><span class="o">=</span>hpj_kpp_land_rst<span class="w"> </span><span class="nv">use</span><span class="o">=</span>attr<span class="w"> </span><span class="nv">attribute_column</span><span class="o">=</span>CN
+r.colors<span class="w"> </span>-e<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land_rst<span class="w"> </span><span class="nv">color</span><span class="o">=</span>aspectcolr
+</pre></div>
+</div>
+<figure class="align-center" id="id8">
+<img alt="../_images/3a.png" class="middle" src="../_images/3a.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 24 </span><span class="caption-text">Kódy <span class="math notranslate nohighlight">\(CN\)</span> pro každou elementární plochu využití půdy v
+zájmovém území.</span><a class="headerlink" href="#id8" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Atributová tabulka vrstvy <span class="map">povodi</span> obsahuje údaje o návrhových
+srážkách s dobou opakovaní 5, 10, 20, 50 a 100 let. Je potřebné přidat
+tuto informaci ke každé elementární ploše.</p>
+<figure class="align-center" id="id9">
+<img alt="../_images/5a.png" class="middle" src="../_images/5a.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 25 </span><span class="caption-text">Atributy související s návrhovými srážkami s různou dobou opakovaní.</span><a class="headerlink" href="#id9" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Vrstvu <span class="map">hpj_kpp_land</span> sjednotíme s vrstvou <span class="map">povodi</span>,
+na což využijeme modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.overlay.html">v.overlay</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.overlay<span class="w"> </span><span class="nv">ainput</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">binput</span><span class="o">=</span>povodi<span class="w"> </span><span class="nv">operator</span><span class="o">=</span>or<span class="w"> </span><span class="nv">output</span><span class="o">=</span>hpj_kpp_land_pov
+</pre></div>
+</div>
+<p>Po sjednotení vidíme, že došlo k rozdělení území na menší
+plochy. Přesný počet je možné zjistit použitím <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.select.html">db.select</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.select<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;select count (*) as elem_pocet from hpj_kpp_land_1&quot;</span>
+db.select<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;select count (*) as elem_pocet from hpj_kpp_land_pov_1&quot;</span>
+</pre></div>
+</div>
+<figure class="align-center" id="id10">
+<img alt="../_images/6a.png" class="small" src="../_images/6a.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 26 </span><span class="caption-text">Počet elementárních ploch před a po sjednocení s vrstvou povodí.</span><a class="headerlink" href="#id10" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="kroky-2-a-3">
+<h3>Kroky 2 a 3<a class="headerlink" href="#kroky-2-a-3" title="Permalink to this heading">¶</a></h3>
+<p>Pro každou elementární plochu vypočítame její výměru, parametr <span class="math notranslate nohighlight">\(A\)</span>
+(maximální ztráta) a parametr <span class="math notranslate nohighlight">\(I_{a}\)</span> (počáteční ztráta, což je
+5 % z <span class="math notranslate nohighlight">\(A\)</span>)</p>
+<div class="math notranslate nohighlight">
+\[A = 25.4 \times (\frac{1000}{CN} - 10)\]</div>
+<div class="math notranslate nohighlight">
+\[I_a = 0.2 \times A\]</div>
+<p>Do atributové tabulky <cite>hpj_kpp_land_pov</cite> přidáme nové sloupce
+<span class="dbcolumn">vymera</span>, <span class="dbcolumn">A</span>, <span class="dbcolumn">I_a</span> vypočítame výměru,
+parametr <span class="math notranslate nohighlight">\(A\)</span> a parametr <span class="math notranslate nohighlight">\(I_{a}\)</span>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.addcolumn<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land_pov<span class="w"> </span><span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;vymera double,A double,I_a double&quot;</span>
+v.to.db<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land_pov<span class="w"> </span><span class="nv">option</span><span class="o">=</span>area<span class="w"> </span><span class="nv">columns</span><span class="o">=</span>vymera
+v.db.update<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land_pov<span class="w"> </span><span class="nv">column</span><span class="o">=</span>A<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="s2">&quot;24.5 * (1000 / a_CN - 10)&quot;</span>
+v.db.update<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land_pov<span class="w"> </span><span class="nv">column</span><span class="o">=</span>I_a<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="s2">&quot;0.2 * A&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="kroky-4-a-5">
+<h3>Kroky 4 a 5<a class="headerlink" href="#kroky-4-a-5" title="Permalink to this heading">¶</a></h3>
+<p>Přidáme další nové sloupce do atributové tabulky o parametry <span class="math notranslate nohighlight">\(H_{o}\)</span>
+a <span class="math notranslate nohighlight">\(O_{p}\)</span> a vypočítame jejich hodnoty pomocí <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.update.html">v.db.update</a>.</p>
+<div class="math notranslate nohighlight">
+\[H_O = \frac{(H_S − 0.2 \times A)^2}{H_S + 0.8 \times A}\]</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>V dalších krocích budeme uvažovat průměrný úhrn návrhové srážky
+<span class="math notranslate nohighlight">\(H_{s}\)</span> = 32 mm. Při úhrnu s dobou opakovaní 2 roky (atribut
+<span class="dbcolumn">H_002_120</span>) či dobou 5, 10, 20, 50 anebo 100 let by byl
+postup obdobný.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Hodnota v čitateli musí být kladná, resp. nesmíme umocňovat záporné
+číslo. V připadě, že čitatel je záporný, výška přímého odtoku je
+rovná nule. Pro vyřešení této situace si pomůžeme novým sloupcem
+v atributové tabulce, který nazveme <span class="dbcolumn">HOklad</span>.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.addcolumn<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land_pov<span class="w"> </span><span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;HOklad double, HO double, OP double&quot;</span>
+v.db.update<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land_pov<span class="w"> </span><span class="nv">column</span><span class="o">=</span>HOklad<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="s2">&quot;(32 - 0.2 * A)&quot;</span>
+db.execute<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;update hpj_kpp_land_pov_1 set HOklad = 0 where HOklad &lt; 0&quot;</span>
+v.db.update<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land_pov<span class="w"> </span><span class="nv">column</span><span class="o">=</span>HO<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="s2">&quot;(HOklad * HOklad) / (32 + 0.8 * A)&quot;</span>
+</pre></div>
+</div>
+<p>Nakonec vypočítáme objem <span class="math notranslate nohighlight">\(O_{p}\)</span> a výsledky zobrazíme v rastrové podobě.</p>
+<div class="math notranslate nohighlight">
+\[O_P = P_P \times \frac{H_O}{1000}\]</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.update<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land_pov<span class="w"> </span><span class="nv">column</span><span class="o">=</span>OP<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="s2">&quot;vymera * (HO / 1000)&quot;</span>
+v.to.rast<span class="w"> </span><span class="nv">input</span><span class="o">=</span>hpj_kpp_land_pov<span class="w"> </span><span class="nv">output</span><span class="o">=</span>HO<span class="w"> </span><span class="nv">use</span><span class="o">=</span>attr<span class="w"> </span><span class="nv">attribute_column</span><span class="o">=</span>HO
+v.to.rast<span class="w"> </span><span class="nv">input</span><span class="o">=</span>hpj_kpp_land_pov<span class="w"> </span><span class="nv">output</span><span class="o">=</span>OP<span class="w"> </span><span class="nv">use</span><span class="o">=</span>attr<span class="w"> </span><span class="nv">attribute_column</span><span class="o">=</span>OP
+</pre></div>
+</div>
+<figure class="align-center" id="id11">
+<img alt="../_images/7a.png" class="middle" src="../_images/7a.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 27 </span><span class="caption-text">Výška v mm vlevo a objem v <span class="math notranslate nohighlight">\(m^{3}\)</span> vpravo přímého odtoku pro
+elementární plochy.</span><a class="headerlink" href="#id11" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Vypočítame a zobrazíme průměrné hodnoty přímého odtoku pro jednotlivé
+povodí.  Přitom je potrebné nastavit rozlišení výpočetního regionu,
+překopírovat mapu povodí do aktuálneho mapsetu a nastaviť vhodnou
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/raster/tabulka-barev.html">barevnost výsledku</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">vector</span><span class="o">=</span>kpp<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">10</span>
+v.rast.stats<span class="w"> </span><span class="nv">map</span><span class="o">=</span>povodi<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>HO<span class="w"> </span><span class="nv">column_prefix</span><span class="o">=</span>ho
+v.to.rast<span class="w"> </span><span class="nv">input</span><span class="o">=</span>povodi<span class="w"> </span><span class="nv">output</span><span class="o">=</span>HO_pov<span class="w"> </span><span class="nv">use</span><span class="o">=</span>attr<span class="w"> </span><span class="nv">attribute_column</span><span class="o">=</span>ho_average
+r.colors<span class="w"> </span><span class="nv">map</span><span class="o">=</span>HO_pov<span class="w"> </span><span class="nv">color</span><span class="o">=</span>bcyr
+
+v.rast.stats<span class="w"> </span><span class="nv">map</span><span class="o">=</span>povodi<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>OP<span class="w"> </span><span class="nv">column_prefix</span><span class="o">=</span>op
+v.to.rast<span class="w"> </span><span class="nv">input</span><span class="o">=</span>povodi<span class="w"> </span><span class="nv">output</span><span class="o">=</span>OP_pov<span class="w"> </span><span class="nv">use</span><span class="o">=</span>attr<span class="w"> </span><span class="nv">attribute_column</span><span class="o">=</span>op_average
+r.colors<span class="w"> </span><span class="nv">map</span><span class="o">=</span>OP_pov<span class="w"> </span><span class="nv">color</span><span class="o">=</span>bcyr
+</pre></div>
+</div>
+<figure class="align-center" id="id12">
+<img alt="../_images/8a.png" class="middle" src="../_images/8a.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 28 </span><span class="caption-text">Výpočet statistických údajů pro každé povodí.</span><a class="headerlink" href="#id12" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id13">
+<img alt="../_images/9a.png" class="middle" src="../_images/9a.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 29 </span><span class="caption-text">Průměrná výška odtoku v <span class="math notranslate nohighlight">\(mm\)</span> a průměrný objem odtoku v <span class="math notranslate nohighlight">\(m^{3}\)</span>
+povodí v zájmovém území.</span><a class="headerlink" href="#id13" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+<section id="vystupni-data">
+<h2>Výstupní data<a class="headerlink" href="#vystupni-data" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="map">hpj_kpp</span> - sjednocení <span class="map">hpj</span> a <span class="map">kpp</span> (atributy aj z číselníku
+<span class="map">hpj</span>),</p></li>
+<li><p><span class="map">hpj_kpp_land</span> - průnik <span class="map">hpj_kpp</span> a <span class="map">landuse</span>,</p></li>
+<li><p><span class="map">hpj_kpp_land_pov</span> - průnik <span class="map">hpj_kpp_land</span> a <span class="map">povodi</span>,</p></li>
+<li><p><span class="map">hpj_kpp_rst</span> - rastr s hodnotami <em>HydrSk</em>,</p></li>
+<li><p><span class="map">hpj_kpp_land_rst</span> - rastr s hodnotami <em>CN</em>,</p></li>
+<li><p><span class="map">HO</span>, resp. <span class="map">HO_pov</span> - rastr s výškou odtoku <span class="math notranslate nohighlight">\(mm\)</span>
+pro elementární plochy, resp. pre povodí,</p></li>
+<li><p><span class="map">OP</span>, resp. <span class="map">OP_pov</span> - rastr s hodnotami objemu odtoku v
+<span class="math notranslate nohighlight">\(m^{3}\)</span> pro elementární plochy, resp. povodí.</p></li>
+</ul>
+</section>
+<section id="pouzite-zdroje">
+<h2>Použité zdroje<a class="headerlink" href="#pouzite-zdroje" title="Permalink to this heading">¶</a></h2>
+<p id="o1">[1] <a class="reference external" href="http://hydro.upol.cz/?page_id=15">HYDRO.upol.cz</a></p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Hydrologie</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Metoda SCS CN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usle.html">Průměrná dlouhodobá ztráta půdy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="index.html" title="Hydrologie"
+              >předchozí</a> |
+            <a href="usle.html" title="Průměrná dlouhodobá ztráta půdy"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

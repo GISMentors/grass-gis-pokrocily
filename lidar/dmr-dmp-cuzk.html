@@ -1,0 +1,651 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Tvorba DMR a DMP &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Zpracování obrazových dat" href="../zod/index.html" />
+    <link rel="prev" title="Import lidarových dat" href="import.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="import.html" title="Import lidarových dat"
+             accesskey="P">předchozí</a> |
+          <a href="../zod/index.html" title="Zpracování obrazových dat"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="tvorba-dmr-a-dmp">
+<h1>Tvorba DMR a DMP<a class="headerlink" href="#tvorba-dmr-a-dmp" title="Permalink to this heading">¶</a></h1>
+<p>Tato kapitola shromažďuje informace, jak pracovat s daty <strong>digitálního
+modelu reliéfu a povrchu</strong> poskytovaných <a class="reference external" href="http://www.cuzk.cz/">Českým úřadem zeměměřičským
+a katastrálním</a> v systému GRASS GIS.</p>
+<p>Tyto produkty poskytuje ČÚZK ve dvou formátech:</p>
+<ol class="arabic simple">
+<li><p>textovém XYZ</p></li>
+<li><p>binárním LAS, resp. komprimované formě LAZ</p></li>
+</ol>
+<p>Souřadnice X,Y jsou referencovány v souřadnicovém systému S-JTSK
+(<a class="reference external" href="http://epsg.io/5514">EPSG:5514</a>), souřadnice H (nadmořská výška) ve výškovém referenčním
+systému Balt po vyrovnání (Bpv).</p>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Tato data nejsou poskytována v režimu otevřených dat, ČÚZK
+nicméně zveřejnil vzorová data volně ke stažení <a class="reference external" href="http://geoportal.cuzk.cz/UKAZKOVA_DATA/VYSKOPIS.zip">zde</a>. Ukázkový
+dataset obsahuje data pouze v textovém formátu XYZ.</p>
+</div>
+<p>Postup importu lidarových dat je popsán v <a class="reference internal" href="import.html"><span class="doc">předcházející kapitole</span></a>.</p>
+<section id="digitalni-model-reliefu">
+<h2>Digitální model reliéfu<a class="headerlink" href="#digitalni-model-reliefu" title="Permalink to this heading">¶</a></h2>
+<p>Data pro <a class="reference external" href="http://cs.wikipedia.org/wiki/Digitální model terénu">digitální model reliéfu</a>, tj. digitální reprezentaci modelu reliéfu <em>bez</em> umělých a
+přírodních objektů (např. vegetace nebo budovy) poskytuje ČÚZK ve dvou
+verzích:</p>
+<ul class="simple" id="dmr4g">
+<li><p><strong>DMR4G</strong> - diskrétní body v pravidelné síti (5 x 5 m) bodů o
+souřadnicích X,Y,H s úplnou střední chybou výšky 0,3 m v odkrytém
+terénu a 1 m v zalesněném terénu. Další informace <a class="reference external" href="http://geoportal.cuzk.cz/(S(kle1ef454jwgniffefmzxmed))/Default.aspx?lng=CZ&amp;mode=TextMeta&amp;side=vyskopis&amp;metadataID=CZ-CUZK-DMR4G-V&amp;mapid=8&amp;menu=301">zde</a>.</p></li>
+<li><p><strong>DMR5G</strong> - diskrétní body v nepravidelné trojúhelníkové síti (TIN) bodů
+o souřadnicích X,Y,H s úplnou střední chybou výšky 0,18 m v odkrytém
+terénu a 0,3 m v zalesněném terénu. Další informace <a class="reference external" href="http://geoportal.cuzk.cz/(S(kle1ef454jwgniffefmzxmed))/Default.aspx?lng=CZ&amp;mode=TextMeta&amp;side=vyskopis&amp;metadataID=CZ-CUZK-DMR5G-V&amp;mapid=8&amp;menu=302">zde</a>.</p></li>
+</ul>
+</section>
+<section id="digitalni-model-povrchu">
+<h2>Digitální model povrchu<a class="headerlink" href="#digitalni-model-povrchu" title="Permalink to this heading">¶</a></h2>
+<p>Data pro <a class="reference external" href="http://cs.wikipedia.org/wiki/Digitální model povrchu">digitální model povrchu</a> (DMP), tj. digitální reprezentaci modelu reliéfu <em>včetně</em>
+umělých a přírodních objektů poskytuje ČÚZK v současnosti v jedné
+verzi, a to jako:</p>
+<ul class="simple">
+<li><p><strong>DMP1G</strong> - diskrétní body v nepravidelné sítě výškových bodů
+(TIN) s úplnou střední chybou výšky 0,4 m pro přesně vymezené
+objekty (budovy) a 0,7 m pro objekty přesně neohraničené (lesy a
+další prvky rostlinného pokryvu). Další informace <a class="reference external" href="http://geoportal.cuzk.cz/(S(kle1ef454jwgniffefmzxmed))/Default.aspx?lng=CZ&amp;mode=TextMeta&amp;side=vyskopis&amp;metadataID=CZ-CUZK-DMP1G-V&amp;mapid=8&amp;menu=303">zde</a>.</p></li>
+</ul>
+<p>Následující kapitoly popisují typické postupy tvorby rastrové či TIN
+reprezentace DMR/DMP.</p>
+</section>
+<section id="tvorba-dmr-dmp-reprezentace">
+<h2>Tvorba DMR/DMP reprezentace<a class="headerlink" href="#tvorba-dmr-dmp-reprezentace" title="Permalink to this heading">¶</a></h2>
+<p>Digitální model reliéfu či povrchu lze v systému GRASS vytvořit
+několika způsoby. První uvedený postup je vhodný především pro
+DMR4G. Další tři postupy jsou aplikovatelné jak na DMR5G tak DMP1G.</p>
+<p><strong>1. Vytvoření rastrové reprezentace převzetím hodnot vstupních bodových dat</strong></p>
+<p>Import vstupních dat do rastrové mapy s prostorových rozlišením
+odvozeným ze vstupu. Jednoduchý postup vhodný především pro vstupní
+bodová data v pravidelné mřížce. Příklad v kapitole
+<a class="reference internal" href="#create-dmr4g"><span class="std std-ref">Vytvoření DMR převzetím hodnot pravidelné mřížky bodových dat DMR4G</span></a>.</p>
+<p><strong>2. Vytvoření rastrové reprezentace s vyplněním „děr“</strong></p>
+<p>Import vstupních dat do rastrové mapy s prostorových rozlišením
+odvozeným ze vstupu. Interpolace hodnot pouze v místech, kde chybí
+vstupní data. Příklad v kapitole <a class="reference internal" href="#create-dmr5g-holes"><span class="std std-ref">Vytvoření DMR kombinací převzetí hodnot DMR5G a interpolací chybějících hodnot</span></a>.</p>
+<p><strong>3. Spline interpolace z importovaných vektorových bodových dat</strong></p>
+<p>Import vstupních dat do vektorové bodové mapy, interpolace výsledného
+povrchu pomocí modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.surf.rst.html">v.surf.rst</a>. Časově náročné. Vhodné
+pro vytvoření DMT s vysokým prostorovým rozlišením. Příklad v kapitole
+<a class="reference internal" href="#create-dmr5g-spline"><span class="std std-ref">Vytvoření DMR metodou spline na základě DMR5G</span></a>.</p>
+<p><strong>4. Vytvoření TIN reprezentace</strong></p>
+<p>Vytvoření TIN (<a class="reference external" href="http://en.wikipedia.org/wiki/Triangulated irregular network">Triangulated irregular network</a>)
+reprezentace na základě vstupních bodových dat. Většina navazujících
+nástrojů pro analýzu topografického povrchu v systému GRASS podporuje
+pouze rastrovou reprezentaci digitálního modelu reliéfu či
+povrchu. Vhodné při exportu TIN a navazující operace již mimo systém
+GRASS GIS. Příklad v kapitole <a class="reference internal" href="#create-dmr5g-tin"><span class="std std-ref">Vytvoření DMR v podobě TIN reprezentace</span></a>.</p>
+<section id="vytvoreni-dmr-prevzetim-hodnot-pravidelne-mrizky-bodovych-dat-dmr4g">
+<span id="create-dmr4g"></span><h3>Vytvoření DMR převzetím hodnot pravidelné mřížky bodových dat DMR4G<a class="headerlink" href="#vytvoreni-dmr-prevzetim-hodnot-pravidelne-mrizky-bodovych-dat-dmr4g" title="Permalink to this heading">¶</a></h3>
+<p>V prvním kroku zjistíme hraniční souřadnice importovaných dat, viz
+kapitola <a class="reference internal" href="import.html#lidar-import-scan"><span class="std std-ref">import dat</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.in.xyz<span class="w"> </span>-sg<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_4g.xyz<span class="w"> </span><span class="nv">separator</span><span class="o">=</span>space
+</pre></div>
+</div>
+<p>Na základě toho nastavíme výpočetní region a to tak, aby střed buňky
+odpovídal vstupní pravidelné mřížce bodů. Prostorové rozlišení
+nastavíme na 5m, což odpovídá vzdálenosti bodů DMR4G.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">n</span><span class="o">=</span>-1088005<span class="w"> </span><span class="nv">s</span><span class="o">=</span>-1090000<span class="w"> </span><span class="nv">e</span><span class="o">=</span>-625005<span class="w"> </span><span class="nv">w</span><span class="o">=</span>-627500<span class="w"> </span><span class="nv">b</span><span class="o">=</span><span class="m">461</span>.5<span class="w"> </span><span class="nv">t</span><span class="o">=</span><span class="m">554</span>.31
+g.region<span class="w"> </span><span class="nv">n</span><span class="o">=</span>n+2.5<span class="w"> </span><span class="nv">s</span><span class="o">=</span>s-2.5<span class="w"> </span><span class="nv">w</span><span class="o">=</span>w-2.5<span class="w"> </span><span class="nv">e</span><span class="o">=</span>e+2.5<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">5</span>
+</pre></div>
+</div>
+<p>Následně na to data do nastaveného výpočetního regionu naimportujeme.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.in.xyz<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_4g.xyz<span class="w"> </span><span class="nv">separator</span><span class="o">=</span>space<span class="w"> </span><span class="nv">output</span><span class="o">=</span>HLIN04_4g
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Podobný postup by bylo možné aplikovat na binární vstupní
+data ve formátu LAS/LAZ a modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.in.lidar.html">r.in.lidar</a>,
+viz kapitola <a class="reference internal" href="import.html#lidar-las-raster-steps"><span class="std std-ref">import dat</span></a>.</p>
+</div>
+<figure class="align-center" id="id2">
+<img alt="../_images/dmr4g.png" src="../_images/dmr4g.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 51 </span><span class="caption-text">Ukázka výsledného produktu digitálního modelu reliéfu vytvořeno na
+bázi DMR4G převzetím hodnot vstupních bodů. Na obrázku jsou pro
+ilustraci vykreslena vstupní pravidelná síť bodů DMR4G a výstupní
+mřížka rastrové mapy.</span><a class="headerlink" href="#id2" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Zájmové území by nemělo obsahovat místa bez dat. To můžeme
+zkontrolovat pomocí modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.univar.html">r.univar</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.univar<span class="w"> </span>HLIN04_4g
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="n">total</span> <span class="n">null</span> <span class="n">cells</span><span class="p">:</span> <span class="mi">0</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</div>
+<figure class="align-center" id="id3">
+<img alt="../_images/dmr4g-3d.png" class="middle" src="../_images/dmr4g-3d.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 52 </span><span class="caption-text">Vizualizace terénu na bázi DMR4G ve 3D pohledu.</span><a class="headerlink" href="#id3" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="vytvoreni-dmr-kombinaci-prevzeti-hodnot-dmr5g-a-interpolaci-chybejicich-hodnot">
+<span id="create-dmr5g-holes"></span><h3>Vytvoření DMR kombinací převzetí hodnot DMR5G a interpolací chybějících hodnot<a class="headerlink" href="#vytvoreni-dmr-kombinaci-prevzeti-hodnot-dmr5g-a-interpolaci-chybejicich-hodnot" title="Permalink to this heading">¶</a></h3>
+<p>Začneme obdobně jako v <a class="reference internal" href="#create-dmr4g"><span class="std std-ref">předchozí kapitole</span></a>
+importem vstupních dat do rastrové reprezentace podle toho, zda jsou
+vstupní data dostupná v <a class="reference internal" href="import.html#lidar-xyz-raster"><span class="std std-ref">textovém</span></a> nebo
+<a class="reference internal" href="import.html#lidar-las-raster"><span class="std std-ref">binárním</span></a> formátu. Příklad níže ukazuje
+postup pro textová data.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.in.xyz<span class="w"> </span>-sg<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_5g.xyz<span class="w"> </span><span class="nv">separator</span><span class="o">=</span>space
+g.region<span class="w"> </span><span class="nv">n</span><span class="o">=</span>-1088000.076<span class="w"> </span><span class="nv">s</span><span class="o">=</span>-1090000.059<span class="w"> </span><span class="nv">e</span><span class="o">=</span>-624999.829<span class="w"> </span><span class="nv">w</span><span class="o">=</span>-627499.828<span class="w"> </span><span class="nv">b</span><span class="o">=</span><span class="m">461</span>.312<span class="w"> </span><span class="nv">t</span><span class="o">=</span><span class="m">554</span>.334
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>ZÚ poskytuje výškopisná data po dlaždicích SM5 (2x2.5 km). V
+tomto kontextu by bylo vhodnější načíst data do výpočetního regionu
+zarovnaného dle kladu SM5, tj. na celá čísla:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">n</span><span class="o">=</span>-1088000<span class="w"> </span><span class="nv">s</span><span class="o">=</span>-1090000<span class="w"> </span><span class="nv">e</span><span class="o">=</span>-625000<span class="w"> </span><span class="nv">w</span><span class="o">=</span>-627500<span class="w"> </span><span class="nv">b</span><span class="o">=</span><span class="m">461</span>.312<span class="w"> </span><span class="nv">t</span><span class="o">=</span><span class="m">554</span>.334
+</pre></div>
+</div>
+</div>
+<p id="dmr5g-res">V našem případě nastavíme prostorové rozlišení na 3 metry (vycházíme z
+průměrné hustoty vstupních bodů, viz <a class="reference internal" href="import.html#v-outlier"><span class="std std-ref">poznámky k importu
+vektorových dat</span></a>). Předtím je samozřejmě nutné importovat
+data do vektorové reprezentace, postup je uveden v kapitole
+<a class="reference internal" href="#create-dmr5g-spline"><span class="std std-ref">Vytvoření DMR metodou spline na základě DMR5G</span></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Estimated</span> <span class="n">point</span> <span class="n">density</span><span class="p">:</span> <span class="mf">0.1102</span>
+<span class="n">Estimated</span> <span class="n">mean</span> <span class="n">distance</span> <span class="n">between</span> <span class="n">points</span><span class="p">:</span> <span class="mf">3.012</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">region</span> <span class="n">res</span><span class="o">=</span><span class="mi">3</span> <span class="o">-</span><span class="n">a</span>
+</pre></div>
+</div>
+<p>Poté data naimportujeme:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.in.xyz<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_5g.xyz<span class="w"> </span><span class="nv">separator</span><span class="o">=</span>space<span class="w"> </span><span class="nv">output</span><span class="o">=</span>HLIN04_5g
+</pre></div>
+</div>
+<p>Rastrová mapa bude vzhledem k povaze dat DMR5G obsahovat místa bez dat
+(no-data). V našem případě jde téměř o polovinu buněk(!) Tato místa se
+bude snažit v dalším kroku vyplnit na základně interpolovaných hodnot.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.univar<span class="w"> </span><span class="nv">map</span><span class="o">=</span>HLIN04_5g
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">total</span> <span class="n">null</span> <span class="ow">and</span> <span class="n">non</span><span class="o">-</span><span class="n">null</span> <span class="n">cells</span><span class="p">:</span> <span class="mi">557112</span>
+<span class="n">total</span> <span class="n">null</span> <span class="n">cells</span><span class="p">:</span> <span class="mi">249326</span>
+</pre></div>
+</div>
+<figure class="align-center" id="id4">
+<img alt="../_images/dmr5g-holes.png" src="../_images/dmr5g-holes.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 53 </span><span class="caption-text">Importovaná dlaždice DMR5G do rastrové reprezentace.</span><a class="headerlink" href="#id4" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Pro vyplnění chybějících hodnot DMR použijeme modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.fillnulls.html">r.fillnulls</a>. Modul podporuje tři různé metody interpolace:
+<em>rst</em> (<a class="reference external" href="http://cs.wikipedia.org/wiki/spline">spline</a>, tj. metoda použitá v kapitole
+<a class="reference internal" href="#create-dmr5g-spline"><span class="std std-ref">Vytvoření DMR metodou spline na základě DMR5G</span></a>), <em>bilinear</em> (<a class="reference external" href="http://cs.wikipedia.org/wiki/bilinear">bilinear</a>),
+<em>bicubic</em> (<a class="reference external" href="http://cs.wikipedia.org/wiki/Bikubická interpolace">bicubic</a>). Pro DMR je
+vhodná metoda spline (<em>rst</em>). Nicnémě vzhledem k její časové
+náročnosti (desítky minut na uvedené dlaždici) zvolíme v tomto případě
+akceptovatelnou bikubickou interpolaci (<em>bicubic</em>).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.fillnulls<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_5g<span class="w"> </span><span class="nv">output</span><span class="o">=</span>HLIN04_5g_filled<span class="w"> </span><span class="nv">method</span><span class="o">=</span>bicubic
+</pre></div>
+</div>
+<figure class="align-center" id="id5">
+<img alt="../_images/dmr5g-filled.png" src="../_images/dmr5g-filled.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 54 </span><span class="caption-text">Importovaná dlaždice DMR5G po interpolaci chybějících
+hodnot. Barevná tabulka nastavena na <em>elevation</em>.</span><a class="headerlink" href="#id5" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id6">
+<img alt="../_images/dmr5g-3d.png" class="middle" src="../_images/dmr5g-3d.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 55 </span><span class="caption-text">Vizualizace terénu na bázi DMR5G ve 3D pohledu.</span><a class="headerlink" href="#id6" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Velmi dobrou alternativou k výše uvedenému modulu je
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.fill.stats.html">r.fill.stats</a>. Ten je určen k rychlému doplnění chybějících
+hodnot na základě statistiky vstupních dat. Výchozí metoda (<em>wmean</em>) v
+podstatě odpovídá interpolační metodě <a class="reference external" href="http://cs.wikipedia.org/wiki/IDW">IDW</a>, <em>mean</em> poté
+aplikaci „low-pass filru“. Dále jsou dostupné metody <em>median</em>,
+<em>mode</em>. Modul je ideální pro zpracovaní velkého objemu dat ve velmi
+vysokém rozlišení. Na rozdíl od <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.fillnulls.html">r.fillnulls</a> interpoluje
+chybějící hodnoty pouze v daném okolí definovaném parametrem
+<code class="xref std std-option docutils literal notranslate"><span class="pre">cells</span></code> (výchozí je okolí 8 buněk). Tento postup je vhodný v
+případě, že místa s chybějícími hodnotami tvoří menší celky. Což není
+náš případ, kdy počet chybějících hodnot dosahuje téměř 50%.</p>
+</section>
+<section id="vytvoreni-dmr-metodou-spline-na-zaklade-dmr5g">
+<span id="create-dmr5g-spline"></span><h3>Vytvoření DMR metodou spline na základě DMR5G<a class="headerlink" href="#vytvoreni-dmr-metodou-spline-na-zaklade-dmr5g" title="Permalink to this heading">¶</a></h3>
+<p>Lidarová data importujeme do vektorové reprezentace, postup pro
+<a class="reference internal" href="import.html#lidar-import-xyz-vektor"><span class="std std-ref">textový</span></a> a <a class="reference internal" href="import.html#lidar-import-las-vektor"><span class="std std-ref">binární</span></a> formát v kapitole <a class="reference internal" href="import.html"><span class="doc">Import lidarových dat</span></a>. Příklad
+níže ukazuje import dat v textovém formátu.</p>
+<div class="highlight-bash notranslate" id="lidar-import-v-in-ascii"><div class="highlight"><pre><span></span>v.in.ascii<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_5g.xyz<span class="w"> </span><span class="nv">output</span><span class="o">=</span>HLIN04_5g<span class="w"> </span><span class="nv">separator</span><span class="o">=</span>space<span class="w"> </span><span class="nv">z</span><span class="o">=</span><span class="m">3</span><span class="w"> </span>-tbz
+</pre></div>
+</div>
+<p>V našem případě zvolíme prostorové rozlišení 3 metry (odvozené z
+průměrné hustoty vstupních bodů, viz <a class="reference internal" href="#dmr5g-res"><span class="std std-ref">předchozí kapitola</span></a>).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">vector</span><span class="o">=</span>HLIN04_5g<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">3</span><span class="w"> </span>-a
+</pre></div>
+</div>
+<p>Poté spustíme proces interpolace:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.surf.rst<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_5g<span class="w"> </span><span class="nv">elevation</span><span class="o">=</span>HLIN04_5g
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Důležité</p>
+<p>Modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.surf.rst.html">v.surf.rst</a> patří mezi extrémně
+výpočetně náročné nástroje. Na testovacím PC trvala interpolace pro
+výše zmíněná data 30 min.</p>
+<p>Od verze GRASS 7.4 podporuje modul paralelizaci výpočtu, což může
+vést k signifikantnímu zrychlení výpočtu. V našem případě rozložení
+výpočtu na 12 jader CPU (parametr <code class="xref std std-option docutils literal notranslate"><span class="pre">nprocs=12</span></code>) vedlo ke
+snížení výpočetního času na 10 min.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.surf.rst<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_5g<span class="w"> </span><span class="nv">elevation</span><span class="o">=</span>HLIN04_5g<span class="w"> </span><span class="nv">nprocs</span><span class="o">=</span><span class="m">12</span>
+</pre></div>
+</div>
+</div>
+<figure class="align-center" id="id7">
+<img alt="../_images/dmr5g.png" class="middle" src="../_images/dmr5g.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 56 </span><span class="caption-text">Ukázka výsledného produktu digitálního modelu reliéfu vytvořeno na
+bázi DMR5G metodou spline s rozlišením 3m.</span><a class="headerlink" href="#id7" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id8">
+<img alt="../_images/dmr4g-vs-5g.png" src="../_images/dmr4g-vs-5g.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 57 </span><span class="caption-text">Porovnání vytvořených DMR převzetím hodnot DMR4G při rozlišení 5m a
+interpolací spline v rozlišení 3m.</span><a class="headerlink" href="#id8" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id9">
+<img alt="../_images/dsm-cuzk.png" class="middle" src="../_images/dsm-cuzk.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 58 </span><span class="caption-text">Ukázka výsledného produktu digitálního modelu povrchu vytvořeného
+spline interpolací v prostorovém rozlišení 2.5m.</span><a class="headerlink" href="#id9" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>porovnat modely spline vs. bicubic</p>
+</div>
+</section>
+<section id="vytvoreni-dmr-v-podobe-tin-reprezentace">
+<span id="create-dmr5g-tin"></span><h3>Vytvoření DMR v podobě TIN reprezentace<a class="headerlink" href="#vytvoreni-dmr-v-podobe-tin-reprezentace" title="Permalink to this heading">¶</a></h3>
+<p>Vstupní data importujeme do vektorové mapy podobně jako v
+<a class="reference internal" href="#lidar-import-v-in-ascii"><span class="std std-ref">předcházejícím případě</span></a>. Pomocí modulu
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.delaunay.html">v.delaunay</a> vytvoříme na základě <a class="reference external" href="http://en.wikipedia.org/wiki/Delaunay triangulation">Delaunayho
+triangulace</a> nepravidelnou trojuhelníkovou
+síť (TIN). Import vstupních bodů provedeme s menší úpravou, a to bez
+přepínače <code class="xref std std-option docutils literal notranslate"><span class="pre">-b</span></code>. Modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.delaunay.html">v.delaunay</a> totiž vyžaduje
+pro svůj běh topologické informace vstupních dat.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.in.ascii<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_5g.xyz<span class="w"> </span><span class="nv">output</span><span class="o">=</span>HLIN04_5g<span class="w"> </span><span class="nv">separator</span><span class="o">=</span>space<span class="w"> </span><span class="nv">z</span><span class="o">=</span><span class="m">3</span><span class="w"> </span>-tz
+v.delaunay<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_5g<span class="w"> </span><span class="nv">output</span><span class="o">=</span>HLIN04_5g_TIN
+</pre></div>
+</div>
+<figure class="align-center" id="id10">
+<img alt="../_images/tin.png" src="../_images/tin.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 59 </span><span class="caption-text">TIN reprezentace DMR.</span><a class="headerlink" href="#id10" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+<section id="davkove-zpracovani-dlazdic-dmr-dmp-a-vytvoreni-vysledne-mozaiky">
+<h2>Dávkové zpracování dlaždic DMR/DMP a vytvoření výsledné mozaiky<a class="headerlink" href="#davkove-zpracovani-dlazdic-dmr-dmp-a-vytvoreni-vysledne-mozaiky" title="Permalink to this heading">¶</a></h2>
+<p>ČÚZK poskytuje typicky data ve formě dlaždic, v případě testovacího
+datasetu se jedná o:</p>
+<ul class="simple">
+<li><p>HLIN04,</p></li>
+<li><p>HLIN05,</p></li>
+<li><p>HLIN14,</p></li>
+<li><p>HLIN15.</p></li>
+</ul>
+<p>Zpracování dlaždic můžeme urychlit paralelizací výpočtu, k tomu
+použijeme nástroje frameworku <em>PyGRASS</em>, viz kapitola
+<a class="reference internal" href="../pygrass/index.html"><span class="doc">PyGRASS</span></a>. Moduly systému GRASS umožňuje spouštět třída
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>, viz příklad v kapitole <span class="xref std std-doc">Úvod do skriptování</span>. Paralelizaci výpočtu je možné poměrně
+jednoduše implementovat pomocí třídy <code class="xref py py-class docutils literal notranslate"><span class="pre">ParallelModuleQueue</span></code>,
+viz <a class="reference external" href="https://grass.osgeo.org/grass72/manuals/libpython/pygrass.modules.interface.html#pygrass.modules.interface.module.ParallelModuleQueue">dokumentace</a>. Příklad
+použití si ukážeme na jednoduché operaci importu dat pomocí modulu
+<a class="reference internal" href="import.html#lidar-import-xyz-vektor"><span class="std std-ref">v.in.ascii</span></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="linenos">1</span>    <span class="n">import_module</span> <span class="o">=</span> <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;v.in.ascii&#39;</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;space&#39;</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="s1">&#39;tbz&#39;</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">2</span>                           <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">(),</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">run_</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span class="linenos">3</span>    <span class="k">try</span><span class="p">:</span>
+<span class="linenos">4</span>        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+<span class="linenos">5</span>            <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="linenos">6</span>            <span class="n">message</span><span class="p">(</span><span class="s2">&quot;Importing &lt;</span><span class="si">{}</span><span class="s2">&gt;...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+<span class="hll"><span class="linenos">7</span>            <span class="n">import_task</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">import_module</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">8</span>            <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">import_task</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">mapname</span><span class="p">))</span>
+</span><span class="hll"><span class="linenos">9</span>        <span class="n">queue</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+</span></pre></div>
+</div>
+<p>Komentáře:</p>
+<ul>
+<li><p>Na řádcích <span class="lcode">1-2</span> vytvoříme objekt modulu
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.in.ascii.html">v.in.ascii</a> obsahující společné parametry.</p></li>
+<li><p>Na řádku <span class="lcode">7</span> vytvoříme pro každý importovaný soubor kopii
+objektu pro import.</p></li>
+<li><p>Této kopii nastavíme na souboru závislé parametry - cestu k
+importovanému souboru (<code class="xref std std-option docutils literal notranslate"><span class="pre">input</span></code>) a název výstupní vektorové
+mapy (<code class="xref std std-option docutils literal notranslate"><span class="pre">output</span></code>). Spustíme instanci takto upraveného objektu
+a zařadíme do fronty (<code class="docutils literal notranslate"><span class="pre">queue</span></code> jako instance třídy
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ParallelModuleQueue</span></code>), viz řádek <span class="lcode">8</span>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="n">queue</span> <span class="o">=</span> <span class="n">ParallelModuleQueue</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;nprocs&#39;</span><span class="p">]))</span>
+</pre></div>
+</div>
+</li>
+<li><p>Poté necháme všechny paralelně běžící procesy doběhnout, viz řádek
+<span class="lcode">9</span>.</p></li>
+</ul>
+<p>Podobně lze paralelně volat i interpolační modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.surf.rst.html">v.surf.rst</a> pouze s tím rozdílem, že je třeba pro každý
+proces nastavit příslušný region na základě vstupních dat
+(dlaždice). Tuto operaci nám zásadně usnadní třída
+<code class="xref py py-class docutils literal notranslate"><span class="pre">MultiModule</span></code>, která umožňuje registrovat navazující moduly
+jako jeden proces ve frontě. V prvním kroku zaregistrujeme modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.region.html">g.region</a>, pomocí kterého nastavíme výpočetní region
+dlaždice (<span class="lcode">11</span>) a poté přidáme do procesu interpolační modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.surf.rst.html">v.surf.rst</a> (<span class="lcode">12</span>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="hll"><span class="linenos"> 1</span>    <span class="n">region_module</span> <span class="o">=</span> <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;g.region&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="s1">&#39;n+</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">offset</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="s1">&#39;s-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">offset</span><span class="p">),</span>
+</span><span class="hll"><span class="linenos"> 2</span>                           <span class="n">e</span><span class="o">=</span><span class="s1">&#39;e+</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">offset</span><span class="p">),</span> <span class="n">w</span><span class="o">=</span><span class="s1">&#39;w-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">offset</span><span class="p">),</span>
+</span><span class="linenos"> 3</span>                           <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos"> 4</span>    <span class="n">rst_module</span> <span class="o">=</span> <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;v.surf.rst&#39;</span><span class="p">,</span> <span class="n">nprocs</span><span class="o">=</span><span class="n">rst_nprocs</span><span class="p">,</span>
+<span class="linenos"> 5</span>                        <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">(),</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">run_</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="linenos"> 6</span>    <span class="k">try</span><span class="p">:</span>
+<span class="linenos"> 7</span>        <span class="k">for</span> <span class="n">mapname</span> <span class="ow">in</span> <span class="n">maps</span><span class="p">:</span>
+<span class="linenos"> 8</span>            <span class="n">message</span><span class="p">(</span><span class="s2">&quot;Interpolating &lt;</span><span class="si">{}</span><span class="s2">&gt;...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mapname</span><span class="p">))</span>
+<span class="linenos"> 9</span>            <span class="n">region_task</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">region_module</span><span class="p">)</span>
+<span class="linenos">10</span>            <span class="n">rst_task</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">rst_module</span><span class="p">)</span>
+<span class="hll"><span class="linenos">11</span>            <span class="n">mm</span> <span class="o">=</span> <span class="n">MultiModule</span><span class="p">([</span><span class="n">region_task</span><span class="p">(</span><span class="n">vector</span><span class="o">=</span><span class="n">mapname</span><span class="p">),</span>
+</span><span class="hll"><span class="linenos">12</span>                              <span class="n">rst_task</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">mapname</span><span class="p">,</span> <span class="n">elevation</span><span class="o">=</span><span class="n">mapname</span><span class="p">)],</span>
+</span><span class="hll"><span class="linenos">13</span>                              <span class="n">sync</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">set_temp_region</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">14</span>            <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">mm</span><span class="p">)</span>
+</span><span class="linenos">15</span>        <span class="n">queue</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Komentáře:</p>
+<ul class="simple">
+<li><p>Ve skriptu nastavujeme výpočetní region dlaždice o něco větší tak,
+aby u výstupních dlaždic DMT vznikly pásy překryvu a bylo možno
+vytvořit výslednou mozaiku DMT bez ostrých přechodů na hranicích
+dlaždic, viz <code class="docutils literal notranslate"><span class="pre">offset</span></code> jako desetinásobek zadaného rozlišení na
+řádce <span class="lcode">1-2</span>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Třída <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiModule</span></code> je dostupná od verze GRASS 7.4.</p>
+</div>
+<p>Výsledná mozaika DMT jednotlivých dlaždic může být vytvořena modulem
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.series.html">r.series</a> a vhodnou statistickou metodou, viz
+<span class="lcode">109</span>. Výsledný skript může vypadat následovně:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="ch">#!/usr/bin/env python</span>
+<span class="linenos">  2</span>
+<span class="linenos">  3</span><span class="c1">#%module</span>
+<span class="linenos">  4</span><span class="c1">#% description: Creates DMT from input XYZ data.</span>
+<span class="linenos">  5</span><span class="c1">#%end</span>
+<span class="linenos">  6</span><span class="c1"># overwrite: yes</span>
+<span class="linenos">  7</span><span class="c1">#%option G_OPT_M_DIR</span>
+<span class="linenos">  8</span><span class="c1">#% required: yes</span>
+<span class="linenos">  9</span><span class="c1">#%end</span>
+<span class="linenos"> 10</span><span class="c1">#%option</span>
+<span class="linenos"> 11</span><span class="c1">#% key: pattern</span>
+<span class="linenos"> 12</span><span class="c1">#% type: string</span>
+<span class="linenos"> 13</span><span class="c1">#% description: File name pattern to filter files in input directory</span>
+<span class="linenos"> 14</span><span class="c1">#%end</span>
+<span class="linenos"> 15</span><span class="c1">#%option G_OPT_R_ELEV</span>
+<span class="linenos"> 16</span><span class="c1">#% description: Name for output elevation raster map mosaics</span>
+<span class="linenos"> 17</span><span class="c1">#%end</span>
+<span class="linenos"> 18</span><span class="c1">#%option</span>
+<span class="linenos"> 19</span><span class="c1">#% key: resolution</span>
+<span class="linenos"> 20</span><span class="c1">#% description: Output resolution</span>
+<span class="linenos"> 21</span><span class="c1">#% type: double</span>
+<span class="linenos"> 22</span><span class="c1">#%end</span>
+<span class="linenos"> 23</span><span class="c1">#%option</span>
+<span class="linenos"> 24</span><span class="c1">#% key: nprocs</span>
+<span class="linenos"> 25</span><span class="c1">#% description: Number of processes</span>
+<span class="linenos"> 26</span><span class="c1">#% answer: 1</span>
+<span class="linenos"> 27</span><span class="c1">#% type: integer</span>
+<span class="linenos"> 28</span><span class="c1">#%end</span>
+<span class="linenos"> 29</span><span class="c1">#%option</span>
+<span class="linenos"> 30</span><span class="c1">#% key: rst_nprocs</span>
+<span class="linenos"> 31</span><span class="c1">#% description: Number of v.surf.rst processes</span>
+<span class="linenos"> 32</span><span class="c1">#% answer: 1</span>
+<span class="linenos"> 33</span><span class="c1">#% type: integer</span>
+<span class="linenos"> 34</span><span class="c1">#%end</span>
+<span class="linenos"> 35</span>
+<span class="linenos"> 36</span><span class="kn">import</span> <span class="nn">os</span>
+<span class="linenos"> 37</span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="linenos"> 38</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 39</span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="linenos"> 40</span>
+<span class="linenos"> 41</span><span class="kn">from</span> <span class="nn">grass.script.core</span> <span class="kn">import</span> <span class="n">parser</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">fatal</span><span class="p">,</span> <span class="n">overwrite</span>
+<span class="linenos"> 42</span>
+<span class="linenos"> 43</span><span class="kn">from</span> <span class="nn">grass.pygrass.modules</span> <span class="kn">import</span> <span class="n">Module</span><span class="p">,</span> <span class="n">MultiModule</span><span class="p">,</span> <span class="n">ParallelModuleQueue</span>
+<span class="linenos"> 44</span><span class="kn">from</span> <span class="nn">grass.exceptions</span> <span class="kn">import</span> <span class="n">CalledModuleError</span>
+<span class="linenos"> 45</span>
+<span class="linenos"> 46</span><span class="k">def</span> <span class="nf">import_files</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+<span class="linenos"> 47</span>    <span class="n">maps</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos"> 48</span>    <span class="k">if</span> <span class="n">pattern</span><span class="p">:</span>
+<span class="linenos"> 49</span>        <span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="linenos"> 50</span>        <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{dir}{sep}{pat}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="linenos"> 51</span>            <span class="nb">dir</span><span class="o">=</span><span class="n">directory</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="n">pat</span><span class="o">=</span><span class="n">pattern</span><span class="p">)</span>
+<span class="linenos"> 52</span>        <span class="p">)</span>
+<span class="linenos"> 53</span>    <span class="k">else</span><span class="p">:</span>
+<span class="linenos"> 54</span>        <span class="n">files</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
+<span class="linenos"> 55</span>                    <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+<span class="linenos"> 56</span>        <span class="p">)</span>
+<span class="linenos"> 57</span>
+<span class="linenos"> 58</span>    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="linenos"> 59</span>
+<span class="linenos"> 60</span>    <span class="n">import_module</span> <span class="o">=</span> <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;v.in.ascii&#39;</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;space&#39;</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="s1">&#39;tbz&#39;</span><span class="p">,</span>
+<span class="linenos"> 61</span>                           <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">(),</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">run_</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="linenos"> 62</span>    <span class="k">try</span><span class="p">:</span>
+<span class="linenos"> 63</span>        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+<span class="linenos"> 64</span>            <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="linenos"> 65</span>            <span class="n">mapname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">basename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos"> 66</span>            <span class="n">maps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mapname</span><span class="p">)</span>
+<span class="linenos"> 67</span>            <span class="n">message</span><span class="p">(</span><span class="s2">&quot;Importing &lt;</span><span class="si">{}</span><span class="s2">&gt;...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+<span class="linenos"> 68</span>            <span class="n">import_task</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">import_module</span><span class="p">)</span>
+<span class="linenos"> 69</span>            <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">import_task</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">mapname</span><span class="p">))</span>
+<span class="linenos"> 70</span>        <span class="n">queue</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="linenos"> 71</span>    <span class="k">except</span> <span class="n">CalledModuleError</span><span class="p">:</span>
+<span class="linenos"> 72</span>        <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="linenos"> 73</span>
+<span class="linenos"> 74</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">maps</span><span class="p">:</span>
+<span class="linenos"> 75</span>        <span class="n">fatal</span><span class="p">(</span><span class="s2">&quot;No input files found&quot;</span><span class="p">)</span>
+<span class="linenos"> 76</span>
+<span class="linenos"> 77</span>    <span class="n">message</span><span class="p">(</span><span class="s2">&quot;Import finished in </span><span class="si">{:.0f}</span><span class="s2"> sec&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+<span class="linenos"> 78</span>
+<span class="linenos"> 79</span>    <span class="k">return</span> <span class="n">maps</span>
+<span class="linenos"> 80</span>
+<span class="linenos"> 81</span><span class="k">def</span> <span class="nf">create_dmt_tiles</span><span class="p">(</span><span class="n">maps</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">rst_nprocs</span><span class="p">,</span> <span class="n">offset_multiplier</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="linenos"> 82</span>    <span class="n">offset</span><span class="o">=</span><span class="n">res</span> <span class="o">*</span> <span class="n">offset_multiplier</span>
+<span class="linenos"> 83</span>
+<span class="linenos"> 84</span>    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="linenos"> 85</span>
+<span class="linenos"> 86</span>    <span class="n">region_module</span> <span class="o">=</span> <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;g.region&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="s1">&#39;n+</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">offset</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="s1">&#39;s-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">offset</span><span class="p">),</span>
+<span class="linenos"> 87</span>                           <span class="n">e</span><span class="o">=</span><span class="s1">&#39;e+</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">offset</span><span class="p">),</span> <span class="n">w</span><span class="o">=</span><span class="s1">&#39;w-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">offset</span><span class="p">),</span>
+<span class="linenos"> 88</span>                           <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos"> 89</span>    <span class="n">rst_module</span> <span class="o">=</span> <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;v.surf.rst&#39;</span><span class="p">,</span> <span class="n">nprocs</span><span class="o">=</span><span class="n">rst_nprocs</span><span class="p">,</span>
+<span class="linenos"> 90</span>                        <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">(),</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">run_</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="linenos"> 91</span>    <span class="k">try</span><span class="p">:</span>
+<span class="linenos"> 92</span>        <span class="k">for</span> <span class="n">mapname</span> <span class="ow">in</span> <span class="n">maps</span><span class="p">:</span>
+<span class="linenos"> 93</span>            <span class="n">message</span><span class="p">(</span><span class="s2">&quot;Interpolating &lt;</span><span class="si">{}</span><span class="s2">&gt;...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mapname</span><span class="p">))</span>
+<span class="linenos"> 94</span>            <span class="n">region_task</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">region_module</span><span class="p">)</span>
+<span class="linenos"> 95</span>            <span class="n">rst_task</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">rst_module</span><span class="p">)</span>
+<span class="linenos"> 96</span>            <span class="n">mm</span> <span class="o">=</span> <span class="n">MultiModule</span><span class="p">([</span><span class="n">region_task</span><span class="p">(</span><span class="n">vector</span><span class="o">=</span><span class="n">mapname</span><span class="p">),</span>
+<span class="linenos"> 97</span>                              <span class="n">rst_task</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">mapname</span><span class="p">,</span> <span class="n">elevation</span><span class="o">=</span><span class="n">mapname</span><span class="p">)],</span>
+<span class="linenos"> 98</span>                              <span class="n">sync</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">set_temp_region</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos"> 99</span>            <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">mm</span><span class="p">)</span>
+<span class="linenos">100</span>        <span class="n">queue</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="linenos">101</span>    <span class="k">except</span> <span class="n">CalledModuleError</span><span class="p">:</span>
+<span class="linenos">102</span>        <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="linenos">103</span>
+<span class="linenos">104</span>    <span class="n">message</span><span class="p">(</span><span class="s2">&quot;Interpolation finished in </span><span class="si">{:.0f}</span><span class="s2"> min&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="mf">60.</span><span class="p">))</span>
+<span class="linenos">105</span>    
+<span class="linenos">106</span><span class="k">def</span> <span class="nf">patch_tiles</span><span class="p">(</span><span class="n">maps</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
+<span class="linenos">107</span>    <span class="n">message</span><span class="p">(</span><span class="s2">&quot;Patching tiles &lt;</span><span class="si">{}</span><span class="s2">&gt;...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">maps</span><span class="p">)))</span>
+<span class="linenos">108</span>    <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;g.region&#39;</span><span class="p">,</span> <span class="n">raster</span><span class="o">=</span><span class="n">maps</span><span class="p">,</span> <span class="n">res</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+<span class="linenos">109</span>    <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;r.series&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">maps</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">)</span>
+<span class="linenos">110</span>    <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;r.colors&#39;</span><span class="p">,</span> <span class="nb">map</span><span class="o">=</span><span class="n">output</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;elevation&#39;</span><span class="p">)</span>
+<span class="linenos">111</span>
+<span class="linenos">112</span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="linenos">113</span>    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="linenos">114</span>
+<span class="linenos">115</span>    <span class="n">maps</span> <span class="o">=</span> <span class="n">import_files</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">],</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;pattern&#39;</span><span class="p">])</span>
+<span class="linenos">116</span>    <span class="n">create_dmt_tiles</span><span class="p">(</span><span class="n">maps</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;resolution&#39;</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;rst_nprocs&#39;</span><span class="p">]))</span>
+<span class="linenos">117</span>    <span class="n">patch_tiles</span><span class="p">(</span><span class="n">maps</span><span class="p">,</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;elevation&#39;</span><span class="p">],</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;resolution&#39;</span><span class="p">])</span>
+<span class="linenos">118</span>
+<span class="linenos">119</span>    <span class="n">message</span><span class="p">(</span><span class="s2">&quot;Done in </span><span class="si">{:.0f}</span><span class="s2"> min&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="mf">60.</span><span class="p">))</span>
+<span class="linenos">120</span>    
+<span class="linenos">121</span>    <span class="k">return</span> <span class="mi">0</span>
+<span class="linenos">122</span>
+<span class="linenos">123</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="linenos">124</span>    <span class="n">options</span><span class="p">,</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">parser</span><span class="p">()</span>
+<span class="linenos">125</span>
+<span class="linenos">126</span>    <span class="c1"># queue for parallel jobs</span>
+<span class="linenos">127</span>    <span class="n">queue</span> <span class="o">=</span> <span class="n">ParallelModuleQueue</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;nprocs&#39;</span><span class="p">]))</span>
+<span class="linenos">128</span>
+<span class="linenos">129</span>    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Skript umožňuje paralelizovat jak běh modulů pro import a
+interpolaci (parametr <code class="xref std std-option docutils literal notranslate"><span class="pre">nprocs</span></code>), tak modulu
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.surf.rst.html">v.surf.rst</a> jako takového (<code class="xref std std-option docutils literal notranslate"><span class="pre">rst_nprocs</span></code>).</p>
+</div>
+<p>Ukázka volání (v tomto případě bude vytíženo při interpolaci 12 jader
+CPU, výpočet trval přes hodinu a 20 minut):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>create-dmt.py<span class="w"> </span><span class="nv">input</span><span class="o">=</span>VYSKOPIS<span class="w"> </span><span class="nv">elevation</span><span class="o">=</span>HLIN_5g<span class="w"> </span><span class="nv">pattern</span><span class="o">=</span>*5g*<span class="w"> </span><span class="nv">resolution</span><span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="nv">nprocs</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">rst_nprocs</span><span class="o">=</span><span class="m">3</span>
+</pre></div>
+</div>
+<p>Výsledná verze skriptu ke stažení <a class="reference external" href="../_static/skripty/create-dmt.py">zde</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>aktualizovat screenshot v rozliseni 3m</p>
+</div>
+<figure class="align-center" id="id11">
+<img alt="../_images/dmr5g_ortofoto_3d.png" src="../_images/dmr5g_ortofoto_3d.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 60 </span><span class="caption-text">Ukázka vizualizace výsledného DMT složeného jako mozaika ze čtyř
+dlaždic vstupních bodových dat s rozlišením 1m ve 3D potaženého
+ortofotem (ČÚZK WMS), viz kapitola <a class="reference internal" href="../3d/index.html#vizualizace-3d"><span class="std std-ref">Vizualizace ve 3D</span></a>.</span><a class="headerlink" href="#id11" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Zpracování lidarových dat</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="import.html">Import lidarových dat</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tvorba DMR a DMP</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="import.html" title="Import lidarových dat"
+              >předchozí</a> |
+            <a href="../zod/index.html" title="Zpracování obrazových dat"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

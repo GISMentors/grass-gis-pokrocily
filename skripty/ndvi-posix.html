@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>POSIX &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="posix">
+<h1>POSIX<a class="headerlink" href="#posix" title="Permalink to this heading">¶</a></h1>
+<section id="zakladni-verze-skriptu">
+<h2>Základní verze skriptu<a class="headerlink" href="#zakladni-verze-skriptu" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/bin/sh</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="c1"># vstup</span>
+<span class="linenos"> 4</span><span class="nv">vis</span><span class="o">=</span><span class="s2">&quot;LC81920252013215LGN00_B4&quot;</span>
+<span class="linenos"> 5</span><span class="nv">nir</span><span class="o">=</span><span class="s2">&quot;LC81920252013215LGN00_B5&quot;</span>
+<span class="linenos"> 6</span><span class="nv">mapset</span><span class="o">=</span><span class="s2">&quot;landsat&quot;</span>
+<span class="linenos"> 7</span><span class="c1"># vysledek</span>
+<span class="linenos"> 8</span><span class="nv">ndvi</span><span class="o">=</span><span class="s2">&quot;ndvi&quot;</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="c1"># pridat mapset do vyhledavaci cesty</span>
+<span class="linenos">11</span>g.mapsets<span class="w"> </span><span class="nv">mapset</span><span class="o">=</span><span class="nv">$mapset</span><span class="w"> </span><span class="nv">ope</span><span class="o">=</span>add<span class="w"> </span>--q
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="c1"># nastavit vypocetni region</span>
+<span class="linenos">14</span>g.region<span class="w"> </span><span class="nv">raster</span><span class="o">=</span><span class="nv">$vis</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="c1"># vypocet NDVI</span>
+<span class="linenos">17</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;VIS: </span><span class="nv">$vis</span><span class="s2"> ; NIR: </span><span class="nv">$nir</span><span class="s2">&quot;</span>
+<span class="linenos">18</span>r.mapcalc<span class="w"> </span><span class="nv">exp</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$ndvi</span><span class="s2"> = float(</span><span class="nv">$nir</span><span class="s2"> - </span><span class="nv">$vis</span><span class="s2">) / (</span><span class="nv">$nir</span><span class="s2"> + </span><span class="nv">$vis</span><span class="s2">)&quot;</span><span class="w"> </span>--o
+<span class="linenos">19</span>
+<span class="linenos">20</span><span class="c1"># reklasifikace (1,2,3)</span>
+<span class="linenos">21</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Reklasifikuji...&quot;</span>
+<span class="linenos">22</span><span class="c1"># r.reclass umi reklasifikovat pouze celociselne rastry, proto pouzime</span>
+<span class="linenos">23</span><span class="c1"># r.recode</span>
+<span class="linenos">24</span>r.recode<span class="w"> </span><span class="nv">input</span><span class="o">=</span><span class="nv">$ndvi</span><span class="w"> </span><span class="nv">output</span><span class="o">=</span>r_<span class="nv">$ndvi</span><span class="w"> </span><span class="nv">rules</span><span class="o">=</span>-<span class="w"> </span>--o<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="linenos">25</span><span class="s"> -1:0.05:1 </span>
+<span class="linenos">26</span><span class="s"> 0.05:0.35:2 </span>
+<span class="linenos">27</span><span class="s"> 0.35:1:3</span>
+<span class="linenos">28</span><span class="s">EOF</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span><span class="c1"># popisky</span>
+<span class="linenos">31</span>r.category<span class="w"> </span><span class="nv">map</span><span class="o">=</span>r_<span class="nv">$ndvi</span><span class="w"> </span><span class="nv">sep</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="w"> </span><span class="nv">rules</span><span class="o">=</span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="linenos">32</span><span class="s">1:bez vegetace, vodni plochy</span>
+<span class="linenos">33</span><span class="s">2:plochy s minimalni vegetaci</span>
+<span class="linenos">34</span><span class="s">3:plochy pokryte vegetaci</span>
+<span class="linenos">35</span><span class="s">EOF</span>
+<span class="linenos">36</span>
+<span class="linenos">37</span><span class="c1"># tabulka barev</span>
+<span class="linenos">38</span>r.colors<span class="w"> </span><span class="nv">map</span><span class="o">=</span>r_<span class="nv">$ndvi</span><span class="w"> </span><span class="nv">rules</span><span class="o">=</span>-<span class="w"> </span>--q<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="linenos">39</span><span class="s"> 1 red</span>
+<span class="linenos">40</span><span class="s"> 2 yellow</span>
+<span class="linenos">41</span><span class="s"> 3 0 136 26</span>
+<span class="linenos">42</span><span class="s">EOF</span>
+<span class="linenos">43</span>
+<span class="linenos">44</span><span class="c1"># vypsat vysledek</span>
+<span class="linenos">45</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Generuji report...&quot;</span>
+<span class="linenos">46</span>r.stats<span class="w"> </span>-pl<span class="w"> </span><span class="nv">input</span><span class="o">=</span>r_<span class="nv">$ndvi</span>
+<span class="linenos">47</span>
+<span class="linenos">48</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Hotovo!&quot;</span>
+</pre></div>
+</div>
+<p>Skript ke stažení <a class="reference external" href="../_static/skripty/ndvi-v1.sh">zde</a>.</p>
+<figure class="align-center" id="id2">
+<img alt="../_images/wxgui-launch-sh.png" src="../_images/wxgui-launch-sh.png" />
+<figcaption>
+<p><span class="caption-text">Při spuštění skriptu z GUI je nutno změnit výchozí typ souboru na
+<code class="docutils literal notranslate"><span class="pre">.sh</span></code>.</span><a class="headerlink" href="#id2" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="pokrocilejsi-verze-skriptu">
+<h2>Pokročilejší verze skriptu<a class="headerlink" href="#pokrocilejsi-verze-skriptu" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/bin/sh</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="c1">#%module</span>
+<span class="linenos"> 4</span><span class="c1">#% description: Vypocet reklasifikovaneho NDVI</span>
+<span class="linenos"> 5</span><span class="c1">#%end</span>
+<span class="linenos"> 6</span><span class="c1">#%option G_OPT_M_MAPSET</span>
+<span class="linenos"> 7</span><span class="c1">#% required: yes</span>
+<span class="linenos"> 8</span><span class="c1">#% answer: landsat</span>
+<span class="linenos"> 9</span><span class="c1">#%end</span>
+<span class="linenos">10</span><span class="c1">#%option</span>
+<span class="linenos">11</span><span class="c1">#% key: output_postfix</span>
+<span class="linenos">12</span><span class="c1">#% type: string</span>
+<span class="linenos">13</span><span class="c1">#% description: Postfix for output maps</span>
+<span class="linenos">14</span><span class="c1">#% answer: ndvi</span>
+<span class="linenos">15</span><span class="c1">#%end </span>
+<span class="linenos">16</span><span class="c1">#%option G_OPT_F_INPUT</span>
+<span class="linenos">17</span><span class="c1">#% key: classes</span>
+<span class="linenos">18</span><span class="c1">#% required: no</span>
+<span class="linenos">19</span><span class="c1">#%end</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;@ARGS_PARSED@&quot;</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="linenos">22</span><span class="w">    </span><span class="nb">exec</span><span class="w"> </span>g.parser<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span>
+<span class="linenos">23</span><span class="k">fi</span>
+<span class="linenos">24</span>
+<span class="linenos">25</span><span class="nv">mapset</span><span class="o">=</span><span class="nv">$GIS_OPT_MAPSET</span>
+<span class="linenos">26</span>
+<span class="linenos">27</span><span class="c1"># pridat mapset do vyhledavaci cesty</span>
+<span class="linenos">28</span>g.mapsets<span class="w"> </span><span class="nv">mapset</span><span class="o">=</span><span class="nv">$mapset</span><span class="w"> </span><span class="nv">ope</span><span class="o">=</span>add<span class="w"> </span>--q
+<span class="linenos">29</span>
+<span class="linenos">30</span><span class="c1"># vstup</span>
+<span class="linenos">31</span><span class="nv">vis</span><span class="o">=</span><span class="sb">`</span>g.list<span class="w"> </span><span class="nv">type</span><span class="o">=</span>raster<span class="w"> </span><span class="nv">mapset</span><span class="o">=</span><span class="nv">$mapset</span><span class="w"> </span><span class="nv">pattern</span><span class="o">=</span><span class="s1">&#39;*B4$&#39;</span><span class="sb">`</span>
+<span class="linenos">32</span><span class="nv">nir</span><span class="o">=</span><span class="sb">`</span>g.list<span class="w"> </span><span class="nv">type</span><span class="o">=</span>raster<span class="w"> </span><span class="nv">mapset</span><span class="o">=</span><span class="nv">$mapset</span><span class="w"> </span><span class="nv">pattern</span><span class="o">=</span><span class="s1">&#39;*B5$&#39;</span><span class="sb">`</span>
+<span class="linenos">33</span><span class="c1"># vysledek</span>
+<span class="linenos">34</span><span class="nv">ndvi</span><span class="o">=</span><span class="nv">$GIS_OPT_OUTPUT_POSTFIX</span>
+<span class="linenos">35</span>
+<span class="linenos">36</span><span class="c1"># nastavit vypocetni region</span>
+<span class="linenos">37</span>g.region<span class="w"> </span><span class="nv">raster</span><span class="o">=</span><span class="nv">$vis</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span><span class="c1"># vypocet NDVI</span>
+<span class="linenos">40</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;VIS: </span><span class="nv">$vis</span><span class="s2"> ; NIR: </span><span class="nv">$nir</span><span class="s2">&quot;</span>
+<span class="linenos">41</span>r.mapcalc<span class="w"> </span><span class="nv">exp</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$ndvi</span><span class="s2"> = float(</span><span class="nv">$nir</span><span class="s2"> - </span><span class="nv">$vis</span><span class="s2">) / (</span><span class="nv">$nir</span><span class="s2"> + </span><span class="nv">$vis</span><span class="s2">)&quot;</span><span class="w"> </span>--o
+<span class="linenos">42</span>
+<span class="linenos">43</span><span class="c1"># reklasifikace (1,2,3)</span>
+<span class="linenos">44</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Reklasifikuji...&quot;</span>
+<span class="linenos">45</span><span class="c1"># r.reclass umi reklasifikovat pouze celociselne rastry, proto pouzime</span>
+<span class="linenos">46</span><span class="c1"># r.recode</span>
+<span class="linenos">47</span><span class="k">if</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>-z<span class="w"> </span><span class="nv">$GIS_OPT_CLASSES</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="linenos">48</span><span class="w">    </span>r.recode<span class="w"> </span><span class="nv">input</span><span class="o">=</span><span class="nv">$ndvi</span><span class="w"> </span><span class="nv">output</span><span class="o">=</span>r_<span class="nv">$ndvi</span><span class="w"> </span><span class="nv">rules</span><span class="o">=</span>-<span class="w"> </span>--o<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="linenos">49</span><span class="s"> -1:0.05:1 </span>
+<span class="linenos">50</span><span class="s"> 0.05:0.35:2 </span>
+<span class="linenos">51</span><span class="s"> 0.35:1:3</span>
+<span class="linenos">52</span><span class="s">EOF</span>
+<span class="linenos">53</span><span class="k">else</span>
+<span class="linenos">54</span><span class="w">    </span>r.recode<span class="w"> </span><span class="nv">input</span><span class="o">=</span><span class="nv">$ndvi</span><span class="w"> </span><span class="nv">output</span><span class="o">=</span>r_<span class="nv">$ndvi</span><span class="w"> </span><span class="nv">rules</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$GIS_OPT_CLASSES</span><span class="s2">&quot;</span><span class="w"> </span>--o<span class="w"> </span>
+<span class="linenos">55</span><span class="k">fi</span>
+<span class="linenos">56</span>
+<span class="linenos">57</span><span class="c1"># popisky</span>
+<span class="linenos">58</span>r.category<span class="w"> </span><span class="nv">map</span><span class="o">=</span>r_<span class="nv">$ndvi</span><span class="w"> </span><span class="nv">sep</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="w"> </span><span class="nv">rules</span><span class="o">=</span>-<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="linenos">59</span><span class="s">1:bez vegetace, vodni plochy</span>
+<span class="linenos">60</span><span class="s">2:plochy s minimalni vegetaci</span>
+<span class="linenos">61</span><span class="s">3:plochy pokryte vegetaci</span>
+<span class="linenos">62</span><span class="s">EOF</span>
+<span class="linenos">63</span>
+<span class="linenos">64</span><span class="c1"># tabulka barev</span>
+<span class="linenos">65</span>r.colors<span class="w"> </span><span class="nv">map</span><span class="o">=</span>r_<span class="nv">$ndvi</span><span class="w"> </span><span class="nv">rules</span><span class="o">=</span>-<span class="w"> </span>--q<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="linenos">66</span><span class="s"> 1 red</span>
+<span class="linenos">67</span><span class="s"> 2 yellow</span>
+<span class="linenos">68</span><span class="s"> 3 0 136 26</span>
+<span class="linenos">69</span><span class="s">EOF</span>
+<span class="linenos">70</span>
+<span class="linenos">71</span><span class="c1"># vypsat vysledek</span>
+<span class="linenos">72</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Generuji report...&quot;</span>
+<span class="linenos">73</span>r.stats<span class="w"> </span>-pl<span class="w"> </span><span class="nv">input</span><span class="o">=</span>r_<span class="nv">$ndvi</span>
+<span class="linenos">74</span>
+<span class="linenos">75</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Hotovo!&quot;</span>
+</pre></div>
+</div>
+<p>Výsledná verze skriptu ke stažení <a class="reference external" href="../_static/skripty/ndvi-v2.sh">zde</a>.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,621 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Průměrná dlouhodobá ztráta půdy &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Časoprostorové analýzy" href="../tgrass/index.html" />
+    <link rel="prev" title="Metoda SCS CN" href="scs-cn.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="scs-cn.html" title="Metoda SCS CN"
+             accesskey="P">předchozí</a> |
+          <a href="../tgrass/index.html" title="Časoprostorové analýzy"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="prumerna-dlouhodoba-ztrata-pudy">
+<h1>Průměrná dlouhodobá ztráta půdy<a class="headerlink" href="#prumerna-dlouhodoba-ztrata-pudy" title="Permalink to this heading">¶</a></h1>
+<section id="teoreticke-zaklady">
+<h2>Teoretické základy<a class="headerlink" href="#teoreticke-zaklady" title="Permalink to this heading">¶</a></h2>
+<p>Průměrnou roční ztrátu půdy způsobenou odtokem z pozemku určitého
+sklonu a způsobu využívaní je možno predikovat pomocí matematického
+modelu <a class="reference external" href="http://cs.wikipedia.org/wiki/Univerzální rovnice ztráty půdy">USLE</a>,
+tzv. <em>univerzální rovnice ztráty půdy</em>:</p>
+<div class="math notranslate nohighlight" id="vzorec-g">
+\[G = R \times K \times L \times S \times C \times P\]</div>
+<p>kde:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>G - průmerná dlouhodobá ztráta půdy (<span class="math notranslate nohighlight">\(t.ha^{-1} . rok^{-1}\)</span>)</p></li>
+<li><p>R - faktor erozní účinnosti deště (<span class="math notranslate nohighlight">\(MJ.ha^{-1} .cm.h^{-1}\)</span>)</p></li>
+<li><p>K - faktor eroze půdy (<span class="math notranslate nohighlight">\(t.h.MJ^{-1} .cm^{-1} .rok^{-1}\)</span>)</p></li>
+<li><p>L - faktor délky svahu (<span class="math notranslate nohighlight">\(-\)</span>)</p></li>
+<li><p>S - faktor sklonu svahu (<span class="math notranslate nohighlight">\(-\)</span>)</p></li>
+<li><p>C - faktor ochranného vlivu vegetačního krytu (<span class="math notranslate nohighlight">\(-\)</span>)</p></li>
+<li><p>P - faktor účinnosti protierozních opatření (<span class="math notranslate nohighlight">\(-\)</span>)</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="vstupni-data">
+<h2>Vstupní data<a class="headerlink" href="#vstupni-data" title="Permalink to this heading">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="map">hpj.shp</span> - vektorová vrstva hlavních půdních jednotek z kódů BPEJ</p></li>
+<li><p><span class="map">kpp.shp</span> - vektorová vrstva komplexního průzkumu půd</p></li>
+<li><p><span class="map">landuse.shp</span> - vektorová vrstva využití území</p></li>
+<li><p><span class="map">povodi.shp</span> - vektorová vrstva povodí IV. řádu s návrhovými
+srážkami <span class="math notranslate nohighlight">\(H_s\)</span> (doba opakovaní 2, 5, 10, 20, 50 a 100 let)</p></li>
+<li><p><span class="dbtable">hpj_k.csv</span> - číselník s kódem <cite>K</cite> pro hlavní půdní jednotky, <a class="reference internal" href="#ciselniky"><span class="std std-numref">Obr. 32</span></a> vlevo</p></li>
+<li><p><span class="dbtable">kpp_k.csv</span> - číselník s kódem <cite>K</cite> pro vrstvu komplexního
+průzkumu půd, <a class="reference internal" href="#ciselniky"><span class="std std-numref">Obr. 32</span></a> vpravo</p></li>
+<li><p><span class="dbtable">lu_c.csv</span> - číselník s kódem <cite>C</cite> pro vrstvu využití území,
+<a class="reference internal" href="#ciselniky"><span class="std std-numref">Obr. 32</span></a> vpravo</p></li>
+<li><p><span class="map">dmt.tif</span> - digitální model terénu v rozlišení 10 x 10 m,
+<a class="reference internal" href="#dmt-maska"><span class="std std-numref">Obr. 31</span></a> vlevo</p></li>
+<li><p><span class="map">maska.pack</span> - oblast území bez liniových a plošných prvků
+prerušujících odtok, <a class="reference internal" href="#dmt-maska"><span class="std std-numref">Obr. 31</span></a> vpravo</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="navrhovany-postup">
+<h2>Navrhovaný postup<a class="headerlink" href="#navrhovany-postup" title="Permalink to this heading">¶</a></h2>
+<p><span class="xref std std-ref">1.</span>
+sjednocení vrstvy hlavních půdních jednotek a komplexního průzkumu půd</p>
+<p><span class="xref std std-ref">2.</span>
+připojení hodnot faktoru <cite>K</cite> k elementárním plochám</p>
+<p><span class="xref std std-ref">3.</span>
+průnik vrstvy elementárních ploch a využití území</p>
+<p><span class="xref std std-ref">4.</span>
+připojení hodnot faktoru <cite>C</cite></p>
+<p><span class="xref std std-ref">5.</span>
+výpočet parametru <cite>KC</cite></p>
+<p><span class="xref std std-ref">6.</span>
+vytvoření rastrové mapy sklonu a akumulace odtoku v každé buňce</p>
+<p><span class="xref std std-ref">7.</span>
+výpočet parametru <cite>LS</cite></p>
+<p><span class="xref std std-ref">8.</span> výpočet <cite>G</cite> a vytvoření rastru s hodnotami
+představující průměrnou dlouhodobou ztrátu půdy</p>
+<p><span class="xref std std-ref">9.</span>
+výpočet průměrných hodnot <cite>G</cite> pro povodí</p>
+<p><span class="xref std std-ref">10.</span>
+vytvoření rastrových vrstev <cite>LS</cite> a <cite>G</cite> s maskou</p>
+<p><span class="xref std std-ref">11.</span>
+výpočet průměrných hodnot <cite>G</cite> pro povodí s maskou</p>
+<figure class="align-center" id="id4">
+<span id="schema-usle"></span><img alt="../_images/schema_usle.png" class="large" src="../_images/schema_usle.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 30 </span><span class="caption-text">Grafické schéma postupu.</span><a class="headerlink" href="#id4" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Znázornění vstupních vektorových dat spolu s atributovými tabulkami je
+totožné se <a class="reference internal" href="scs-cn.html#scs-cn-vstupni-data"><span class="std std-ref">vstupními vektorovými daty pro metodu SCS CN</span></a>. Digitální model reliéfu a oblast řešeného
+území bez liniových a plošných prvků přerušující odtok (maska) jsou
+zobrazena na <a class="reference internal" href="#dmt-maska"><span class="std std-numref">Obr. 31</span></a>. Tabulky s faktory <cite>K</cite> a <cite>C</cite> jsou
+uvedeny na <a class="reference internal" href="#ciselniky"><span class="std std-numref">Obr. 32</span></a>.</p>
+<figure class="align-center" id="id5">
+<span id="dmt-maska"></span><img alt="../_images/dmt_maska.png" class="middle" src="../_images/dmt_maska.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 31 </span><span class="caption-text">Vrstva digitálního modelu terénu a oblast řešeného území bez prvků
+přerušujících odtok.</span><a class="headerlink" href="#id5" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id6">
+<span id="ciselniky"></span><img alt="../_images/ciselniky_usle.png" class="middle" src="../_images/ciselniky_usle.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 32 </span><span class="caption-text">Číselníky s hodnotami <em>K</em> a <em>C</em>.</span><a class="headerlink" href="#id6" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="postup-zpracovani-v-grass-gis">
+<h2>Postup zpracování v GRASS GIS<a class="headerlink" href="#postup-zpracovani-v-grass-gis" title="Permalink to this heading">¶</a></h2>
+<p>Z digitálního modelu terénu (DMT) vytvoříme rastrovou mapu
+znázorňující sklonové poměry ve stupních (<em>slope</em>). Ten bude potřebný
+později pro výpočet <a class="reference internal" href="#ls-faktor"><span class="std std-ref">topografického faktoru LS</span></a>. V
+prvním kroku nastavíme <em>výpočetní region</em> na základě vstupního DMT a
+následně použijeme modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.slope.aspect.html">r.slope.aspect</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Podrobné informace ohledně <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/region.html">výpočetního regionu</a> a <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/rastrova_data/analyzy-povrchu.html">topografických
+analýz</a> ve
+školení GRASS GIS pro začátečníky.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>dmt
+r.slope.aspect<span class="w"> </span><span class="nv">elevation</span><span class="o">=</span>dmt<span class="w"> </span><span class="nv">slope</span><span class="o">=</span>svah
+</pre></div>
+</div>
+<figure class="align-center" id="id7">
+<img alt="../_images/1b.png" class="middle" src="../_images/1b.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 33 </span><span class="caption-text">Hypsografické stupně (DMT) v metrech a sklonové poměry v stupních.</span><a class="headerlink" href="#id7" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Dále vytvoříme vyhlazený DMT (<code class="xref std std-option docutils literal notranslate"><span class="pre">filled</span></code>), rastrovou mapu směru
+odtoku do sousední buňky s největším sklonem (<code class="xref std std-option docutils literal notranslate"><span class="pre">direction</span></code>) a
+rastrovou mapu znázorňující akumulaci odtoku v každé buňce
+(<code class="xref std std-option docutils literal notranslate"><span class="pre">accumulation</span></code>).</p>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Pro vytvoření vyhlazeného DMT možno alternativně použít také
+Addons modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/addons/r.hydrodem.html">r.hydrodem</a>, pro výpočet směru
+odtoku modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.fill.dir.html">r.fill.dir</a> a pro akumulaci odtoku
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.watershed.html">r.watershed</a>.</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Tady by chtělo hlubší analýzu, v čem se moduly liší, to
+je otázka na kolegy z k143.</p>
+</div>
+</div>
+<p>Před výpočtem si nastavíme masku podle zájmového území pomocí
+modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.mask.html">r.mask</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.mask<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>dmt
+r.terraflow<span class="w"> </span><span class="nv">elevation</span><span class="o">=</span>dmt<span class="w"> </span><span class="nv">filled</span><span class="o">=</span>dmt_fill<span class="w"> </span><span class="nv">direction</span><span class="o">=</span>dir<span class="w"> </span><span class="nv">swatershed</span><span class="o">=</span>sink<span class="w"> </span><span class="nv">accumulation</span><span class="o">=</span>accu<span class="w"> </span><span class="nv">tci</span><span class="o">=</span>tci
+</pre></div>
+</div>
+<figure class="align-center" id="id8">
+<img alt="../_images/2b.png" class="large" src="../_images/2b.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 34 </span><span class="caption-text">Směr odtoku ve stupních a akumulace odtoku v <span class="math notranslate nohighlight">\(m^2\)</span> vytvořené modulem
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.terraflow.html">r.terraflow</a>.</span><a class="headerlink" href="#id8" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<section id="ls-faktor">
+<span id="id2"></span><h3>LS faktor<a class="headerlink" href="#ls-faktor" title="Permalink to this heading">¶</a></h3>
+<p>LS faktor (topografický faktor) možno vypočítat podle vztahu:</p>
+<div class="math notranslate nohighlight">
+\[LS = 1.6 \times (accu \times \frac{res}{22.13})^{0.6} \times (\frac{sin(slope \times \frac{pi}{180})}{0.09})^{1.3}\]</div>
+<p>kde:</p>
+<ul class="simple">
+<li><p><cite>accu</cite> je rastrová mapa akumulace odtoku</p></li>
+<li><p><cite>res</cite> je prostorové rozlišení DMT</p></li>
+<li><p><cite>slope</cite> je rastrová mapa míry sklonu</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Rovnice vychází z <a class="reference external" href="http://www4.ncsu.edu/~hmitaso/gmslab/denix/usle.html">metody Mitášová</a>.</p>
+</div>
+<p>Pro tyto účely využijeme nástroj <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.mapcalc.html">r.mapcalc</a> jako hlavní
+nástroj mapové algebry v systému GRASS.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Více na téma <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/rastrova_data/rastrova-algebra.html">mapové algebry</a> ve
+školení GRASS GIS pro začátečníky.</p>
+</div>
+<p>V zápisu pro tento nástroj bude rovnice vypadat následovně:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.mapcalc<span class="w"> </span><span class="nv">expr</span><span class="o">=</span><span class="s2">&quot;ls = 1.6 * pow(accu * (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Nastavíme vhodnou tabulku barev:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.colors<span class="w"> </span><span class="nv">map</span><span class="o">=</span>ls<span class="w"> </span><span class="nv">color</span><span class="o">=</span>colors.txt
+</pre></div>
+</div>
+<p>např.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.00</span> <span class="mi">128</span><span class="p">:</span><span class="mi">64</span><span class="p">:</span><span class="mi">64</span>
+<span class="mf">0.01</span> <span class="mi">255</span><span class="p">:</span><span class="mi">128</span><span class="p">:</span><span class="mi">64</span>
+<span class="mf">0.05</span> <span class="mi">0</span><span class="p">:</span><span class="mi">255</span><span class="p">:</span><span class="mi">0</span>
+<span class="mf">0.10</span> <span class="mi">0</span><span class="p">:</span><span class="mi">128</span><span class="p">:</span><span class="mi">128</span>
+<span class="mf">0.20</span> <span class="mi">0</span><span class="p">:</span><span class="mi">128</span><span class="p">:</span><span class="mi">255</span>
+</pre></div>
+</div>
+</div>
+<figure class="align-center" id="id9">
+<img alt="../_images/3b.png" class="small" src="../_images/3b.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 35 </span><span class="caption-text">Topografický faktor LS zahrnující vliv délky a sklonu svahu.</span><a class="headerlink" href="#id9" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="k-a-c-faktor">
+<h3>K a C faktor<a class="headerlink" href="#k-a-c-faktor" title="Permalink to this heading">¶</a></h3>
+<p>Vytvoříme vektorovou vrstvu elementárních ploch <span class="map">hpj_kpp_land</span>
+(viz. <a class="reference internal" href="scs-cn.html#scs-cn-hpj-kpp-land"><span class="std std-ref">návod</span></a> na její vytvoření).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.overlay<span class="w"> </span><span class="nv">ainput</span><span class="o">=</span>hpj<span class="w"> </span><span class="nv">binput</span><span class="o">=</span>kpp<span class="w"> </span><span class="nv">operator</span><span class="o">=</span>or<span class="w"> </span><span class="nv">output</span><span class="o">=</span>hpj_kpp
+v.overlay<span class="w"> </span><span class="nv">ainput</span><span class="o">=</span>hpj_kpp<span class="w"> </span><span class="nv">binput</span><span class="o">=</span>landuse<span class="w"> </span><span class="nv">operator</span><span class="o">=</span>and<span class="w"> </span><span class="nv">output</span><span class="o">=</span>hpj_kpp_land
+</pre></div>
+</div>
+<p>Do její atributové tabulky přidáme dva nové sloupce <span class="dbcolumn">K</span> a
+<span class="dbcolumn">C</span>. To provedeme pomocí <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/vektorova_data/atributy.html">správce atributových dat</a> anebo modulu
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.addcolumn.html">v.db.addcolumn</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.addcolumn<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;K double&quot;</span>
+v.db.addcolumn<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;C double&quot;</span>
+</pre></div>
+</div>
+<p>Hodnotu K faktoru pro jednotlivé elementární plochy přiřadíme pomocí
+číselníku <span class="dbtable">hpj_k.csv</span>. Pro plochy bez hodnoty K faktoru
+doplníme údaje na základě půdních typů a subtypů podle komplexního
+průzkumu půd (tabulka <span class="dbtable">kpp_k.csv</span>). Hodnota C faktoru
+zemědělsky využívaných oblastí zjistíme z průměrných hodnot pro
+jednotlivé plodiny z tabulky <span class="dbtable">lu_c.csv</span>. Na spojení tabulek
+použijeme modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.join.html">v.db.join</a>.</p>
+<p>Převodové tabulky je potřebné nejprve naimportovat do prostředí GRASS
+GIS. Použijeme modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.in.ogr.html">db.in.ogr</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.in.ogr<span class="w"> </span><span class="k">in</span><span class="o">=</span>kpp_k.csv<span class="w"> </span><span class="nv">out</span><span class="o">=</span>kpp_k
+db.in.ogr<span class="w"> </span><span class="k">in</span><span class="o">=</span>hpj_k.csv<span class="w"> </span><span class="nv">out</span><span class="o">=</span>hpj_k
+db.in.ogr<span class="w"> </span><span class="k">in</span><span class="o">=</span>lu_c.csv<span class="w"> </span><span class="nv">out</span><span class="o">=</span>lu_c
+</pre></div>
+</div>
+<p>Potom přistoupíme k připojení tabulky <span class="dbtable">hpj_k</span> k atributům
+vektorové vrstvy <span class="map">hpj_kpp_land</span>, klíčem bude atribut
+<span class="dbcolumn">HPJ</span>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.join<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">column</span><span class="o">=</span>a_HPJ<span class="w"> </span><span class="nv">other_table</span><span class="o">=</span>hpj_k<span class="w"> </span><span class="nv">other_column</span><span class="o">=</span>HPJ
+</pre></div>
+</div>
+<p>Chýbějící informace hodnoty faktoru <code class="docutils literal notranslate"><span class="pre">K</span></code> doplníme z tabulky
+<span class="dbtable">kpp_k</span> SQL dotazem prostřednictvím modulu
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.execute.html">db.execute</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.execute<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;UPDATE hpj_kpp_land SET K = (</span>
+<span class="s2">SELECT b.K FROM hpj_kpp_land AS a JOIN kpp_k as b ON a.a_b_KPP = b.KPP)</span>
+<span class="s2">WHERE K IS NULL&quot;</span>
+</pre></div>
+</div>
+<p>V dalším kroku doplníme hodnoty <code class="docutils literal notranslate"><span class="pre">C</span></code> faktoru z importované tabulky
+<span class="dbtable">lu_c</span>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.join<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">column</span><span class="o">=</span>b_LandUse<span class="w"> </span><span class="nv">other_table</span><span class="o">=</span>lu_c<span class="w"> </span><span class="nv">other_column</span><span class="o">=</span>LU
+</pre></div>
+</div>
+<p>Údaje v atributové tabulky si zkontrolujeme, zda jsou vyplněny
+správně. Použijeme SQL dotaz <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.select.html">db.select</a>, přitom vybere jen
+první tři záznamy (resp. elementární plochy).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.select<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;select cat,K,C from hpj_kpp_land where cat &lt;= 3&quot;</span>
+</pre></div>
+</div>
+<p>Výsledek může vypadat například takto:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cat<span class="p">|</span>K<span class="p">|</span>C
+<span class="m">1</span><span class="p">|</span><span class="m">0</span>.13<span class="p">|</span><span class="m">0</span>.19
+<span class="m">2</span><span class="p">|</span><span class="m">0</span>.13<span class="p">|</span><span class="m">0</span>.19
+<span class="m">3</span><span class="p">|</span><span class="m">0</span>.13<span class="p">|</span><span class="m">0</span>.19
+...
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Atribut <span class="dbcolumn">cat</span> je hodnota, která propojuje
+geometrii prvků se záznamem v atributové tabulce.</p>
+</div>
+<p>Dále do atributové tabulky přidáme nový atribut <span class="dbcolumn">KC</span>, do
+kterého uložíme součin faktorů <code class="docutils literal notranslate"><span class="pre">K</span> <span class="pre">*</span> <span class="pre">C</span></code>. To můžeme vykonat pomocí
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/vektorova_data/atributy.html">správce atributových dat</a> anebo modulem
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.addcolumn.html">v.db.addcolumn</a> v kombinaci s <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.update.html">v.db.update</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.addcolumn<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;KC double&quot;</span>
+v.db.update<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">column</span><span class="o">=</span>KC<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="s2">&quot;K * C&quot;</span>
+</pre></div>
+</div>
+<p>Výsledek opět zkontrolujeme.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.select<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;select cat,K,C,KC from hpj_kpp_land where cat &lt;= 3&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cat<span class="p">|</span>K<span class="p">|</span>C<span class="p">|</span>KC
+<span class="m">1</span><span class="p">|</span><span class="m">0</span>.13<span class="p">|</span><span class="m">0</span>.19<span class="p">|</span><span class="m">0</span>.0247
+<span class="m">2</span><span class="p">|</span><span class="m">0</span>.13<span class="p">|</span><span class="m">0</span>.19<span class="p">|</span><span class="m">0</span>.0247
+<span class="m">3</span><span class="p">|</span><span class="m">0</span>.13<span class="p">|</span><span class="m">0</span>.19<span class="p">|</span><span class="m">0</span>.0247
+...
+</pre></div>
+</div>
+<p>V dalším kroku vektorovou mapu převedeme na rastrovou reprezentaci
+modulem <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.to.rast.html">v.to.rast</a>. Pro zachovaní informací použijeme
+prostorové rozlišení <em>1 m</em> (<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.region.html">g.region</a>,
+viz. <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/region.html">výpočetní region</a> ze školení GRASS GIS pro
+začátečníky).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>dmt<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">1</span>
+v.to.rast<span class="w"> </span><span class="nv">input</span><span class="o">=</span>hpj_kpp_land<span class="w"> </span><span class="nv">output</span><span class="o">=</span>hpj_kpp_land_kc<span class="w"> </span><span class="nv">use</span><span class="o">=</span>attr<span class="w"> </span><span class="nv">attribute_column</span><span class="o">=</span>KC
+</pre></div>
+</div>
+<p>Pomocí modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.resamp.stats.html">r.resamp.stats</a> provedeme převzorkovaní na
+prostorové rozlišení DMT <em>10m</em> a to na základě průměru hodnot
+vypočítaného z hodnot okolních buněk. Tímto postupom zabráníme ztrátě
+informací, ke kterému by došlo při přímém převodu na rastr s
+rozlišením <em>10m</em>. Při rasterizaci se totiž hodnota buňky rastru
+odvozuje na základě polygonu, který prochází středem buňky anebo na
+základě polygonu, který zabírá největší část plochy buňky.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>dmt
+r.resamp.stats<span class="w"> </span><span class="nv">input</span><span class="o">=</span>hpj_kpp_land_kc<span class="w"> </span><span class="nv">output</span><span class="o">=</span>hpj_kpp_land_kc10
+</pre></div>
+</div>
+<p>Na obrázku <a class="reference internal" href="#porovkn"><span class="std std-numref">Obr. 36</span></a> je znázorněná část zájmového území, kde
+možno vidět rastrovou vrstvu <span class="map">hpj_kpp_land_kc</span> před (vlevo dole)
+a po použití modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.resamp.stats.html">r.resamp.stats</a>.</p>
+<figure class="align-center" id="id10">
+<span id="porovkn"></span><img alt="../_images/10a.png" src="../_images/10a.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 36 </span><span class="caption-text">Část zájmového území s faktorem <em>KC</em> před a po převzorkovaní.</span><a class="headerlink" href="#id10" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Kvůli vizualizaci nastavíme vhodnou <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/rastrova_data/tabulka-barev.html">tabulku barev</a> a kvůli
+přehlednosti mapu přejmenujeme na <span class="map">kc</span> modulem
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.rename.html">g.rename</a>. Výsledek je na <a class="reference internal" href="#kc"><span class="std std-numref">Obr. 37</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.colors<span class="w"> </span><span class="nv">map</span><span class="o">=</span>hpj_kpp_land_kc10<span class="w"> </span><span class="nv">color</span><span class="o">=</span>wave
+g.rename<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>hpj_kpp_land_kc10,kc
+</pre></div>
+</div>
+<figure class="align-center" id="id11">
+<span id="kc"></span><img alt="../_images/11.png" class="small" src="../_images/11.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 37 </span><span class="caption-text">Faktor <em>KC</em> zahrnující vliv eroze půdy a vliv ochranného vlivu
+vegetačního pokrytu.</span><a class="headerlink" href="#id11" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="r-a-p-faktor">
+<h3>R a P faktor<a class="headerlink" href="#r-a-p-faktor" title="Permalink to this heading">¶</a></h3>
+<p>Hodnoty těchto parametrů nebudeme odvozovat jako ty předcházející. V
+tomto případě jednoduše použijeme průmernou hodnotu <code class="docutils literal notranslate"><span class="pre">R</span></code> a <code class="docutils literal notranslate"><span class="pre">P</span></code>
+faktoru pro Českou republiku, t.j <code class="docutils literal notranslate"><span class="pre">R</span> <span class="pre">=</span> <span class="pre">40</span></code> a <code class="docutils literal notranslate"><span class="pre">P</span> <span class="pre">=</span> <span class="pre">1</span></code>.</p>
+</section>
+<section id="vypocet-prumerne-dlouhodobe-ztraty-pudy">
+<h3>Výpočet průmerné dlouhodobé ztráty půdy<a class="headerlink" href="#vypocet-prumerne-dlouhodobe-ztraty-pudy" title="Permalink to this heading">¶</a></h3>
+<p>Ztrátu půdy <cite>G</cite> vypočítame modulem <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.mapcalc.html">r.mapcalc</a>
+(<code class="xref std std-numref docutils literal notranslate"><span class="pre">rmapcalc</span></code>), přičemž vycházíme ze vztahu, který byl uvedený v
+<a class="reference internal" href="#vzorec-g"><span class="std std-ref">teoretické časti školení</span></a>.</p>
+<figure class="align-center" id="rmapcalc">
+<img alt="../_images/15.png" class="small" src="../_images/15.png" />
+</figure>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.mapcalc<span class="w"> </span><span class="nv">expr</span><span class="o">=</span><span class="s2">&quot;g = 40 ∗ ls ∗ kc ∗ 1&quot;</span>
+r.colors<span class="w"> </span>-n<span class="w"> </span>-e<span class="w"> </span><span class="nv">map</span><span class="o">=</span>g<span class="w"> </span><span class="nv">color</span><span class="o">=</span>corine
+</pre></div>
+</div>
+<p>Pro výslednou vrstvu zvolíme vhodnou barevnou škálu, přidáme legendu,
+měřítko a mapu zobrazíme (<a class="reference internal" href="#map-g"><span class="std std-numref">Obr. 38</span></a>)</p>
+<figure class="align-center" id="id12">
+<span id="map-g"></span><img alt="../_images/12.png" class="small" src="../_images/12.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 38 </span><span class="caption-text">Vrstva s hodnotami představujícími průměrnou dlouhodobou ztrátu
+půdy G v jednotkách <span class="math notranslate nohighlight">\(t.ha^{-1} . rok^{-1}\)</span>.</span><a class="headerlink" href="#id12" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Na <a class="reference internal" href="#map-g"><span class="std std-numref">Obr. 38</span></a> je maximální hodnota v legendě <em>1</em>. Je to
+pouze z důvodu, aby byl výsledek přehledný a korespondoval s
+barvami v mapě. V skutečnosti parametr <code class="docutils literal notranslate"><span class="pre">G</span></code> nabývá hodnot až
+<em>230</em>, při takovémto rozsahu by byla stupnice v legendě
+jednobarevná (v našem případě červená).  Změnit rozsah intervalu v
+legendě bylo možné nastavením parametru <em>range</em>, konkrétněji
+příkazem <code class="code docutils literal notranslate"><span class="pre">d.legend</span> <span class="pre">raster=g</span> <span class="pre">range=0,1</span></code>.</p>
+</div>
+</section>
+<section id="prumerna-hodnota-ztraty-pro-povodi">
+<h3>Průměrná hodnota ztráty pro povodí<a class="headerlink" href="#prumerna-hodnota-ztraty-pro-povodi" title="Permalink to this heading">¶</a></h3>
+<p>Na určení průměrné hodnoty a sumy ztráty pro každé částečné povodí
+využijeme modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.rast.stats.html">v.rast.stats</a>. Klíčovou vrstvou je
+vektorová mapa povodí <span class="map">povodi_iv</span>, kde nastavíme pro nově
+vytvořený sloupec prefix <span class="item">g_</span>. Z těchto hodnot potom modulem
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.univar.html">v.db.univar</a> vypočítáme statistiky průměrných hodnot ztráty
+půdy.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.rast.stats<span class="w"> </span><span class="nv">map</span><span class="o">=</span>povodi_iv<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>g<span class="w"> </span><span class="nv">column_prefix</span><span class="o">=</span>g<span class="w"> </span><span class="nv">method</span><span class="o">=</span>average
+v.db.univar<span class="w"> </span><span class="nv">map</span><span class="o">=</span>povodi_iv<span class="w"> </span><span class="nv">column</span><span class="o">=</span>g_average
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Vektorová vrstva povodí musí být umístěna v aktuálním
+mapsetu. Pokud například pracujeme v jiném mapsetu, stačí
+když ji přidáme z mapsetu <span class="mapset">PERMANENT</span> a následně v
+menu pravým kliknutím na mapě zvolíme <span class="item">Make a copy in
+the current mapset</span>.</p>
+</div>
+<p>Pro účely vizualizace vektorovou vrstvu převedeme na rastr, pomocí
+modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.colors.html">r.colors</a> nastavíme vhodnou tabulku barev a výsledek
+prezentujeme, viz. <a class="reference internal" href="#g-average"><span class="std std-numref">Obr. 39</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.to.rast<span class="w"> </span><span class="nv">input</span><span class="o">=</span>povodi_iv<span class="w"> </span><span class="nv">output</span><span class="o">=</span>pov_avg_G<span class="w"> </span><span class="nv">use</span><span class="o">=</span>attr<span class="w"> </span><span class="nv">attribute_column</span><span class="o">=</span>g_average
+r.colors<span class="w"> </span>-e<span class="w"> </span><span class="nv">map</span><span class="o">=</span>pov_avg_G<span class="w"> </span><span class="nv">color</span><span class="o">=</span>bgyr
+</pre></div>
+</div>
+<figure class="align-center" id="id13">
+<span id="g-average"></span><img alt="../_images/13.png" src="../_images/13.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 39 </span><span class="caption-text">Povodí s průměrnými hodnotami ztráty půdy</span><a class="headerlink" href="#id13" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Z důvodu přehlednosti je opět interval v legendě
+upravený. Maximální hodnota průmerné ztráty půdy na povodí
+je až <em>0.74</em> (v jednotkách <span class="math notranslate nohighlight">\(t.ha^{-1} . rok^{-1}\)</span>)</p>
+</div>
+</section>
+<section id="zahrnuti-prvku-prerusujicich-odtok">
+<h3>Zahrnutí prvků prerušujících odtok<a class="headerlink" href="#zahrnuti-prvku-prerusujicich-odtok" title="Permalink to this heading">¶</a></h3>
+<p>Pro výpočet uvedený výše vychází ztráta půdy v některých místech
+enormně vysoká. To je způsobené tím, že ve výpočtech nejsou zahrnuté
+liniové a plošné prvky přerušující povrchový odtok. Těmito prvky jsou
+především budovy, příkopy dálnic a silnic, železniční tratě anebo
+ploty lemující pozemky.</p>
+<p>Abysme zjistili přesnější hodnoty, je nutné tyto prvky do výpočtu
+zahrnout. Pro tento účel použijeme masku liniových a plošných prvků
+přerušujících odtok <span class="map">maska.pack</span> a vypočítame nové hodnoty LS
+faktoru a ztráty půdy. Vstupem bude <span class="map">dmt</span> bez prvků přerušujících
+odtok (<a class="reference internal" href="#dmt-m"><span class="std std-numref">Obr. 40</span></a>).</p>
+<div class="admonition-todo admonition" id="id3">
+<p class="admonition-title">Todo</p>
+<p>Tuto část je potřeba rozšířit. Maska by se dala určit z
+RÚIAN, a pod.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.unpack<span class="w"> </span>-o<span class="w"> </span><span class="nv">input</span><span class="o">=</span>MASK.pack<span class="w"> </span><span class="nv">output</span><span class="o">=</span>maska
+r.mask<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>maska
+r.terraflow<span class="w"> </span><span class="nv">elevation</span><span class="o">=</span>dmt<span class="w"> </span><span class="nv">filled</span><span class="o">=</span>dmt_fill_m<span class="w"> </span><span class="nv">direction</span><span class="o">=</span>dir_m<span class="w"> </span><span class="nv">swatershed</span><span class="o">=</span><span class="nv">sink_maccumulation</span><span class="o">=</span>accu_m<span class="w"> </span><span class="nv">tci</span><span class="o">=</span>tci_m
+</pre></div>
+</div>
+<figure class="align-center" id="id14">
+<span id="dmt-m"></span><img alt="../_images/14a.png" class="small" src="../_images/14a.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 40 </span><span class="caption-text">Vrstva digitálního modelu terénu vstupujícího do výpočtu bez prvků
+přerušujících odtok.</span><a class="headerlink" href="#id14" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Dále dopočítame faktor <em>LS</em> a následně <em>G</em>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.mapcalc<span class="w"> </span><span class="nv">expr</span><span class="o">=</span><span class="s2">&quot;ls_m = pow(accu_m * (10.0 / 22.13), 0.6) * pow(sin(svah * (3.1415926/180)) / 0.09, 1.3)&quot;</span>
+r.mapcalc<span class="w"> </span><span class="nv">expr</span><span class="o">=</span><span class="s2">&quot;g_m = 40 ∗ ls_m ∗ kc ∗ 1&quot;</span>
+
+r.colors<span class="w"> </span><span class="nv">map</span><span class="o">=</span>ls_m<span class="w"> </span><span class="nv">color</span><span class="o">=</span>wave
+r.colors<span class="w"> </span>-n<span class="w"> </span>-e<span class="w"> </span><span class="nv">map</span><span class="o">=</span>g_m<span class="w"> </span><span class="nv">color</span><span class="o">=</span>corine
+</pre></div>
+</div>
+<p>V posledním kroku vymažeme masku, výsledky zobrazíme a porovnáme
+(<a class="reference internal" href="#ls-porov"><span class="std std-numref">Obr. 41</span></a> a <a class="reference internal" href="#g-porov"><span class="std std-numref">Obr. 42</span></a>).</p>
+<figure class="align-center" id="id15">
+<span id="ls-porov"></span><a class="reference internal image-reference" href="../_images/ls_porov.png"><img alt="../_images/ls_porov.png" src="../_images/ls_porov.png" style="width: 574.2px; height: 286.55px;" /></a>
+<figcaption>
+<p><span class="caption-number">Obr. 41 </span><span class="caption-text">Porovnání hodnot faktoru LS bez ohledu na prvky přerušující odtok
+(vlevo) a s prvky přerušujícími odtok (vpravo).</span><a class="headerlink" href="#id15" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id16">
+<span id="g-porov"></span><a class="reference internal image-reference" href="../_images/g_porov.png"><img alt="../_images/g_porov.png" src="../_images/g_porov.png" style="width: 584.25px; height: 292.97999999999996px;" /></a>
+<figcaption>
+<p><span class="caption-number">Obr. 42 </span><span class="caption-text">Porovnaní výsledků USLE bez ohledu na prvky přerušující odtok
+(vlevo) a s prvky přerušujícími odtok (vpravo).</span><a class="headerlink" href="#id16" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="prumerna-hodnota-ztraty-pro-povodi-s-prvky-prerusujicimi-odtok">
+<h3>Průměrná hodnota ztráty pro povodí s prvky přerušujícími odtok<a class="headerlink" href="#prumerna-hodnota-ztraty-pro-povodi-s-prvky-prerusujicimi-odtok" title="Permalink to this heading">¶</a></h3>
+<p>Opět využijeme modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.rast.stats.html">v.rast.stats</a>. Vektorové mapě povodí
+<span class="map">povodi_iv</span> nastavíme prefix <span class="item">g_m</span> pro nově vytvořený
+sloupec a potom modulem <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.univar.html">v.db.univar</a> zobrazíme statistiky
+průměrných hodnot ztráty půdy. Výsledek v rastrové podobě je na
+<a class="reference internal" href="#g-m-average"><span class="std std-numref">Obr. 43</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.rast.stats<span class="w"> </span><span class="nv">map</span><span class="o">=</span>povodi_iv<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>g_m<span class="w"> </span><span class="nv">column_prefix</span><span class="o">=</span>g_m<span class="w"> </span><span class="nv">method</span><span class="o">=</span>average
+v.db.univar<span class="w"> </span><span class="nv">map</span><span class="o">=</span>povodi_iv<span class="w"> </span><span class="nv">column</span><span class="o">=</span>g_m_average
+
+v.to.rast<span class="w"> </span><span class="nv">input</span><span class="o">=</span>povodi_iv<span class="w"> </span><span class="nv">output</span><span class="o">=</span>pov_avg_G_m<span class="w"> </span><span class="nv">use</span><span class="o">=</span>attr<span class="w"> </span><span class="nv">attribute_column</span><span class="o">=</span>g_m_average
+r.colors<span class="w"> </span>-e<span class="w"> </span><span class="nv">map</span><span class="o">=</span>pov_avg_G_m<span class="w"> </span><span class="nv">color</span><span class="o">=</span>bgyr
+</pre></div>
+</div>
+<figure class="align-center" id="id17">
+<span id="g-m-average"></span><img alt="../_images/16.png" src="../_images/16.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 43 </span><span class="caption-text">Povodí s průměrnými hodnotami ztráty půdy s uvážením prvků,
+které přerušují odtok.</span><a class="headerlink" href="#id17" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Na závěr vypočítáme rozdíly (modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.mapcalc.html">r.mapcalc</a>) výsledných
+vrstev bez a s uvážením prvků, které přerušují odtok pro faktor <em>LS</em>,
+hodnoty představující průměrnou dlouhodobou ztrátu půdy <em>G</em> a povodí s
+průměrnými hodnotami ztráty půdy <em>G_pov</em>. Nazveme je <span class="map">delta_ls</span>,
+<span class="map">delta_g</span> a <span class="map">delta_pov_avg</span> a nastavíme barevnou stupnici
+<span class="item">differences</span>. Viz. <a class="reference internal" href="#diff"><span class="std std-numref">Obr. 44</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.mapcalc<span class="w"> </span><span class="nv">expression</span><span class="o">=</span><span class="nv">delta_ls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>ls<span class="w"> </span>-<span class="w"> </span>ls_m
+r.mapcalc<span class="w"> </span><span class="nv">expression</span><span class="o">=</span><span class="nv">delta_g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>g<span class="w"> </span>-<span class="w"> </span>g_m
+r.mapcalc<span class="w"> </span><span class="nv">expression</span><span class="o">=</span><span class="nv">delta_pov_avg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>pov_avg_G<span class="w"> </span>-<span class="w"> </span>pov_avg_G_m
+
+r.colors<span class="w"> </span><span class="nv">map</span><span class="o">=</span>delta_ls<span class="w"> </span><span class="nv">color</span><span class="o">=</span>differences
+r.colors<span class="w"> </span><span class="nv">map</span><span class="o">=</span>delta_g<span class="w"> </span><span class="nv">color</span><span class="o">=</span>differences
+r.colors<span class="w"> </span><span class="nv">map</span><span class="o">=</span>delta_pov_avg<span class="w"> </span><span class="nv">color</span><span class="o">=</span>differences
+</pre></div>
+</div>
+<figure class="align-center" id="id18">
+<span id="diff"></span><a class="reference internal image-reference" href="../_images/diff.png"><img alt="../_images/diff.png" src="../_images/diff.png" style="width: 679.8000000000001px; height: 240.9px;" /></a>
+<figcaption>
+<p><span class="caption-number">Obr. 44 </span><span class="caption-text">Znázornění rozdílů rastrových vrstev LS, G a G_pov, které
+vznikly bez uvážení a s uvážením prvků, které přerušují odtok.</span><a class="headerlink" href="#id18" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+<section id="poznamky">
+<h2>Poznámky<a class="headerlink" href="#poznamky" title="Permalink to this heading">¶</a></h2>
+<p>GRASS nabízí na výpočet USLE dva užitečné moduly <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.uslek.html">r.uslek</a> a
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.usler.html">r.usler</a>.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Hydrologie</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="scs-cn.html">Metoda SCS CN</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Průměrná dlouhodobá ztráta půdy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="scs-cn.html" title="Metoda SCS CN"
+              >předchozí</a> |
+            <a href="../tgrass/index.html" title="Časoprostorové analýzy"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

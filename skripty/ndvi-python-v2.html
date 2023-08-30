@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>NDVI - Pokročilejší verze skriptu &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="PyGRASS" href="../pygrass/index.html" />
+    <link rel="prev" title="NDVI - Základní verze skriptu" href="ndvi-python-v1.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="ndvi-python-v1.html" title="NDVI - Základní verze skriptu"
+             accesskey="P">předchozí</a> |
+          <a href="../pygrass/index.html" title="PyGRASS"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="ndvi-pokrocilejsi-verze-skriptu">
+<h1>NDVI - Pokročilejší verze skriptu<a class="headerlink" href="#ndvi-pokrocilejsi-verze-skriptu" title="Permalink to this heading">¶</a></h1>
+<p>Pokročilejší verze skriptu je rozšířena o:</p>
+<ul class="simple">
+<li><p>uživatelské rozhraní, řádky <span class="lcode">3-23</span></p></li>
+<li><p>vstupní parametry (<code class="xref std std-option docutils literal notranslate"><span class="pre">red</span></code>, <code class="xref std std-option docutils literal notranslate"><span class="pre">nir</span></code>, <code class="xref std std-option docutils literal notranslate"><span class="pre">aoi</span></code> a
+<code class="xref std std-option docutils literal notranslate"><span class="pre">classes</span></code>), viz řádky <span class="lcode">6-23</span></p></li>
+<li><p>uživatelské rozhraní je zpracováno funkcí <code class="docutils literal notranslate"><span class="pre">parse()</span></code> (řádek
+<span class="lcode">97</span>), která je součástí balíčku <code class="docutils literal notranslate"><span class="pre">grass.script</span></code> (řádek
+<span class="lcode">28</span>)</p></li>
+<li><p>hodnoty parametrů jsou na řádku <span class="lcode">97</span> uloženy do proměnné
+<code class="docutils literal notranslate"><span class="pre">options</span></code>, přepínače do proměnné <code class="docutils literal notranslate"><span class="pre">flags</span></code>, ty jsou dále použity
+na řádcích <span class="lcode">33-35,57,75</span></p></li>
+<li><p>celý kód je vložen do funkce <code class="docutils literal notranslate"><span class="pre">main()</span></code> (řádek <span class="lcode">32</span>)</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span>
+<span class="hll"><span class="linenos"> 3</span><span class="c1">#%module</span>
+</span><span class="hll"><span class="linenos"> 4</span><span class="c1">#% description: Creates reclassified NDVI based on given AOI.</span>
+</span><span class="hll"><span class="linenos"> 5</span><span class="c1">#%end</span>
+</span><span class="hll"><span class="linenos"> 6</span><span class="c1">#%option G_OPT_R_MAP</span>
+</span><span class="hll"><span class="linenos"> 7</span><span class="c1">#% key: red</span>
+</span><span class="hll"><span class="linenos"> 8</span><span class="c1">#% description: Name of red channel</span>
+</span><span class="hll"><span class="linenos"> 9</span><span class="c1">#% answer: LC81920252013215LGN00_B4@landsat</span>
+</span><span class="hll"><span class="linenos">10</span><span class="c1">#%end</span>
+</span><span class="hll"><span class="linenos">11</span><span class="c1">#%option G_OPT_R_MAP</span>
+</span><span class="hll"><span class="linenos">12</span><span class="c1">#% key: nir</span>
+</span><span class="hll"><span class="linenos">13</span><span class="c1">#% description: Name of nir channel</span>
+</span><span class="hll"><span class="linenos">14</span><span class="c1">#% answer: LC81920252013215LGN00_B5@landsat</span>
+</span><span class="hll"><span class="linenos">15</span><span class="c1">#%end</span>
+</span><span class="hll"><span class="linenos">16</span><span class="c1">#%option G_OPT_V_MAP</span>
+</span><span class="hll"><span class="linenos">17</span><span class="c1">#% key: aoi</span>
+</span><span class="hll"><span class="linenos">18</span><span class="c1">#% answer: obce@ruian_praha</span>
+</span><span class="hll"><span class="linenos">19</span><span class="c1">#%end</span>
+</span><span class="hll"><span class="linenos">20</span><span class="c1">#%option G_OPT_F_INPUT</span>
+</span><span class="hll"><span class="linenos">21</span><span class="c1">#% key: classes</span>
+</span><span class="hll"><span class="linenos">22</span><span class="c1">#% required: no</span>
+</span><span class="hll"><span class="linenos">23</span><span class="c1">#%end</span>
+</span><span class="linenos">24</span>
+<span class="linenos">25</span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="linenos">26</span><span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">PIPE</span>
+<span class="linenos">27</span>
+<span class="hll"><span class="linenos">28</span><span class="kn">from</span> <span class="nn">grass.script</span> <span class="kn">import</span> <span class="n">parser</span><span class="p">,</span> <span class="n">fatal</span><span class="p">,</span> <span class="n">message</span>
+</span><span class="linenos">29</span>
+<span class="linenos">30</span><span class="kn">from</span> <span class="nn">grass.pygrass.modules</span> <span class="kn">import</span> <span class="n">Module</span>
+<span class="linenos">31</span>
+<span class="hll"><span class="linenos">32</span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span><span class="hll"><span class="linenos">33</span>    <span class="n">vis</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">]</span>
+</span><span class="hll"><span class="linenos">34</span>    <span class="n">nir</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;nir&#39;</span><span class="p">]</span>
+</span><span class="hll"><span class="linenos">35</span>    <span class="n">aoi</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;aoi&#39;</span><span class="p">]</span>
+</span><span class="linenos">36</span>    <span class="k">if</span> <span class="s1">&#39;@&#39;</span> <span class="ow">in</span> <span class="n">aoi</span><span class="p">:</span>
+<span class="linenos">37</span>        <span class="n">aoi_name</span> <span class="o">=</span> <span class="n">aoi</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos">38</span>    <span class="k">else</span><span class="p">:</span>
+<span class="linenos">39</span>        <span class="n">aoi_name</span> <span class="o">=</span> <span class="n">aoi</span>
+<span class="linenos">40</span>    
+<span class="linenos">41</span>    <span class="n">ndvi</span> <span class="o">=</span> <span class="s2">&quot;ndvi_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aoi_name</span><span class="p">)</span>
+<span class="linenos">42</span>    <span class="n">r_ndvi</span><span class="o">=</span> <span class="s2">&quot;r_ndvi_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aoi_name</span><span class="p">)</span>
+<span class="linenos">43</span>
+<span class="linenos">44</span>    <span class="c1"># 0. nastavit vypocetni region</span>
+<span class="linenos">45</span>    <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;g.region&#39;</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="n">vis</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="n">aoi</span><span class="p">)</span>
+<span class="linenos">46</span>    
+<span class="linenos">47</span>    <span class="c1"># 1. vypocet NDVI</span>
+<span class="linenos">48</span>    <span class="n">message</span><span class="p">(</span><span class="s2">&quot;VIS: </span><span class="si">{0}</span><span class="s2"> ; NIR: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">nir</span><span class="p">))</span>
+<span class="linenos">49</span>    <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;r.mapcalc&#39;</span><span class="p">,</span>
+<span class="linenos">50</span>           <span class="n">expression</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{o}</span><span class="s2"> = float(</span><span class="si">{n}</span><span class="s2"> - </span><span class="si">{v}</span><span class="s2">) / (</span><span class="si">{n}</span><span class="s2"> + </span><span class="si">{v}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="o">=</span><span class="n">ndvi</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">vis</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">nir</span><span class="p">),</span>
+<span class="linenos">51</span>           <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">52</span>    
+<span class="linenos">53</span>    <span class="c1"># 2. reklasifikace (1,2,3)</span>
+<span class="linenos">54</span>    <span class="n">message</span><span class="p">(</span><span class="s2">&quot;Reklasifikuji...&quot;</span><span class="p">)</span>
+<span class="linenos">55</span>    <span class="c1"># r.reclass umi reklasifikovat pouze celociselne rastry, proto pouzime</span>
+<span class="linenos">56</span>    <span class="c1"># r.recode</span>
+<span class="hll"><span class="linenos">57</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;classes&#39;</span><span class="p">]:</span>
+</span><span class="linenos">58</span>        <span class="n">recode</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="linenos">59</span><span class="s2">        -1:0.05:1 </span>
+<span class="linenos">60</span><span class="s2">        0.05:0.35:2 </span>
+<span class="linenos">61</span><span class="s2">        0.35:1:3</span>
+<span class="linenos">62</span><span class="s2">        &quot;&quot;&quot;</span>
+<span class="linenos">63</span>        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos">64</span>            <span class="s1">&#39;rules&#39;</span> <span class="p">:</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span>
+<span class="linenos">65</span>            <span class="s1">&#39;stdin_&#39;</span> <span class="p">:</span> <span class="n">recode</span>
+<span class="linenos">66</span>        <span class="p">}</span>
+<span class="linenos">67</span>    <span class="k">else</span><span class="p">:</span>
+<span class="linenos">68</span>        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos">69</span>            <span class="s1">&#39;rules&#39;</span> <span class="p">:</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;classes&#39;</span><span class="p">]</span>
+<span class="linenos">70</span>        <span class="p">}</span>
+<span class="linenos">71</span>    <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;r.recode&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">ndvi</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">r_ndvi</span><span class="p">,</span>
+<span class="linenos">72</span>           <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="linenos">73</span>    
+<span class="linenos">74</span>    <span class="c1"># 3. tabulka barev</span>
+<span class="hll"><span class="linenos">75</span>    <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;classes&#39;</span><span class="p">]:</span>
+</span><span class="linenos">76</span>        <span class="n">colors</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="linenos">77</span><span class="s2">        1 red</span>
+<span class="linenos">78</span><span class="s2">        2 yellow</span>
+<span class="linenos">79</span><span class="s2">        3 0 136 26</span>
+<span class="linenos">80</span><span class="s2">        &quot;&quot;&quot;</span>
+<span class="linenos">81</span>        <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;r.colors&#39;</span><span class="p">,</span> <span class="nb">map</span><span class="o">=</span><span class="n">r_ndvi</span><span class="p">,</span>
+<span class="linenos">82</span>               <span class="n">rules</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stdin_</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+<span class="linenos">83</span>    
+<span class="linenos">84</span>    <span class="c1"># 4. vypsat vysledek</span>
+<span class="linenos">85</span>    <span class="n">message</span><span class="p">(</span><span class="s2">&quot;Generuji report...&quot;</span><span class="p">)</span>
+<span class="linenos">86</span>    <span class="n">report</span> <span class="o">=</span> <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;r.stats&#39;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="s1">&#39;pl&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">r_ndvi</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">stdout_</span><span class="o">=</span><span class="n">PIPE</span><span class="p">)</span>
+<span class="linenos">87</span>    
+<span class="linenos">88</span>    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+<span class="linenos">89</span>        <span class="n">trida</span><span class="p">,</span> <span class="n">popisek</span><span class="p">,</span> <span class="n">procento</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+<span class="linenos">90</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Trida </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trida</span><span class="p">,</span> <span class="n">procento</span><span class="p">))</span>
+<span class="linenos">91</span>        
+<span class="linenos">92</span>    <span class="k">return</span> <span class="mi">0</span>
+<span class="linenos">93</span>
+<span class="linenos">94</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="linenos">95</span>    <span class="n">options</span><span class="p">,</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">parser</span><span class="p">()</span>
+<span class="linenos">96</span>    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Výsledná verze skriptu ke stažení <a class="reference external" href="../_static/skripty/ndvi-v2.py">zde</a>.</p>
+<figure class="align-center" id="id2">
+<span id="wxgui-ndvi-v2-0"></span><img alt="../_images/wxgui-ndvi-v2-0.png" src="../_images/wxgui-ndvi-v2-0.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 11 </span><span class="caption-text">Příklad spuštění pokročilé verze skriptu v GUI, výběr vstupních
+parametru v dialogu nástroje.</span><a class="headerlink" href="#id2" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id3">
+<img alt="../_images/wxgui-ndvi-v2-1.png" src="../_images/wxgui-ndvi-v2-1.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 12 </span><span class="caption-text">Výsledek je vypsán do záložky <span class="item">Command output</span> v dialogu
+nástroje.</span><a class="headerlink" href="#id3" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<section id="poznamky-k-uzivatelskemu-rozhrani">
+<h2>Poznámky k uživatelskému rozhraní<a class="headerlink" href="#poznamky-k-uzivatelskemu-rozhrani" title="Permalink to this heading">¶</a></h2>
+<p>Parametry jsou definovány pomocí tzv. <a class="reference external" href="http://grass.osgeo.org/programming7/parser__standard__options_8c.html">standardizovaných voleb</a>,
+např. <code class="docutils literal notranslate"><span class="pre">G_OPT_R_MAP</span></code> definující parametr pro volbu rastrové mapy. V
+našem případě změníme potřebné vlastnosti (<code class="docutils literal notranslate"><span class="pre">key</span></code>, <code class="docutils literal notranslate"><span class="pre">description</span></code>) a
+zvolíme výchozí hodnotu parametru pro snažší testování (<code class="docutils literal notranslate"><span class="pre">answer</span></code>).</p>
+<p>Ve výsledku se skript chová jako standardní modul systému GRASS,
+přepínačem <code class="xref std std-option docutils literal notranslate"><span class="pre">--help</span></code> obdržíme informace o jeho syntaxi.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ndvi-v2.py<span class="w"> </span>--help
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Creates</span> <span class="n">reclassified</span> <span class="n">NDVI</span> <span class="n">based</span> <span class="n">on</span> <span class="n">given</span> <span class="n">AOI</span><span class="o">.</span>
+<span class="n">Usage</span><span class="p">:</span>
+ <span class="n">ndvi</span><span class="o">-</span><span class="n">v2</span><span class="o">.</span><span class="n">py</span> <span class="n">red</span><span class="o">=</span><span class="n">name</span> <span class="n">nir</span><span class="o">=</span><span class="n">name</span> <span class="n">aoi</span><span class="o">=</span><span class="n">name</span> <span class="p">[</span><span class="n">classes</span><span class="o">=</span><span class="n">name</span><span class="p">]</span>
+<span class="p">[</span><span class="o">--</span><span class="n">help</span><span class="p">]</span>
+   <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">quiet</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">ui</span><span class="p">]</span>
+<span class="n">Parameters</span><span class="p">:</span>
+      <span class="n">red</span>   <span class="n">Name</span> <span class="n">of</span> <span class="n">red</span> <span class="n">channel</span>
+            <span class="n">default</span><span class="p">:</span> <span class="n">LC81920252013215LGN00_B4</span><span class="nd">@landsat</span>
+      <span class="n">nir</span>   <span class="n">Name</span> <span class="n">of</span> <span class="n">nir</span> <span class="n">channel</span>
+            <span class="n">default</span><span class="p">:</span> <span class="n">LC81920252013215LGN00_B5</span><span class="nd">@landsat</span>
+      <span class="n">aoi</span>   <span class="n">Name</span> <span class="n">of</span> <span class="n">vector</span> <span class="nb">map</span>
+            <span class="n">default</span><span class="p">:</span> <span class="n">obce</span><span class="nd">@ruian_praha</span>
+  <span class="n">classes</span>   <span class="n">Name</span> <span class="n">of</span> <span class="nb">input</span> <span class="n">file</span>
+</pre></div>
+</div>
+</section>
+<section id="poznamky-k-vypisovani-informacnich-zprav">
+<h2>Poznámky k vypisování informačních zpráv<a class="headerlink" href="#poznamky-k-vypisovani-informacnich-zprav" title="Permalink to this heading">¶</a></h2>
+<p>Nahradili jsme funkci <code class="docutils literal notranslate"><span class="pre">print()</span></code> pro vypisování zpráv o průběhu
+funkcí <code class="docutils literal notranslate"><span class="pre">message()</span></code> z balíčku <code class="docutils literal notranslate"><span class="pre">grass.script</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;VIS: </span><span class="si">{0}</span><span class="s2"> ; NIR: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">nir</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>přepsáno na</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="n">message</span><span class="p">(</span><span class="s2">&quot;VIS: </span><span class="si">{0}</span><span class="s2"> ; NIR: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">nir</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Díky tomu budou fungovat globální přepínače <code class="xref std std-option docutils literal notranslate"><span class="pre">--quiet</span></code> a
+<code class="xref std std-option docutils literal notranslate"><span class="pre">--verbose</span></code> pro tichý, resp. upovídaný mód.  Např. při použítí
+volby <code class="xref std std-option docutils literal notranslate"><span class="pre">--quiet</span></code> se vypíše pouze výsledný report, ostatní
+zprávy o průběhu výpočtu budou skryty.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ndvi-v2.py<span class="w"> </span><span class="nv">red</span><span class="o">=</span>LC81920252013215LGN00_B4@landsat<span class="w"> </span><span class="nv">nir</span><span class="o">=</span>LC81920252013215LGN00_B5@landsat<span class="w"> </span><span class="nv">aoi</span><span class="o">=</span>obce@ruian_praha<span class="w"> </span>--q
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Trida</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">1.30</span><span class="o">%</span>
+<span class="n">Trida</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">72.33</span><span class="o">%</span>
+<span class="n">Trida</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">26.37</span><span class="o">%</span>
+</pre></div>
+</div>
+</section>
+<section id="poznamky-ke-spusteni-modulu">
+<h2>Poznámky ke spuštění modulu<a class="headerlink" href="#poznamky-ke-spusteni-modulu" title="Permalink to this heading">¶</a></h2>
+<p>Pokud skript spustíme bez parametrů mělo by vyskočit grafické okno
+podobné ostatním modulům systému GRASS.</p>
+<figure class="align-center" id="id4">
+<img alt="../_images/wxgui-ndvi-v2-0.png" src="../_images/wxgui-ndvi-v2-0.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 13 </span><span class="caption-text">Vygenerovaný grafický dialog skriptu.</span><a class="headerlink" href="#id4" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Mějme soubor <cite>classes.txt</cite> s odlišným rozdělením tříd:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">1</span> 
+<span class="mf">0.1</span><span class="p">:</span><span class="mf">0.40</span><span class="p">:</span><span class="mi">2</span> 
+<span class="mf">0.40</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span>
+</pre></div>
+</div>
+<p>Soubor ke stažení <a class="reference external" href="../_static/skripty/classes.txt">zde</a>.</p>
+<blockquote>
+<div><p>Spuštění skriptu bude vypadat následovně</p>
+</div></blockquote>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ndvi-v2.py<span class="w"> </span><span class="nv">red</span><span class="o">=</span>LC81920252013215LGN00_B4@landsat<span class="w"> </span><span class="nv">nir</span><span class="o">=</span>LC81920252013215LGN00_B5@landsat<span class="w"> </span><span class="nv">aoi</span><span class="o">=</span>obce@ruian_praha<span class="w"> </span><span class="nv">classes</span><span class="o">=</span>classes.txt
+</pre></div>
+</div>
+<p>s výsledkem:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Trida</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">4.70</span><span class="o">%</span>
+<span class="n">Trida</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">79.37</span><span class="o">%</span>
+<span class="n">Trida</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">15.93</span><span class="o">%</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Úvod do skriptování</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="spusteni.html">Spuštění skriptu</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="ndvi.html">Ukázka skriptu (NDVI)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="ndvi-python-v1.html" title="NDVI - Základní verze skriptu"
+              >předchozí</a> |
+            <a href="../pygrass/index.html" title="PyGRASS"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

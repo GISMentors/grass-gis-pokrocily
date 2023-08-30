@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>PyGRASS &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Přístup k rastrovým datům" href="rastry.html" />
+    <link rel="prev" title="NDVI - Pokročilejší verze skriptu" href="../skripty/ndvi-python-v2.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="../skripty/ndvi-python-v2.html" title="NDVI - Pokročilejší verze skriptu"
+             accesskey="P">předchozí</a> |
+          <a href="rastry.html" title="Přístup k rastrovým datům"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="pygrass">
+<h1>PyGRASS<a class="headerlink" href="#pygrass" title="Permalink to this heading">¶</a></h1>
+<p><a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass_index.html">PyGRASS</a> je objektově orientované
+rozhraní pro programování aplikací (<a class="reference external" href="http://cs.wikipedia.org/wiki/API">API</a>) v jazyku
+<a class="reference external" href="http://cs.wikipedia.org/wiki/Python">Python</a> programu GRASS GIS. PyGRASS umožňuje volat
+nástroje systému GRASS, viz kapitola <a class="reference internal" href="../skripty/ndvi-python-v1.html#pygrass-module"><span class="std std-ref">úvod do skriptování</span></a>. Jeho hlavní výhodou je však <em>možnost přistupovat k
+datům (rastrovým a vektorovým mapám) a funkcionalitě knihoven systému
+GRASS</em> (implementovaným v jazyce C) přes objektově orientované Python
+rozhraní <em>přímo</em>, tj. bez volání příkazů systému GRASS. Tento přístup
+si ukážeme na několika příkladech přístup k rastrovým a vektorovým
+datům.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rastry.html">Přístup k rastrovým datům</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rastry.html#statistika-rastrovych-dat">Statistika rastrových dat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rastry.html#dotazovani-na-rastrova-data">Dotazování na rastrová data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vektory.html">Přístup k vektorovým datům</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vektory.html#pruchod-vektorovymi-prvky-bez-topologie">Průchod vektorovými prvky bez topologie</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vektory.html#pristup-k-topologii">Přístup k topologii</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vektory.html#nalezeni-nejblizsich-prvku-zapis-novych-prvku">Nalezení nejbližších prvků, zápis nových prvků</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Další úkázky PyGRASS jsou součástí školení <a class="reference external" href="http://training.gismentors.eu/grass-gis-workshop-jena/units/13.html">Jena GRASS GIS
+Workshop</a>.</p>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PyGRASS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rastry.html">Přístup k rastrovým datům</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vektory.html">Přístup k vektorovým datům</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="../skripty/ndvi-python-v2.html" title="NDVI - Pokročilejší verze skriptu"
+              >předchozí</a> |
+            <a href="rastry.html" title="Přístup k rastrovým datům"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

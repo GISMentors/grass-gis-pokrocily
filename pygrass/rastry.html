@@ -1,0 +1,279 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Přístup k rastrovým datům &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Přístup k vektorovým datům" href="vektory.html" />
+    <link rel="prev" title="PyGRASS" href="index.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="index.html" title="PyGRASS"
+             accesskey="P">předchozí</a> |
+          <a href="vektory.html" title="Přístup k vektorovým datům"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="pristup-k-rastrovym-datum">
+<h1>Přístup k rastrovým datům<a class="headerlink" href="#pristup-k-rastrovym-datum" title="Permalink to this heading">¶</a></h1>
+<p>Přístup k rastrovým datům umožňuje PyGRASS ve třech režimech:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass.raster.html#pygrass.raster.RasterRow">RasterRow</a> (náhodné čtení po řádcích, sekvenční zápis)</p></li>
+<li><p><a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass.raster.html#pygrass.raster.RasterRowIO">RasterRowIO</a> (čtení po řádcích z vyrovnávací paměti, sekvenční zápis)</p></li>
+<li><p><a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass.raster.html#pygrass.raster.RasterSegment">RasterSegment</a> (náhodné čtení a zápis po dlaždicích)</p></li>
+</ul>
+<p>Další informace v <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass_raster.html">dokumentaci PyGRASS</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Varování</p>
+<p>GRASS při čtení rastrových dat vždy data převzorkuje podle
+aktuálního výpočetního regionu. Manipulaci s regionem má
+v PyGRASS na starost třída <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass.gis.html#pygrass.gis.region.Region">Region</a> anebo lze přímo použít modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.region.html">g.region</a>.</p>
+</div>
+<section id="statistika-rastrovych-dat">
+<h2>Statistika rastrových dat<a class="headerlink" href="#statistika-rastrovych-dat" title="Permalink to this heading">¶</a></h2>
+<p>V následující ukázce vypíšeme statistiku rastru:</p>
+<ol class="arabic simple">
+<li><p>Před načtením dat je nastaven výpočetní region (řádek <span class="lcode">11-13</span>).</p></li>
+<li><p>Rastrová data jsou načtena pomocí třídy <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass.raster.html#pygrass.raster.RasterRow">RasterRow</a>
+(řádek <span class="lcode">15-16</span>).</p></li>
+<li><p>Jednotlivé řádky a sloupce rastru jsou procházeny cyklem <code class="docutils literal notranslate"><span class="pre">for</span></code>
+(řádky <span class="lcode">20-21</span>).</p></li>
+<li><p>Na konci skriptu nezapomeneme rastrovou mapu korektně uzavřít
+<span class="lcode">34</span>.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">grass.pygrass.raster</span> <span class="kn">import</span> <span class="n">RasterRow</span>
+<span class="linenos"> 5</span><span class="kn">from</span> <span class="nn">grass.pygrass.modules</span> <span class="kn">import</span> <span class="n">Module</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="kn">from</span> <span class="nn">grass.pygrass.gis.region</span> <span class="kn">import</span> <span class="n">Region</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;dmt@PERMANENT&#39;</span>
+<span class="linenos">10</span>
+<span class="hll"><span class="linenos">11</span><span class="n">reg</span> <span class="o">=</span> <span class="n">Region</span><span class="p">()</span>
+</span><span class="hll"><span class="linenos">12</span><span class="n">reg</span><span class="o">.</span><span class="n">from_rast</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">13</span><span class="n">reg</span><span class="o">.</span><span class="n">set_current</span><span class="p">()</span>
+</span><span class="linenos">14</span>
+<span class="hll"><span class="linenos">15</span><span class="n">rast</span> <span class="o">=</span> <span class="n">RasterRow</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">16</span><span class="n">rast</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+</span><span class="linenos">17</span>
+<span class="linenos">18</span><span class="nb">min</span> <span class="o">=</span> <span class="nb">max</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos">19</span><span class="n">count</span> <span class="o">=</span> <span class="n">ncount</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="hll"><span class="linenos">20</span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rast</span><span class="p">:</span>
+</span><span class="hll"><span class="linenos">21</span>    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+</span><span class="linenos">22</span>        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="linenos">23</span>            <span class="n">ncount</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="linenos">24</span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos">25</span>            <span class="k">if</span> <span class="nb">min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">26</span>                <span class="nb">min</span> <span class="o">=</span> <span class="nb">max</span> <span class="o">=</span> <span class="n">value</span>
+<span class="linenos">27</span>            <span class="k">else</span><span class="p">:</span>
+<span class="linenos">28</span>                <span class="k">if</span> <span class="nb">min</span> <span class="o">&gt;</span> <span class="n">value</span><span class="p">:</span>
+<span class="linenos">29</span>                    <span class="nb">min</span> <span class="o">=</span> <span class="n">value</span>
+<span class="linenos">30</span>                <span class="k">elif</span> <span class="nb">max</span> <span class="o">&lt;</span> <span class="n">value</span><span class="p">:</span>
+<span class="linenos">31</span>                    <span class="nb">max</span> <span class="o">=</span> <span class="n">value</span>
+<span class="linenos">32</span>        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="linenos">33</span>
+<span class="hll"><span class="linenos">34</span><span class="n">rast</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span class="linenos">35</span>
+<span class="linenos">36</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;min=</span><span class="si">{:.2f}</span><span class="s2"> max=</span><span class="si">{:.2f}</span><span class="s2"> count=</span><span class="si">{}</span><span class="s2"> (no-data: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="linenos">37</span>    <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ncount</span><span class="p">)</span>
+<span class="linenos">38</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Skript ke stažení <a class="reference external" href="../_static/skripty/rastr_stats_pygrass.py">zde</a>.</p>
+<p>Výpis může vypadat následovně:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">min</span><span class="o">=</span><span class="mf">53.80</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1530.51</span> <span class="n">count</span><span class="o">=</span><span class="mi">138116</span> <span class="p">(</span><span class="n">no</span><span class="o">-</span><span class="n">data</span><span class="p">:</span> <span class="mi">59244</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Tento skript berte jako <strong>ilustrační</strong>, rozhodně jej <em>nelze
+považovat za optimální cestu</em> pro zjištění extremních hodnot v
+rastru. Porovnejte s modulem <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.univar.html">r.univar</a> a verzí skriptu
+založené na knihovně <a class="reference external" href="https://numpy.org">NumPy</a>
+(<span class="lcode">17-18</span>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">grass.pygrass.raster</span> <span class="kn">import</span> <span class="n">RasterRow</span>
+<span class="linenos"> 5</span><span class="kn">from</span> <span class="nn">grass.pygrass.gis.region</span> <span class="kn">import</span> <span class="n">Region</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;dmt@PERMANENT&#39;</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="n">reg</span> <span class="o">=</span> <span class="n">Region</span><span class="p">()</span>
+<span class="linenos">10</span><span class="n">reg</span><span class="o">.</span><span class="n">from_rast</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<span class="linenos">11</span><span class="n">reg</span><span class="o">.</span><span class="n">set_current</span><span class="p">()</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="k">with</span> <span class="n">RasterRow</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">rast</span><span class="p">:</span>
+<span class="linenos">14</span>    <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rast</span><span class="p">)</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;min=</span><span class="si">{:.2f}</span><span class="s2"> max=</span><span class="si">{:.2f}</span><span class="s2"> count=</span><span class="si">{}</span><span class="s2"> (no-data: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="hll"><span class="linenos">17</span>      <span class="n">array</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">array</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">array</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">18</span>      <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">)))</span>
+</span><span class="linenos">19</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Skript ke stažení <a class="reference external" href="../_static/skripty/rastr_stats_pygrass_numpy.py">zde</a>.</p>
+</div>
+</section>
+<section id="dotazovani-na-rastrova-data">
+<h2>Dotazování na rastrová data<a class="headerlink" href="#dotazovani-na-rastrova-data" title="Permalink to this heading">¶</a></h2>
+<p>Skript vypisuje <em>pro definiční body obcí v ČR jejich nadmořské výšky</em>
+odvozené z digitálního modelu terénu (rastrová mapa <span class="map">dmt</span>).</p>
+<ol class="arabic simple">
+<li><p>Před načtením rastrových dat na řádcích <span class="lcode">10-12</span> je na
+základě rastrové mapy <span class="map">dmt</span> nastaven výpočetní region.</p></li>
+<li><p>Rastrová mapa <span class="map">dmt</span> je načtena třídou
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/libpython/pygrass.raster.html#pygrass.raster.RasterRow">RasterRow</a> (řádka <span class="lcode">14-15</span>).</p></li>
+<li><p>Jelikož se jedná u vstupní vektorové mapy o data bodová, tak stačí
+mapu otevřít bez topologie (řádky <span class="lcode">17-18</span>).</p></li>
+<li><p>Souřadnice definičních bodů obcí jsou převedeny na souřadnice rastru
+funkcí <code class="docutils literal notranslate"><span class="pre">coor2pixel</span></code> (řádek <span class="lcode">21</span>)</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">grass.pygrass.raster</span> <span class="kn">import</span> <span class="n">RasterRow</span>
+<span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">grass.pygrass.vector</span> <span class="kn">import</span> <span class="n">Vector</span>
+<span class="linenos"> 5</span><span class="kn">from</span> <span class="nn">grass.pygrass.gis.region</span> <span class="kn">import</span> <span class="n">Region</span>
+<span class="linenos"> 6</span><span class="kn">from</span> <span class="nn">grass.pygrass.utils</span> <span class="kn">import</span> <span class="n">coor2pixel</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;dmt@PERMANENT&#39;</span>
+<span class="linenos"> 9</span>
+<span class="hll"><span class="linenos">10</span><span class="n">reg</span> <span class="o">=</span> <span class="n">Region</span><span class="p">()</span>
+</span><span class="hll"><span class="linenos">11</span><span class="n">reg</span><span class="o">.</span><span class="n">from_rast</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">12</span><span class="n">reg</span><span class="o">.</span><span class="n">set_current</span><span class="p">()</span>
+</span><span class="linenos">13</span>
+<span class="hll"><span class="linenos">14</span><span class="n">dmt</span> <span class="o">=</span> <span class="n">RasterRow</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">15</span><span class="n">dmt</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+</span><span class="linenos">16</span>
+<span class="hll"><span class="linenos">17</span><span class="n">obce</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="s1">&#39;obce_bod&#39;</span><span class="p">)</span>
+</span><span class="hll"><span class="linenos">18</span><span class="n">obce</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+</span><span class="linenos">19</span>
+<span class="linenos">20</span><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">obce</span><span class="p">:</span>
+<span class="hll"><span class="linenos">21</span>    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">coor2pixel</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">coords</span><span class="p">(),</span> <span class="n">region</span><span class="p">)</span>
+</span><span class="linenos">22</span>    <span class="n">value</span> <span class="o">=</span> <span class="n">dmt</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)][</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+<span class="linenos">23</span>    <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{:40}</span><span class="s1">: </span><span class="si">{:.0f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;nazev&#39;</span><span class="p">],</span> <span class="n">value</span><span class="p">))</span>
+<span class="linenos">24</span>
+<span class="linenos">25</span><span class="n">obce</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos">26</span><span class="n">dmt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Skript ke stažení <a class="reference external" href="../_static/skripty/obce_dmt.py">zde</a>.</p>
+<p>Výpis může vypadat následovně:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="n">Kopidlno</span>                                <span class="p">:</span> <span class="mi">225</span>
+<span class="n">Neratov</span>                                 <span class="p">:</span> <span class="mi">223</span>
+<span class="n">Podhorní</span> <span class="n">Újezd</span> <span class="n">a</span> <span class="n">Vojice</span>                 <span class="p">:</span> <span class="mi">336</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Rychlost implementace můžete porovnat s modulem
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.what.rast.html">v.what.rast</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.what.rast<span class="w"> </span>-p<span class="w"> </span><span class="nv">map</span><span class="o">=</span>obce_bod@ruian<span class="w"> </span><span class="nv">raster</span><span class="o">=</span>dmt@PERMANENT
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">PyGRASS</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Přístup k rastrovým datům</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vektory.html">Přístup k vektorovým datům</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="index.html" title="PyGRASS"
+              >předchozí</a> |
+            <a href="vektory.html" title="Přístup k vektorovým datům"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

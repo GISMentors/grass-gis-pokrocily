@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Ukázka skriptu (NDVI) &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="NDVI - Základní verze skriptu" href="ndvi-python-v1.html" />
+    <link rel="prev" title="Spuštění skriptu" href="spusteni.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="spusteni.html" title="Spuštění skriptu"
+             accesskey="P">předchozí</a> |
+          <a href="ndvi-python-v1.html" title="NDVI - Základní verze skriptu"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="ukazka-skriptu-ndvi">
+<h1>Ukázka skriptu (NDVI)<a class="headerlink" href="#ukazka-skriptu-ndvi" title="Permalink to this heading">¶</a></h1>
+<p>V následující úkázce se zaměříme na <a class="reference external" href="http://en.wikipedia.org/wiki/NDVI">normalizovaný
+vegetační difereční index</a> (NDVI), který lze určit na základě
+viditelného červeného a blízkého infračerveného kanálu satelitních
+dat.</p>
+<div class="math notranslate nohighlight">
+\[NDVI = (NIR - VIS) / (NIR  + VIS)\]</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Použijeme data <a class="reference external" href="http://cs.wikipedia.org/wiki/Landsat">Landsat</a> 8 z mapsetu
+<a class="reference external" href="http://training.gismentors.eu/geodata/grass/gismentors-landsat.zip">gismentors-lansat</a>
+(985 MB). V případě Landsat 8 je červený kanál v pořadí
+<em>čtvrtý</em>, blízký infračernený <em>pátý</em>, viz
+<a class="reference external" href="http://en.wikipedia.org/wiki/Landsat_8#Operational_Land_Imager">wikipedia</a>.</p>
+</div>
+<p><strong>Postup výpočtu</strong></p>
+<ol class="arabic simple">
+<li><p>Rastrovou vrstvu <span class="map">ndvi</span> vypočteme pomocí nástoje
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/rastrova_data/rastrova-algebra.html">mapové algebry</a>
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.mapcalc.html">r.mapcalc</a></p></li>
+<li><p><a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/rastrova_data/reklasifikace.html">Reklasifikaci</a> do třech
+tříd (1:bez vegetace, vodni plochy; 2:plochy s minimalni vegetaci;
+3:plochy pokryte vegetaci) provedeme pomocí modulu
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.recode.html">r.recode</a> (jedná o data s <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/rastr.html#raster-types">plovoucí desetinnou
+čárkou</a>, jinak
+by bylo vhodnější použít přímo <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.reclass.html">r.reclass</a>).</p></li>
+<li><p>Nastavíme vhodnou <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/rastrova_data/tabulka-barev.html">tabulku barev</a> pro
+reklasifikovaná data <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.colors.html">r.colors</a></p></li>
+<li><p>Nakonec vypíšeme pro jednotlivé kategorie NDVI jejich percentuální
+pokrytí, a to pomocí modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.stats.html">r.stats</a></p></li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Namísto obecného modulu mapové algebry <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.mapcalc.html">r.mapcalc</a>
+bychom mohli použít specializovaný <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/i.vi.html">i.vi</a>.</p>
+</div>
+<p><strong>Implementace</strong></p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ndvi-python-v1.html">NDVI - Základní verze skriptu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndvi-python-v2.html">NDVI - Pokročilejší verze skriptu</a></li>
+</ul>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Úvod do skriptování</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="spusteni.html">Spuštění skriptu</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Ukázka skriptu (NDVI)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="spusteni.html" title="Spuštění skriptu"
+              >předchozí</a> |
+            <a href="ndvi-python-v1.html" title="NDVI - Základní verze skriptu"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

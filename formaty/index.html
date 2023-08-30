@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Práce s externími formáty &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="3D" href="../3d/index.html" />
+    <link rel="prev" title="Segmentace obrazu" href="../zod/segmentace.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="../zod/segmentace.html" title="Segmentace obrazu"
+             accesskey="P">předchozí</a> |
+          <a href="../3d/index.html" title="3D"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="prace-s-externimi-formaty">
+<h1>Práce s externími formáty<a class="headerlink" href="#prace-s-externimi-formaty" title="Permalink to this heading">¶</a></h1>
+<p>GRASS používá nativně vlastní souborově orientovaný rastrový a
+vektorový formát.</p>
+<p>Od verze GRASS 7 nicméně umožňuje pracovat s daty v externích
+rastrových a vektorových formátech <em>přímo</em> bez nutnosti konverze dat do
+nativního formátu.</p>
+<p>Data v externích formátech systém GRASS čte pomocí knihovny <a class="reference external" href="http://gdal.org">GDAL</a>. Z toho vyplívá, že v systému GRASS lze načíst
+všechny datové formáty, které tato knihovna podporuje v režimu čtení.</p>
+<p>Odbobně lze systém GRASS nastavit, aby ukládal nově vytvořená data v jiném formátu
+než vlastním, tj. nativním. V tomto případě lze data zapisovat do
+jakéholiv formátu, který knihovna GDAL podporuje v režimu zápisu.</p>
+<p>Další informace lze najít na <a class="reference external" href="http://grasswiki.osgeo.org/wiki/Working_with_external_data_in_GRASS_7">wiki stránce o externích formátech</a>
+projektu GRASS.</p>
+<section id="pripojeni-dat-z-wxgui">
+<h2>Připojení dat z wxGUI<a class="headerlink" href="#pripojeni-dat-z-wxgui" title="Permalink to this heading">¶</a></h2>
+<p>Nástroje pro připojení externích dat a nastavení výstupního formátu
+jsou dostupné z menu správce vrstev</p>
+<figure class="align-center">
+<img alt="../_images/link-menu.png" src="../_images/link-menu.png" />
+</figure>
+<p>anebo z nástrojové lišty</p>
+<figure class="align-center">
+<img alt="../_images/link-tooltip.png" class="small" src="../_images/link-tooltip.png" />
+</figure>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/link-tool.png"><img alt="../_images/link-tool.png" src="../_images/link-tool.png" style="width: 250px;" /></a>
+</figure>
+</section>
+<section id="rastrova-data">
+<h2>Rastrová data<a class="headerlink" href="#rastrova-data" title="Permalink to this heading">¶</a></h2>
+<section id="cteni">
+<h3>Čtení<a class="headerlink" href="#cteni" title="Permalink to this heading">¶</a></h3>
+<p>Pro připojení externích rastrových dat slouží modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.external.html">r.external</a>.</p>
+<section id="priklad-pripojeni-dat-ve-formatu-jpeg">
+<h4>Příklad přípojení dat ve formátu JPEG<a class="headerlink" href="#priklad-pripojeni-dat-ve-formatu-jpeg" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.external<span class="w"> </span><span class="nv">input</span><span class="o">=</span>/tmp/ortofoto.jpg<span class="w"> </span><span class="nv">output</span><span class="o">=</span>ortofoto
+</pre></div>
+</div>
+</section>
+</section>
+<section id="zapis">
+<h3>Zápis<a class="headerlink" href="#zapis" title="Permalink to this heading">¶</a></h3>
+<p>Nastavit externí výstupní rastrový formát umožňuje modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.external.out.html">r.external.out</a>.</p>
+<section id="priklad-nastaveni-vystupniho-formatu-na-geotiff">
+<h4>Příklad nastavení výstupního formátu na GeoTIFF<a class="headerlink" href="#priklad-nastaveni-vystupniho-formatu-na-geotiff" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.external.out<span class="w"> </span><span class="nv">directory</span><span class="o">=</span>/tmp/tif<span class="w"> </span><span class="nv">extension</span><span class="o">=</span>tif<span class="w"> </span><span class="nv">format</span><span class="o">=</span>GTiff
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="vektorova-data">
+<h2>Vektorová data<a class="headerlink" href="#vektorova-data" title="Permalink to this heading">¶</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Varování</p>
+<p>Práci s externími formáty pro vektorová data lze
+doporučit pouze při čtení pro účely vizualizace a jednorázovém
+zápisu mimo GRASS. Zcela zásadní rozdíl je v datových modelech, které jsou
+použity. GRASS používá striktně topologický formát, GDAL je
+postaven na OGC standardu Simple Features, tj. netopologickém
+datovém modelu. GRASS pro takováto data sestavuje
+tzv. pseudo-topologii. Pro standardní práci se systém GRASS nelze
+tuto cestu doporučit.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Jako alternativa k nativnímu topologickému formátu se jeví
+<a class="reference external" href="http://training.gismentors.eu/postgis-pokrocily/kapitoly/8_topologie.html">PostGIS Topology</a>. Implementace
+podpory pro tento formát není nicméně v systému GRASS zcela
+dokončena a lze ji doporučit pouze pro testování, více na
+<a class="reference external" href="http://grasswiki.osgeo.org/wiki/PostGIS_Topology">wiki</a>
+projektu.</p>
+</div>
+<section id="id1">
+<h3>Čtení<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<p>Pro připojení externích rastrových dat slouží modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.external.html">v.external</a>.</p>
+<figure class="align-center" id="id3">
+<img alt="../_images/v.external.png" src="../_images/v.external.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 71 </span><span class="caption-text">Příklad připojení externím vektorových dat z GUI</span><a class="headerlink" href="#id3" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<section id="priklad-pripojeni-dat-z-databaze-postgis">
+<h4>Příklad přípojení dat z databáze PostGIS<a class="headerlink" href="#priklad-pripojeni-dat-z-databaze-postgis" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.external<span class="w"> </span><span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:dbname=gismentors host=training.gismentors.eu user=skoleni password=XXX&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="nv">layer</span><span class="o">=</span>ruian.obce_bod<span class="w"> </span><span class="nv">out</span><span class="o">=</span>obce_pg
+</pre></div>
+</div>
+</section>
+<section id="priklad-pripojeni-dat-z-ruian">
+<h4>Příklad přípojení dat z <a class="reference external" href="http://freegis.fsv.cvut.cz/gwiki/RUIAN">RÚIAN</a><a class="headerlink" href="#priklad-pripojeni-dat-z-ruian" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.external<span class="w"> </span><span class="nv">input</span><span class="o">=</span>/vsicurl/http://vdp.cuzk.cz/vymenny_format/soucasna/20150331_OB_564567_UKSH.xml.gz<span class="w"> </span><span class="se">\</span>
+<span class="nv">layer</span><span class="o">=</span>AdresniMista
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id2">
+<h3>Zápis<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
+<p>Nastavit externí výstupní rastrový formát umožňuje modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.external.out.html">v.external.out</a>.</p>
+<figure class="align-center" id="id4">
+<img alt="../_images/v.external.out.png" src="../_images/v.external.out.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 72 </span><span class="caption-text">Příklad nastavení výstupního formátu pro vektorová data</span><a class="headerlink" href="#id4" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<section id="priklad-nastaveni-vystupniho-formatu-na-esri-shapefile">
+<h4>Příklad nastavení výstupního formátu na Esri Shapefile<a class="headerlink" href="#priklad-nastaveni-vystupniho-formatu-na-esri-shapefile" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.external.out<span class="w"> </span><span class="nv">output</span><span class="o">=</span>/tmp/shp<span class="w"> </span><span class="nv">format</span><span class="o">=</span><span class="s2">&quot;ESRI_Shapefile&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Práce s externími formáty</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pripojeni-dat-z-wxgui">Připojení dat z wxGUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rastrova-data">Rastrová data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vektorova-data">Vektorová data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="../zod/segmentace.html" title="Segmentace obrazu"
+              >předchozí</a> |
+            <a href="../3d/index.html" title="3D"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

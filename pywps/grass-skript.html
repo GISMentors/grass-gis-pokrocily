@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Implementace skriptu pro GRASS &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Vypublikování skriptu jako WPS procesu" href="wps-proces.html" />
+    <link rel="prev" title="Publikování WPS procesu" href="index.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="index.html" title="Publikování WPS procesu"
+             accesskey="P">předchozí</a> |
+          <a href="wps-proces.html" title="Vypublikování skriptu jako WPS procesu"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="implementace-skriptu-pro-grass">
+<h1>Implementace skriptu pro GRASS<a class="headerlink" href="#implementace-skriptu-pro-grass" title="Permalink to this heading">¶</a></h1>
+<p>Skript bude v první fázi vypisovat pro dané PSČ seznam obcí a jejich
+sousedy dle PSČ.</p>
+<section id="priprava-dat">
+<h2>Příprava dat<a class="headerlink" href="#priprava-dat" title="Permalink to this heading">¶</a></h2>
+<p>Vektorová mapa <span class="map">obce_polygon</span> z mapsetu <span class="mapset">ruian</span>
+neobsahuje v atributové tabulce PSČ. Tuto informaci budeme muset
+nejprve doplnit. PSČ obcí ke stažení <a class="reference external" href="http://training.gismentors.eu/geodata/db_pcobc.zip">zde</a> jako DBF
+tabulka.</p>
+<p>V aktuálním mapsetu si vytvoříme kopii původní mapy
+(<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.copy.html">g.copy</a>) a k její atributové tabulce připojíme tabulku
+s PSČ.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.copy<span class="w"> </span><span class="nv">vector</span><span class="o">=</span>obce_polygon@ruian,obce
+</pre></div>
+</div>
+<p>Vstupní tabulku s PSČ nejprve pomocí <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.in.ogr.html">db.in.ogr</a>
+naimportujeme:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.in.ogr<span class="w"> </span><span class="nv">input</span><span class="o">=</span>zv_pcobc.dbf<span class="w"> </span><span class="nv">encoding</span><span class="o">=</span>cp852
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Modul předpokládá kódování znaků UTF-8. Vzhledem k tomu, že
+jsou vstupní data v kódování CP852 (DOS), je nutné jej definovat
+parametrem <code class="xref std std-option docutils literal notranslate"><span class="pre">encoding</span></code>.</p>
+<p>Ve verzích GRASS 7.0.2 a nižší modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.in.ogr.html">db.in.ogr</a>
+parametr <code class="xref std std-option docutils literal notranslate"><span class="pre">encoding</span></code> nemá. V tomto případě definujeme
+kódování pomocí proměnné prostředí
+<span class="target" id="index-0"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">SHAPE_ENCODING</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">SHAPE_ENCODING</span><span class="o">=</span>cp852<span class="w"> </span>db.in.ogr<span class="w"> </span><span class="nv">input</span><span class="o">=</span>zv_pcobc.dbf
+</pre></div>
+</div>
+</div>
+<p>Tabulka bohužel neobsahuje kód obce, podle kterého bysme mohli data
+pohodlně pomocí modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.join.html">v.db.join</a> připojit k atributové
+tabulce obcí, viz. výpis modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.select.html">db.select</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.select<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;select * from zv_pcobc_dbf limit 1&quot;</span>
+
+NAZCOBCE<span class="p">|</span>PSC<span class="p">|</span>NAZPOST<span class="p">|</span>KODOKRESU<span class="p">|</span>NAZOKRESU<span class="p">|</span>NAZOBCE<span class="p">|</span>KOD
+Abertamy<span class="p">|</span><span class="m">36235</span><span class="p">|</span>Abertamy<span class="p">|</span><span class="m">3403</span><span class="p">|</span>Karlovy<span class="w"> </span>Vary<span class="p">|</span>Abertamy<span class="p">|</span>
+</pre></div>
+</div>
+<p>Vytvoříme pomocnou tabulku pomocí <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/db.execute.html">db.execute</a>, která bude
+obsahovat dva sloupce: kód obce a PSČ.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.execute<span class="w"> </span><span class="nv">sql</span><span class="o">=</span><span class="s2">&quot;create table obce_psc as select o.kod,z.psc from obce as o join zv_pcobc_dbf as z on o.okreskod = z.KODOKRESU and o.nazev = z.NAZOBCE&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Tento postup je nutný, neboť databáze SQLite (která je pro
+systém GRASS vychozí při ukládání atributových dat, viz
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/vektor.html#atributova-data">školení pro začátečníky</a>), nepodporuje
+<span class="sqlcmd">JOIN</span> v příkazu <span class="sqlcmd">UPDATE</span>. Pokud používate
+namísto toho např. PostgreSQL, tak se operace zjednoduší.</p>
+</div>
+<p>Takto vytvořenou tabulku již lze k atributové tabulce vektorové mapy
+obcí pomocí <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.join.html">v.db.join</a> připojit.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.join<span class="w"> </span><span class="nv">map</span><span class="o">=</span>obce<span class="w"> </span><span class="nv">column</span><span class="o">=</span>kod<span class="w"> </span><span class="nv">other_table</span><span class="o">=</span>obce_psc<span class="w"> </span><span class="nv">other_column</span><span class="o">=</span>kod
+</pre></div>
+</div>
+<p>Výsledek si můžeme zkontrolovat pomocí modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.db.select.html">v.db.select</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.db.select<span class="w"> </span><span class="nv">map</span><span class="o">=</span>obce<span class="w"> </span><span class="nv">column</span><span class="o">=</span>kod,nazev,psc
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="mi">532401</span><span class="o">|</span><span class="n">Jarpice</span><span class="o">|</span><span class="mi">27371</span>
+<span class="mi">532428</span><span class="o">|</span><span class="n">Jemníky</span><span class="o">|</span><span class="mi">27401</span>
+<span class="mi">548103</span><span class="o">|</span><span class="n">Kámen</span><span class="o">|</span><span class="mi">39413</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="implementace-testovaci-verze-skriptu">
+<h2>Implementace testovací verze skriptu<a class="headerlink" href="#implementace-testovaci-verze-skriptu" title="Permalink to this heading">¶</a></h2>
+<p>Podrobnější informace v kapitole <a class="reference internal" href="../pygrass/vektory.html"><span class="doc">Přístup k vektorovým datům</span></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">grass.pygrass.vector</span> <span class="kn">import</span> <span class="n">VectorTopo</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="n">psc</span> <span class="o">=</span> <span class="s1">&#39;41115&#39;</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="n">obce</span> <span class="o">=</span> <span class="n">VectorTopo</span><span class="p">(</span><span class="s1">&#39;obce&#39;</span><span class="p">)</span>
+<span class="linenos"> 8</span><span class="n">obce</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Seznam obci s PSC </span><span class="si">{}</span><span class="s2">:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">psc</span><span class="p">))</span>
+<span class="linenos">11</span><span class="n">obce_psc</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="linenos">12</span><span class="k">for</span> <span class="n">prvek</span> <span class="ow">in</span> <span class="n">obce</span><span class="o">.</span><span class="n">viter</span><span class="p">(</span><span class="s1">&#39;areas&#39;</span><span class="p">):</span>
+<span class="linenos">13</span>    <span class="k">if</span> <span class="n">prvek</span><span class="o">.</span><span class="n">attrs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">prvek</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;psc&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">psc</span><span class="p">:</span>
+<span class="linenos">14</span>        <span class="k">continue</span>
+<span class="linenos">15</span>    <span class="n">obce_psc</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">prvek</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="linenos">16</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">psc</span><span class="p">,</span> <span class="n">prvek</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;nazev&#39;</span><span class="p">]))</span>
+<span class="linenos">17</span>    
+<span class="linenos">18</span><span class="n">sousede</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="linenos">19</span><span class="k">for</span> <span class="n">prvek</span> <span class="ow">in</span> <span class="n">obce</span><span class="o">.</span><span class="n">viter</span><span class="p">(</span><span class="s1">&#39;areas&#39;</span><span class="p">):</span>
+<span class="linenos">20</span>    <span class="k">if</span> <span class="n">prvek</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obce_psc</span><span class="p">:</span>
+<span class="linenos">21</span>        <span class="k">continue</span>
+<span class="linenos">22</span>
+<span class="linenos">23</span>    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">prvek</span><span class="o">.</span><span class="n">boundaries</span><span class="p">():</span>
+<span class="linenos">24</span>        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">read_area_ids</span><span class="p">():</span>
+<span class="linenos">25</span>            <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">prvek</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+<span class="linenos">26</span>               <span class="n">sousede</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Seznam sousednich obce:&quot;</span><span class="p">)</span>
+<span class="linenos">29</span><span class="k">for</span> <span class="n">prvek</span> <span class="ow">in</span> <span class="n">obce</span><span class="o">.</span><span class="n">viter</span><span class="p">(</span><span class="s1">&#39;areas&#39;</span><span class="p">):</span>
+<span class="linenos">30</span>    <span class="k">if</span> <span class="n">prvek</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sousede</span> <span class="ow">or</span> \
+<span class="linenos">31</span>       <span class="n">prvek</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;psc&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">psc</span><span class="p">:</span>
+<span class="linenos">32</span>        <span class="k">continue</span>
+<span class="linenos">33</span>    
+<span class="linenos">34</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prvek</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;psc&#39;</span><span class="p">],</span> <span class="n">prvek</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;nazev&#39;</span><span class="p">]))</span>
+<span class="linenos">35</span>
+<span class="linenos">36</span><span class="n">obce</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Skript je koncipován jako ukázka, uvedená implementace má
+vážné nedostatky, např. nepoužívá vůbec prostorový
+index. Místo toho všechny prvky prochází sekvenčně.</p>
+</div>
+<p>Skript ke stažení <a class="reference external" href="../_static/skripty/obce_psc_v1.py">zde</a>.</p>
+<p>Výstup může vypadat následovně:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Seznam</span> <span class="n">obci</span> <span class="n">s</span> <span class="n">PSC</span> <span class="mi">41115</span><span class="p">:</span>
+<span class="mi">41115</span><span class="p">:</span> <span class="n">Děčany</span>
+<span class="mi">41115</span><span class="p">:</span> <span class="n">Podsedice</span>
+<span class="mi">41115</span><span class="p">:</span> <span class="n">Jenčice</span>
+<span class="mi">41115</span><span class="p">:</span> <span class="n">Lkáň</span>
+<span class="mi">41115</span><span class="p">:</span> <span class="n">Chodovlice</span>
+<span class="mi">41115</span><span class="p">:</span> <span class="n">Dlažkovice</span>
+<span class="mi">41115</span><span class="p">:</span> <span class="n">Sedlec</span>
+<span class="mi">41115</span><span class="p">:</span> <span class="n">Třebívlice</span>
+<span class="n">Seznam</span> <span class="n">sousednich</span> <span class="n">obce</span><span class="p">:</span>
+<span class="mi">44001</span><span class="p">:</span> <span class="n">Želkovice</span>
+<span class="mi">41002</span><span class="p">:</span> <span class="n">Velemín</span>
+<span class="mi">41113</span><span class="p">:</span> <span class="n">Třebenice</span>
+<span class="mi">41804</span><span class="p">:</span> <span class="n">Lukov</span>
+<span class="mi">41002</span><span class="p">:</span> <span class="n">Úpohlavy</span>
+<span class="mi">41002</span><span class="p">:</span> <span class="n">Slatina</span>
+<span class="mi">41114</span><span class="p">:</span> <span class="n">Vlastislav</span>
+<span class="mi">43921</span><span class="p">:</span> <span class="n">Koštice</span>
+<span class="mi">43922</span><span class="p">:</span> <span class="n">Chožov</span>
+<span class="mi">43926</span><span class="p">:</span> <span class="n">Libčeves</span>
+<span class="mi">41002</span><span class="p">:</span> <span class="n">Vchynice</span>
+<span class="mi">41002</span><span class="p">:</span> <span class="n">Čížkovice</span>
+<span class="mi">41116</span><span class="p">:</span> <span class="n">Klapý</span>
+<span class="mi">41113</span><span class="p">:</span> <span class="n">Třebenice</span>
+<span class="mi">41757</span><span class="p">:</span> <span class="n">Hrobčice</span>
+</pre></div>
+</div>
+</section>
+<section id="druha-verze-skriptu">
+<h2>Druhá verze skriptu<a class="headerlink" href="#druha-verze-skriptu" title="Permalink to this heading">¶</a></h2>
+<p>Druhá verze skriptu se bude lišit od první tím, že namísto textového
+výpisu vytvoří novou vektorovou mapu se spojeným polygonem obcí s
+definovaným PSČ a zároveň bude obsahovat sousední obce.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">grass.pygrass.vector</span> <span class="kn">import</span> <span class="n">VectorTopo</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="n">psc</span> <span class="o">=</span> <span class="s1">&#39;41115&#39;</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="n">obce</span> <span class="o">=</span> <span class="n">VectorTopo</span><span class="p">(</span><span class="s1">&#39;obce&#39;</span><span class="p">)</span>
+<span class="linenos"> 8</span><span class="n">obce</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="n">vystup</span> <span class="o">=</span> <span class="n">VectorTopo</span><span class="p">(</span><span class="s1">&#39;obce_psc_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">psc</span><span class="p">))</span>
+<span class="linenos">11</span><span class="n">vystup</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">tab_cols</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span>       <span class="s1">&#39;INTEGER PRIMARY KEY&#39;</span><span class="p">),</span>
+<span class="linenos">12</span>                           <span class="p">(</span><span class="s1">&#39;nazev&#39;</span><span class="p">,</span>     <span class="s1">&#39;TEXT&#39;</span><span class="p">),</span>
+<span class="linenos">13</span>                           <span class="p">(</span><span class="s1">&#39;psc&#39;</span><span class="p">,</span>       <span class="s1">&#39;INTEGER&#39;</span><span class="p">)])</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span><span class="n">obec_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos">16</span><span class="n">obce_psc</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="linenos">17</span><span class="k">for</span> <span class="n">prvek</span> <span class="ow">in</span> <span class="n">obce</span><span class="o">.</span><span class="n">viter</span><span class="p">(</span><span class="s1">&#39;areas&#39;</span><span class="p">):</span>
+<span class="linenos">18</span>    <span class="k">if</span> <span class="n">prvek</span><span class="o">.</span><span class="n">attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">19</span>        <span class="k">continue</span>
+<span class="linenos">20</span>    <span class="k">if</span> <span class="n">prvek</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;psc&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">psc</span><span class="p">:</span>
+<span class="linenos">21</span>        <span class="k">if</span> <span class="n">obec_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">22</span>            <span class="n">obec_id</span> <span class="o">=</span> <span class="n">prvek</span><span class="o">.</span><span class="n">id</span>
+<span class="linenos">23</span>            
+<span class="linenos">24</span>        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">prvek</span><span class="o">.</span><span class="n">boundaries</span><span class="p">():</span>
+<span class="linenos">25</span>            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">read_area_ids</span><span class="p">():</span>
+<span class="linenos">26</span>                <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">obec_id</span><span class="p">:</span>
+<span class="linenos">27</span>                    <span class="n">obce_psc</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="linenos">28</span><span class="n">obce_psc</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">obec_id</span><span class="p">)</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span><span class="n">hranice</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="linenos">31</span><span class="k">for</span> <span class="n">prvek</span> <span class="ow">in</span> <span class="n">obce</span><span class="o">.</span><span class="n">viter</span><span class="p">(</span><span class="s1">&#39;areas&#39;</span><span class="p">):</span>
+<span class="linenos">32</span>    <span class="k">if</span> <span class="n">prvek</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obce_psc</span><span class="p">:</span>
+<span class="linenos">33</span>        <span class="k">continue</span>
+<span class="linenos">34</span>
+<span class="linenos">35</span>    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">prvek</span><span class="o">.</span><span class="n">boundaries</span><span class="p">():</span>
+<span class="linenos">36</span>        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hranice</span><span class="p">:</span>
+<span class="linenos">37</span>            <span class="n">hranice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="linenos">38</span>            <span class="n">vystup</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="linenos">39</span>
+<span class="linenos">40</span>    <span class="n">vystup</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">prvek</span><span class="o">.</span><span class="n">centroid</span><span class="p">(),</span> <span class="n">attrs</span><span class="o">=</span><span class="p">(</span><span class="n">prvek</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;nazev&#39;</span><span class="p">],</span> <span class="n">prvek</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;psc&#39;</span><span class="p">]))</span>
+<span class="linenos">41</span>
+<span class="linenos">42</span><span class="n">vystup</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="linenos">43</span>
+<span class="linenos">44</span><span class="n">vystup</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos">45</span><span class="n">obce</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Skript ke stažení <a class="reference external" href="../_static/skripty/obce_psc_v2.py">zde</a>.</p>
+<figure class="align-center" id="id1">
+<img alt="../_images/obce_psc.png" class="middle" src="../_images/obce_psc.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 15 </span><span class="caption-text">Vizualizace výsledku pro PSČ 41115.</span><a class="headerlink" href="#id1" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<section id="poznamka">
+<h3>Poznámka<a class="headerlink" href="#poznamka" title="Permalink to this heading">¶</a></h3>
+<p>Úloha by se dala samozřejmě řešit poměrně jednoduše namísto PyGRASS
+kombinací standardních modulů systému GRASS <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.extract.html">v.extract</a> a
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.select.html">v.select</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">grass.pygrass.modules</span> <span class="kn">import</span> <span class="n">Module</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="n">psc</span> <span class="o">=</span> <span class="s1">&#39;41115&#39;</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="n">Module</span><span class="p">(</span><span class="s1">&#39;v.extract&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="s1">&#39;obce&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;obce1&#39;</span><span class="p">,</span>
+<span class="linenos"> 8</span>       <span class="n">where</span><span class="o">=</span><span class="s2">&quot;psc = &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">psc</span><span class="p">))</span>
+<span class="linenos"> 9</span><span class="n">Module</span><span class="p">(</span><span class="s1">&#39;v.select&#39;</span><span class="p">,</span> <span class="n">ainput</span><span class="o">=</span><span class="s1">&#39;obce&#39;</span><span class="p">,</span> <span class="n">binput</span><span class="o">=</span><span class="s1">&#39;obce1&#39;</span><span class="p">,</span>
+<span class="linenos">10</span>       <span class="n">output</span><span class="o">=</span><span class="s1">&#39;obce_psc_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">psc</span><span class="p">),</span>
+<span class="linenos">11</span>       <span class="n">operator</span><span class="o">=</span><span class="s1">&#39;overlap&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">12</span><span class="n">Module</span><span class="p">(</span><span class="s1">&#39;g.remove&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;vector&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;obce1&#39;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Skript ke stažení <a class="reference external" href="../_static/skripty/obce_psc_v3.py">zde</a>.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Publikování WPS procesu</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Implementace skriptu pro GRASS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wps-proces.html">Vypublikování skriptu jako WPS procesu</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="index.html" title="Publikování WPS procesu"
+              >předchozí</a> |
+            <a href="wps-proces.html" title="Vypublikování skriptu jako WPS procesu"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

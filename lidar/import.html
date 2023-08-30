@@ -1,0 +1,429 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Import lidarových dat &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Tvorba DMR a DMP" href="dmr-dmp-cuzk.html" />
+    <link rel="prev" title="Zpracování lidarových dat" href="index.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="index.html" title="Zpracování lidarových dat"
+             accesskey="P">předchozí</a> |
+          <a href="dmr-dmp-cuzk.html" title="Tvorba DMR a DMP"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="import-lidarovych-dat">
+<h1>Import lidarových dat<a class="headerlink" href="#import-lidarovych-dat" title="Permalink to this heading">¶</a></h1>
+<p>Před importem dat je potřeba vytvořit příslušnou lokaci, viz kapitola
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/struktura-dat.html">struktura dat</a> a <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/data/tvorba-lokace.html">tvorba
+lokace</a> ze školení
+<a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik">GRASS GIS pro začátečníky</a>. Lokaci
+pro import dat v textovém či binárním formátu lidarových dat vytvoříme
+typicky <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/data/tvorba-lokace.html#lokace-sjtsk">na základě EPSG kódu</a>.</p>
+<p>Obecně řečeno lze vstupní lidarová data importovat do systému GRASS
+jako <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/vektor.html">vektorová</a>
+nebo <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/intro/rastr.html">rastrová</a>
+data. V případě importu lidarových dat do rastrové reprezentace hraje
+zásadní roli <a class="reference external" href="http://training.gismentors.eu/grass-gis-zacatecnik/_build/html/intro/region.html">výpočetní region</a>.</p>
+<section id="textovy-format-xyz">
+<h2>Textový formát XYZ<a class="headerlink" href="#textovy-format-xyz" title="Permalink to this heading">¶</a></h2>
+<p>Vstupní soubor obsahuje souřadnice <em>x,y,z</em> pro každý bod na jednom
+řádku. Souřadnice jsou odděleny většinou bílým znakem jako je mezera
+nebo tabulátor. Pro vytvoření rastrového výstupu lze použít modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.in.xyz.html">r.in.xyz</a>, resp. <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.in.ascii.html">v.in.ascii</a> v případě výstupu
+vektorového. Druhý uvedený modul importuje bodová data tak, jak jsou
+uvedena na vstupu. Modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.in.xyz.html">r.in.xyz</a> se chová odlišně,
+vytvoří na základě agregace načtených bodů do rastrových buněk
+aktuálního výpočetního regionu dle zvolené statistické metody
+(parametr <code class="xref std std-option docutils literal notranslate"><span class="pre">method</span></code>, výchozí je průměrná hodnota - <em>mean</em>)
+novou rastrovou mapu.</p>
+<section id="rastrova-reprezentace">
+<span id="lidar-xyz-raster"></span><h3>Rastrová reprezentace<a class="headerlink" href="#rastrova-reprezentace" title="Permalink to this heading">¶</a></h3>
+<p>Příklad importu si ukážeme na souboru <em>HLIN04_5g.xyz</em> z kapitoly
+<a class="reference internal" href="dmr-dmp-cuzk.html"><span class="doc">Tvorba DMR a DMP</span></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">625002.344</span> <span class="o">-</span><span class="mf">1089749.632</span> <span class="mf">502.825</span>
+<span class="o">-</span><span class="mf">625000.53</span> <span class="o">-</span><span class="mf">1089735.192</span> <span class="mf">502.585</span>
+<span class="o">-</span><span class="mf">625006.071</span> <span class="o">-</span><span class="mf">1089779.418</span> <span class="mf">504.849</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>V tomto případě jsou data v souřadnicovém systému S-JTSK
+(<a class="reference external" href="http://epsg.io/5514">EPSG:5514</a>).</p>
+</div>
+<p>Modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.in.xyz.html">r.in.xyz</a> vzhledem k tomu, že provádí agregaci
+načtených dat, se na rozdíl od ostatních importních modulů řídí
+aktuálním výpočetním regionem. Proto je třeba před importem nastavit
+na základě vstupních dat výpočetní region. K tomu nám poslouží
+přepínače <code class="xref std std-option docutils literal notranslate"><span class="pre">-sg</span></code>.</p>
+<div class="highlight-bash notranslate" id="lidar-import-scan"><div class="highlight"><pre><span></span>r.in.xyz<span class="w"> </span>-sg<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_5g.xyz<span class="w"> </span><span class="nv">separator</span><span class="o">=</span>space
+
+<span class="nv">n</span><span class="o">=</span>-1088000.076<span class="w"> </span><span class="nv">s</span><span class="o">=</span>-1090000.059<span class="w"> </span><span class="nv">e</span><span class="o">=</span>-624999.829<span class="w"> </span><span class="nv">w</span><span class="o">=</span>-627499.828<span class="w"> </span><span class="nv">b</span><span class="o">=</span><span class="m">461</span>.312<span class="w"> </span><span class="nv">t</span><span class="o">=</span><span class="m">554</span>.334
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Ve verzi GRASS GIS 7.2.0 a nižší je třeba ještě zadat
+parametr <code class="xref std std-option docutils literal notranslate"><span class="pre">output</span></code>, a to i přestože modul žádný výstup
+v tomto případě nevytváří.</p>
+</div>
+<p>Výsledek nám poslouží pro nastavení rozsahu výpočetního regionu pomocí
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.region.html">g.region</a>, na nás bude zvolit vhodné prostorové
+rozlišení. V našem případě zvolíme 1 metr.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">n</span><span class="o">=</span>-1088000.076<span class="w"> </span><span class="nv">s</span><span class="o">=</span>-1090000.059<span class="w"> </span><span class="nv">e</span><span class="o">=</span>-624999.829<span class="w"> </span><span class="nv">w</span><span class="o">=</span>-627499.828<span class="w"> </span><span class="nv">b</span><span class="o">=</span><span class="m">461</span>.312<span class="w"> </span><span class="nv">t</span><span class="o">=</span><span class="m">554</span>.334<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">1</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Přepínačem <code class="xref std std-option docutils literal notranslate"><span class="pre">-p</span></code> můžeme vytisknout pro kontrolu
+aktuální nastavení.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span>-p
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">north</span><span class="p">:</span>      <span class="o">-</span><span class="mf">1088000.076</span>
+<span class="n">south</span><span class="p">:</span>      <span class="o">-</span><span class="mf">1090000.059</span>
+<span class="n">west</span><span class="p">:</span>       <span class="o">-</span><span class="mf">627499.828</span>
+<span class="n">east</span><span class="p">:</span>       <span class="o">-</span><span class="mf">624999.829</span>
+<span class="n">nsres</span><span class="p">:</span>      <span class="mf">0.9999915</span>
+<span class="n">ewres</span><span class="p">:</span>      <span class="mf">0.9999996</span>
+</pre></div>
+</div>
+<p id="lidar-import-align">Modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.region.html">g.region</a> provádí zarovnání na hraniční
+souřadnice, proto prostorové rozlišení neodpovídá přesně zadané
+hodnotě. Zarovnání regionu na rozlišení můžeme vynutit pomocí
+přepínače <code class="xref std std-option docutils literal notranslate"><span class="pre">-a</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">n</span><span class="o">=</span>-1088000.076<span class="w"> </span><span class="nv">s</span><span class="o">=</span>-1090000.059<span class="w"> </span><span class="nv">e</span><span class="o">=</span>-624999.829<span class="w"> </span><span class="nv">w</span><span class="o">=</span>-627499.828<span class="w"> </span><span class="nv">b</span><span class="o">=</span><span class="m">461</span>.312<span class="w"> </span><span class="nv">t</span><span class="o">=</span><span class="m">554</span>.334<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>-pa
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">north</span><span class="p">:</span>      <span class="o">-</span><span class="mi">1088000</span>
+<span class="n">south</span><span class="p">:</span>      <span class="o">-</span><span class="mi">1090001</span>
+<span class="n">west</span><span class="p">:</span>       <span class="o">-</span><span class="mi">627500</span>
+<span class="n">east</span><span class="p">:</span>       <span class="o">-</span><span class="mi">624999</span>
+<span class="n">nsres</span><span class="p">:</span>      <span class="mi">1</span>
+<span class="n">ewres</span><span class="p">:</span>      <span class="mi">1</span>
+</pre></div>
+</div>
+<p id="region-cell-center">Další možností je nastavit region tak, aby vstupní body padly do
+centra rastrových buněk. V tomto případě rozšíříme rozsah regionu o
+polovinu nastaveného prostorového rozlišení, v našem případě tedy o
+0,5 metru.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">n</span><span class="o">=</span>-1088000.076<span class="w"> </span><span class="nv">s</span><span class="o">=</span>-1090000.059<span class="w"> </span><span class="nv">e</span><span class="o">=</span>-624999.829<span class="w"> </span><span class="nv">w</span><span class="o">=</span>-627499.828<span class="w"> </span><span class="nv">b</span><span class="o">=</span><span class="m">461</span>.312<span class="w"> </span><span class="nv">t</span><span class="o">=</span><span class="m">554</span>.334
+g.region<span class="w"> </span><span class="nv">n</span><span class="o">=</span>n+0.5<span class="w"> </span><span class="nv">s</span><span class="o">=</span>s-0.5<span class="w"> </span><span class="nv">w</span><span class="o">=</span>w-0.5<span class="w"> </span><span class="nv">e</span><span class="o">=</span>e+0.5<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>-p
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">north</span><span class="p">:</span>      <span class="o">-</span><span class="mf">1087999.576</span>
+<span class="n">south</span><span class="p">:</span>      <span class="o">-</span><span class="mf">1090000.559</span>
+<span class="n">west</span><span class="p">:</span>       <span class="o">-</span><span class="mf">627500.328</span>
+<span class="n">east</span><span class="p">:</span>       <span class="o">-</span><span class="mf">624999.329</span>
+<span class="n">nsres</span><span class="p">:</span>      <span class="mf">0.9999915</span>
+<span class="n">ewres</span><span class="p">:</span>      <span class="mf">0.9999996</span>
+</pre></div>
+</div>
+</div>
+<p>Poté již provedeme import (vynecháme přepínače <code class="xref std std-option docutils literal notranslate"><span class="pre">-sg</span></code> a přidáme
+parametr <code class="xref std std-option docutils literal notranslate"><span class="pre">output</span></code>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.in.xyz<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_5g.xyz<span class="w"> </span><span class="nv">separator</span><span class="o">=</span>space<span class="w"> </span><span class="nv">output</span><span class="o">=</span>HLIN04_5g
+</pre></div>
+</div>
+</section>
+<section id="vektorova-reprezentace">
+<span id="lidar-import-xyz-vektor"></span><h3>Vektorová reprezentace<a class="headerlink" href="#vektorova-reprezentace" title="Permalink to this heading">¶</a></h3>
+<p>Pokud chceme vstupní data importovat jako bodovou vektorovou mapu,
+použijeme modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.in.ascii.html">v.in.ascii</a>. V tomto případě se data
+naimportují v původní podobě, nedochází k žádné formě agregace tak
+jako u <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.in.xyz.html">r.in.xyz</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.in.ascii<span class="w"> </span><span class="nv">input</span><span class="o">=</span>HLIN04_5g.xyz<span class="w"> </span><span class="nv">output</span><span class="o">=</span>HLIN04_5g<span class="w"> </span><span class="nv">separator</span><span class="o">=</span>space<span class="w"> </span><span class="nv">z</span><span class="o">=</span><span class="m">3</span><span class="w"> </span>-tbz
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Důležité</p>
+<p>Import lze urychlit přepínačem <code class="xref std std-option docutils literal notranslate"><span class="pre">-t</span></code> (nevytvářet
+atributovou tabulku) a <code class="xref std std-option docutils literal notranslate"><span class="pre">-b</span></code> (nesestavovat
+topologii).</p>
+<p>Ve výchozím nastavení modul importuje body jako 2D. Pomocí
+přepínače <code class="xref std std-option docutils literal notranslate"><span class="pre">-z</span></code> si vynutíme výstup do 3D vektorové
+mapy. Index sloupce se z-tovou souřadnici definujeme pomocí
+parametru <code class="xref std std-option docutils literal notranslate"><span class="pre">z</span></code>.</p>
+</div>
+<figure class="align-center" id="id3">
+<img alt="../_images/import-rast-vect.png" src="../_images/import-rast-vect.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 49 </span><span class="caption-text">Ilustrace importu lidarových dat do rastrové a vektorové bodové mapy.</span><a class="headerlink" href="#id3" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+<section id="binarni-format-las-laz">
+<h2>Binární formát LAS/LAZ<a class="headerlink" href="#binarni-format-las-laz" title="Permalink to this heading">¶</a></h2>
+<p>Data v binárním formátu <a class="reference external" href="https://www.asprs.org/committee-general/laser-las-file-format-exchange-activities.html">LAS</a>
+či komprimované formě LAZ lze do systému GRASS naimportovat podobně
+jako data v textovém formátu, a to jako rastrovou mapu
+(<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.in.lidar.html">r.in.lidar</a>) anebo jako mapu vektorovou
+(<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.in.lidar.html">v.in.lidar</a>).</p>
+<section id="lidar-las-raster">
+<span id="id1"></span><h3>Rastrová reprezentace<a class="headerlink" href="#lidar-las-raster" title="Permalink to this heading">¶</a></h3>
+<p>Modul <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.in.lidar.html">r.in.lidar</a> podobně jako <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.in.xyz.html">r.in.xyz</a> (viz
+<a class="reference internal" href="#lidar-xyz-raster"><span class="std std-ref">Textový formát XYZ</span></a>) provádí agregaci
+vstupních bodů v aktuálním výpočetním regionu, a to na základě zvolené
+statistické metody (parametr <code class="xref std std-option docutils literal notranslate"><span class="pre">method</span></code>, výchozí metoda je
+průměrná hodnota <em>mean</em>).</p>
+<p>Na rozdíl od výše zmíněného modulu umožňuje <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.in.lidar.html">r.in.lidar</a>
+nastavit výpočetní region pro import automaticky na základě vstupních
+dat. K tomu slouží přepínač <code class="xref std std-option docutils literal notranslate"><span class="pre">-e</span></code>. V tomto ohledu se hodí
+použít ještě přepínač <code class="xref std std-option docutils literal notranslate"><span class="pre">-n</span></code>, který nastaví po importu výpočetní
+region na základě vstupních dat. Prostorové rozlišení regionu
+nastavíme parametrem <code class="xref std std-option docutils literal notranslate"><span class="pre">resolution</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.in.lidar<span class="w"> </span><span class="nv">input</span><span class="o">=</span>pf_VIMP27_g.laz<span class="w"> </span><span class="nv">output</span><span class="o">=</span>pf_VIMP27_g<span class="w"> </span><span class="nv">resolution</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>-ne
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Důležité</p>
+<p>V případě, že vstupní soubor neobsahuje informace o
+souřadnicovém připojení, tak příkaz skončí chybou:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ERROR</span><span class="p">:</span> <span class="n">Projection</span> <span class="n">of</span> <span class="n">dataset</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">appear</span> <span class="n">to</span> <span class="n">match</span> <span class="n">current</span> <span class="n">location</span><span class="o">.</span>
+
+<span class="n">GRASS</span> <span class="n">LOCATION</span> <span class="n">PROJ_INFO</span> <span class="ow">is</span><span class="p">:</span>
+<span class="n">name</span><span class="p">:</span> <span class="n">S</span><span class="o">-</span><span class="n">JTSK</span> <span class="o">/</span> <span class="n">Krovak</span> <span class="n">East</span> <span class="n">North</span>
+<span class="n">datum</span><span class="p">:</span> <span class="n">S_JTSK</span>
+<span class="n">ellps</span><span class="p">:</span> <span class="n">bessel</span>
+<span class="n">proj</span><span class="p">:</span> <span class="n">krovak</span>
+<span class="n">lat_0</span><span class="p">:</span> <span class="mf">49.5</span>
+<span class="n">lon_0</span><span class="p">:</span> <span class="mf">24.83333333333333</span>
+<span class="n">alpha</span><span class="p">:</span> <span class="mf">30.28813972222222</span>
+<span class="n">k</span><span class="p">:</span> <span class="mf">0.9999</span>
+<span class="n">x_0</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">y_0</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">no_defs</span><span class="p">:</span> <span class="n">defined</span>
+<span class="n">towgs84</span><span class="p">:</span> <span class="mf">570.8</span><span class="p">,</span><span class="mf">85.7</span><span class="p">,</span><span class="mf">462.8</span><span class="p">,</span><span class="mf">4.998</span><span class="p">,</span><span class="mf">1.587</span><span class="p">,</span><span class="mf">5.261</span><span class="p">,</span><span class="mf">3.56</span>
+
+<span class="n">Import</span> <span class="n">dataset</span> <span class="n">PROJ_INFO</span> <span class="ow">is</span><span class="p">:</span>
+<span class="n">Dataset</span> <span class="n">proj</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">(</span><span class="n">unreferenced</span><span class="o">/</span><span class="n">unknown</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="n">case</span> <span class="n">of</span> <span class="n">no</span> <span class="n">significant</span> <span class="n">differences</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">projection</span> <span class="n">definitions</span><span class="p">,</span>
+<span class="n">use</span> <span class="n">the</span> <span class="o">-</span><span class="n">o</span> <span class="n">flag</span> <span class="n">to</span> <span class="n">ignore</span> <span class="n">them</span> <span class="ow">and</span> <span class="n">use</span> <span class="n">current</span> <span class="n">location</span> <span class="n">definition</span><span class="o">.</span>
+<span class="n">Consider</span> <span class="n">generating</span> <span class="n">a</span> <span class="n">new</span> <span class="n">location</span> <span class="k">with</span> <span class="s1">&#39;location&#39;</span> <span class="n">parameter</span> <span class="kn">from</span>
+<span class="nn">input</span> <span class="n">data</span> <span class="nb">set</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>V tomto případě, pokud jste si jisti, že vstupní data jsou
+lokalizována v souřadnicovém systému aktuální GRASS lokace,
+přidejte přepínač <code class="xref std std-option docutils literal notranslate"><span class="pre">-o</span></code>, který kontrolu souřadnicového
+systému přeskočí.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Rozsah souřadnic vstupních dat lze zjistit pomocí
+přepínače <code class="xref std std-option docutils literal notranslate"><span class="pre">-p</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.in.lidar<span class="w"> </span><span class="nv">input</span><span class="o">=</span>pf_VIMP27_g.laz<span class="w"> </span>-p
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Using</span> <span class="n">LAS</span> <span class="n">Library</span> <span class="n">Version</span> <span class="s1">&#39;libLAS 1.8.1 with GeoTIFF 1.4.2 LASzip 2.0.1&#39;</span>
+<span class="o">...</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">Point</span> <span class="n">Records</span><span class="p">:</span>           <span class="mi">4997968</span>
+<span class="o">...</span>
+<span class="n">Min</span> <span class="n">X</span> <span class="n">Y</span> <span class="n">Z</span><span class="p">:</span>                         <span class="o">-</span><span class="mi">807500</span> <span class="o">-</span><span class="mf">1.156e+06</span> <span class="mf">804.294</span>
+<span class="n">Max</span> <span class="n">X</span> <span class="n">Y</span> <span class="n">Z</span><span class="p">:</span>                         <span class="o">-</span><span class="mi">805000</span> <span class="o">-</span><span class="mf">1.154e+06</span> <span class="mf">1061.49</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>Z výše uvedeného je zřejmé, že jsou vstupní data v souřadnicovém
+systému S-JTSK <a class="reference external" href="http://epsg.io/5514">EPSG:5514</a>.</p>
+</div>
+</div>
+<div class="admonition note" id="lidar-las-raster-steps">
+<p class="admonition-title">Poznámka</p>
+<p>Pokud si přejete větší kontrolu nad procesem importu, tak
+lze podobně jako v případě importu <a class="reference internal" href="#lidar-xyz-raster"><span class="std std-ref">textových dat</span></a> rozložit proces do dvou kroků. Nejprve určit
+nastavení výpočetního regionu na základě vstupních dat a poté
+provést samotný import.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.in.lidar<span class="w"> </span><span class="nv">input</span><span class="o">=</span>pf_VIMP27_g.laz<span class="w"> </span>-sgo
+</pre></div>
+</div>
+<p>Výsledek, v našem případě</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n</span><span class="o">=-</span><span class="mf">1154000.000000</span> <span class="n">s</span><span class="o">=-</span><span class="mf">1155999.999000</span> <span class="n">e</span><span class="o">=-</span><span class="mf">805000.000000</span> <span class="n">w</span><span class="o">=-</span><span class="mf">807499.998000</span> <span class="n">b</span><span class="o">=</span><span class="mf">804.294000</span> <span class="n">t</span><span class="o">=</span><span class="mf">1061.487000</span>
+</pre></div>
+</div>
+<p>použijeme pro nastavení výpočetního regionu včetně požadovaného
+rozlišení (parametr <code class="xref std std-option docutils literal notranslate"><span class="pre">res</span></code>). Nezapomene na přepínač
+<code class="xref std std-option docutils literal notranslate"><span class="pre">-a</span></code>, který zarovná nastavení právě podle hodnoty
+prostorového rozlišení.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">n</span><span class="o">=</span>-1154000.000<span class="w"> </span><span class="nv">s</span><span class="o">=</span>-1155999.999<span class="w"> </span><span class="nv">e</span><span class="o">=</span>-805000.000<span class="w"> </span><span class="nv">w</span><span class="o">=</span>-807499.998<span class="w"> </span><span class="nv">b</span><span class="o">=</span><span class="m">804</span>.294<span class="w"> </span><span class="nv">t</span><span class="o">=</span><span class="m">1061</span>.487<span class="w"> </span><span class="nv">res</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>-a
+</pre></div>
+</div>
+<p>Poté již provedeme import:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.in.lidar<span class="w"> </span><span class="nv">input</span><span class="o">=</span>pf_VIMP27_g.laz<span class="w"> </span><span class="nv">output</span><span class="o">=</span>pf_VIMP27_g<span class="w"> </span>-o
+</pre></div>
+</div>
+</div>
+<p>Základní metadata importované rastrové mapy vypíšeme pomocí modulu
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/r.info.html">r.info</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r.info<span class="w"> </span><span class="nv">map</span><span class="o">=</span>pf_VIMP27_g
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span>   <span class="n">Rows</span><span class="p">:</span>         <span class="mi">2000</span>                                                       <span class="o">|</span>
+<span class="o">|</span>   <span class="n">Columns</span><span class="p">:</span>      <span class="mi">2500</span>                                                       <span class="o">|</span>
+<span class="o">|</span>   <span class="n">Total</span> <span class="n">Cells</span><span class="p">:</span>  <span class="mi">5000000</span>                                                    <span class="o">|</span>
+<span class="o">...</span>
+<span class="o">|</span>            <span class="n">N</span><span class="p">:</span>   <span class="o">-</span><span class="mi">1154000</span>    <span class="n">S</span><span class="p">:</span>   <span class="o">-</span><span class="mi">1156000</span>   <span class="n">Res</span><span class="p">:</span>     <span class="mi">1</span>                     <span class="o">|</span>
+<span class="o">|</span>            <span class="n">E</span><span class="p">:</span>    <span class="o">-</span><span class="mi">805000</span>    <span class="n">W</span><span class="p">:</span>    <span class="o">-</span><span class="mi">807500</span>   <span class="n">Res</span><span class="p">:</span>     <span class="mi">1</span>                     <span class="o">|</span>
+<span class="o">|</span>   <span class="n">Range</span> <span class="n">of</span> <span class="n">data</span><span class="p">:</span>    <span class="nb">min</span> <span class="o">=</span> <span class="mf">804.313</span>  <span class="nb">max</span> <span class="o">=</span> <span class="mf">1061.487</span>                          <span class="o">|</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="lidar-import-las-vektor">
+<span id="id2"></span><h3>Vektorová reprezentace<a class="headerlink" href="#lidar-import-las-vektor" title="Permalink to this heading">¶</a></h3>
+<p>Pro vytvoření vektorové mapy na základě vstupních dat slouží modul
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.in.lidar.html">v.in.lidar</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.in.lidar<span class="w"> </span><span class="nv">input</span><span class="o">=</span>pf_VIMP27_g.laz<span class="w"> </span><span class="nv">output</span><span class="o">=</span>pf_VIMP27_g
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Důležité</p>
+<p>Podobně jako v případě importu <a class="reference internal" href="#lidar-import-xyz-vektor"><span class="std std-ref">textových dat</span></a> lze proces urychlit tím, že nebudeme
+vytvářet atributová data (pokud je nepotřebujeme, např. v případě
+již klasifikovaných dat určených pro tvorbu digitálního modelu
+terénu, viz kapitola <a class="reference internal" href="dmr-dmp-cuzk.html"><span class="doc">Tvorba DMR a DMP</span></a>) a současně přeskočíme
+tvorbu topologie, která u bodových dat stejně nedává smysl. V našem
+případě ještě použijeme přepínač <code class="xref std std-option docutils literal notranslate"><span class="pre">-o</span></code>, který přeskočí
+kontrolu souřadnicového systému.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.in.lidar<span class="w"> </span><span class="nv">input</span><span class="o">=</span>pf_VIMP27_g.laz<span class="w"> </span><span class="nv">output</span><span class="o">=</span>pf_VIMP27_g<span class="w">  </span>-otb
+</pre></div>
+</div>
+</div>
+<figure class="align-center" id="id4">
+<img alt="../_images/import-rast-vect-holes.png" src="../_images/import-rast-vect-holes.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 50 </span><span class="caption-text">Ilustrace importu lidarových dat do rastrové a vektorové bodové
+mapy. V rastrové mapě jsou zřetelná místa bez vstupních bodových
+dat (no-data).</span><a class="headerlink" href="#id4" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Základní metadata můžeme vypsat pomocí modulu <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.info.html">v.info</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>v.info<span class="w"> </span><span class="nv">map</span><span class="o">=</span>pf_VIMP27_g
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span>   <span class="n">Number</span> <span class="n">of</span> <span class="n">points</span><span class="p">:</span>       <span class="mi">4997968</span>         <span class="n">Number</span> <span class="n">of</span> <span class="n">centroids</span><span class="p">:</span>  <span class="mi">0</span>          <span class="o">|</span>
+<span class="o">...</span>
+<span class="o">|</span>               <span class="n">N</span><span class="p">:</span>          <span class="o">-</span><span class="mi">1154000</span>    <span class="n">S</span><span class="p">:</span>      <span class="o">-</span><span class="mf">1155999.999</span>                 <span class="o">|</span>
+<span class="o">|</span>               <span class="n">E</span><span class="p">:</span>           <span class="o">-</span><span class="mi">805000</span>    <span class="n">W</span><span class="p">:</span>       <span class="o">-</span><span class="mf">807499.998</span>                 <span class="o">|</span>
+<span class="o">|</span>               <span class="n">B</span><span class="p">:</span>           <span class="mf">804.294</span>    <span class="n">T</span><span class="p">:</span>          <span class="mf">1061.487</span>                 <span class="o">|</span>
+</pre></div>
+</div>
+<p id="v-outlier">Hustotu importovaných bodů můžeme ověřit pomocí modulu
+<a class="reference external" href="http://grass.osgeo.org/grass80/manuals/v.lidar.edgedetection.html">v.lidar.edgedetection</a>. Vzhledem k tomu, že tento modul používá pro
+výpočet nastavení aktualního výpočetního region, je potřeba jej
+nejprve nastavit pomocí <a class="reference external" href="http://grass.osgeo.org/grass80/manuals/g.region.html">g.region</a> (nastavení regionu může
+trvat několik sekund neboť chybí u vstupních dat topologie a modul
+musí rozsah souřadnic spočítat přímo z bodových dat).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>g.region<span class="w"> </span><span class="nv">vector</span><span class="o">=</span>pf_VIMP27_g
+v.lidar.edgedetection<span class="w"> </span>-e<span class="w"> </span><span class="nv">input</span><span class="o">=</span>pf_VIMP27_g
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Estimated</span> <span class="n">point</span> <span class="n">density</span><span class="p">:</span> <span class="mf">0.9996</span>
+<span class="n">Estimated</span> <span class="n">mean</span> <span class="n">distance</span> <span class="n">between</span> <span class="n">points</span><span class="p">:</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Zpracování lidarových dat</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Import lidarových dat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dmr-dmp-cuzk.html">Tvorba DMR a DMP</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="index.html" title="Zpracování lidarových dat"
+              >předchozí</a> |
+            <a href="dmr-dmp-cuzk.html" title="Tvorba DMR a DMP"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

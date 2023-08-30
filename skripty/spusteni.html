@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Spuštění skriptu &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Ukázka skriptu (NDVI)" href="ndvi.html" />
+    <link rel="prev" title="Úvod do skriptování" href="index.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="index.html" title="Úvod do skriptování"
+             accesskey="P">předchozí</a> |
+          <a href="ndvi.html" title="Ukázka skriptu (NDVI)"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="spusteni-skriptu">
+<h1>Spuštění skriptu<a class="headerlink" href="#spusteni-skriptu" title="Permalink to this heading">¶</a></h1>
+<p>Začneme jednoduchým skriptem, který vypíše statistiku rastrové mapy. V
+našem případě digitálního modelu terénu (<span class="map">dmt</span>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="kn">from</span> <span class="nn">grass.pygrass.modules</span> <span class="kn">import</span> <span class="n">Module</span>
+
+<span class="n">rast</span><span class="o">=</span><span class="s1">&#39;dmt&#39;</span>
+
+<span class="c1"># set computational region</span>
+<span class="n">Module</span><span class="p">(</span><span class="s1">&#39;g.region&#39;</span><span class="p">,</span> <span class="n">raster</span><span class="o">=</span><span class="n">rast</span><span class="p">)</span>
+
+<span class="c1"># compute &amp; print statistics</span>
+<span class="n">Module</span><span class="p">(</span><span class="s1">&#39;r.univar&#39;</span><span class="p">,</span> <span class="nb">map</span><span class="o">=</span><span class="n">rast</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Soubor (ke stažení <a class="reference external" href="../_static/skripty/rastr_stats.py">zde</a>) uložte
+na disk.</p>
+<p>Bližší popis kódu nechme na kapitolu <span class="xref std std-doc">ndvi-python</span> a
+<a class="reference internal" href="../pygrass/index.html"><span class="doc">PyGRASS</span></a>.</p>
+<section id="spusteni-z-gui">
+<h2>Spuštění z GUI<a class="headerlink" href="#spusteni-z-gui" title="Permalink to this heading">¶</a></h2>
+<p>Nejjednodušší cestou jak vytvořit a spustit skript, je použít nástroje
+grafického uživatelského rozhraní systému GRASS. Otevřeme integrovaný
+textový editor dostupný z menu <span class="menuselection">File ‣ Simple Python
+editor</span> anebo z nástrojové lišty <a class="reference internal" href="../_images/python.png"><img alt="grass-python" src="../_images/python.png" style="width: 1.5em;" /></a>.</p>
+<figure class="align-center" id="id1">
+<img alt="../_images/python-editor.png" class="middle" src="../_images/python-editor.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 2 </span><span class="caption-text">Nativní Python editor systému GRASS. Skript spustíme pomocí
+tlačítka <a class="reference internal" href="../_images/execute.png"><img alt="grass-execute" src="../_images/execute.png" style="width: 1.5em;" /></a>.</span><a class="headerlink" href="#id1" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<p>Již hotový skript lze spustit přímo z menu správce vrstev
+<span class="menuselection">File ‣ Launch script</span> anebo z nástrojové lišty
+<a class="reference internal" href="../_images/script-load.png"><img alt="grass-script-load" src="../_images/script-load.png" style="width: 1.5em;" /></a>.</p>
+<p>Po výběru skriptu si GRASS zkontroluje, zda je skript <em>spustitelný</em> a
+zda je tzv. v <em>spouštěcí cestě</em>. V připadě, že tomu tak není, tak se
+objeví příslušné dialogy, které potvrdíme (<span class="item">Yes</span>).</p>
+<figure class="align-center" id="id2">
+<img alt="../_images/launch-permission.png" class="small" src="../_images/launch-permission.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 3 </span><span class="caption-text">Dialog pro nastavení spustitelnosti.</span><a class="headerlink" href="#id2" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id3">
+<img alt="../_images/launch-path.png" class="small" src="../_images/launch-path.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 4 </span><span class="caption-text">Dialog pro přidání adresáře se skriptem do spouštěcí cesty.</span><a class="headerlink" href="#id3" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>Přidání skriptu do spouštěcí cesty má tu výhodu, že lze
+skript znovu spustit z příkazové řádky správce vrstev jako
+kterýkoliv modul systému GRASS.</p>
+</div>
+<p>Skript se poté spustí, výpis je přesměrován do okna správce vrstev.</p>
+<figure class="align-center" id="id4">
+<img alt="../_images/launch-output.png" src="../_images/launch-output.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 5 </span><span class="caption-text">Výsledek spuštění skriptu v okně správce vrstev.</span><a class="headerlink" href="#id4" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Cesta ke skriptu je součástí historie příkazové řádky. Z ní můžeme
+vyvolat skript opakovaně.</p>
+<figure class="align-center" id="id5">
+<img alt="../_images/lmgr-launch-cmd.png" src="../_images/lmgr-launch-cmd.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 6 </span><span class="caption-text">Spuštění skriptu z příkazové řádky správce vrstev.</span><a class="headerlink" href="#id5" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="spusteni-jako-batch-job">
+<h2>Spuštění jako batch job<a class="headerlink" href="#spusteni-jako-batch-job" title="Permalink to this heading">¶</a></h2>
+<p>Pokud je definována proměnná prostředí <span class="target" id="index-0"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">GRASS_BATCH_JOB</span></code>, tak
+GRASS spustí soubor uvedený jako hodnota této proměnné. Po doběhnutí
+skriptu se GRASS sám ukončí.</p>
+<p>Příklad pro Linux:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">GRASS_BATCH_JOB</span><span class="o">=</span>/home/martin/skripty/rastr_stats.py
+grass78<span class="w"> </span>/opt/grassdata/gismentors/user1
+</pre></div>
+</div>
+<p>Příklad pro MS Windows (spuštěno z <em>OSGeo4W Shell</em>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">set</span><span class="w"> </span><span class="nv">GRASS_BATCH_JOB</span><span class="o">=</span>C:<span class="se">\u</span>sers<span class="se">\m</span>artin<span class="se">\s</span>kripty<span class="se">\r</span>astr_stats.py
+grass78<span class="w"> </span>C:<span class="se">\u</span>sers<span class="se">\m</span>artin<span class="se">\g</span>rassdata<span class="se">\g</span>ismentors<span class="se">\u</span>ser1
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Důležité</p>
+<p>Tento způsob nemusí být pod MS Windows funkční v
+případě, že je nainstalován v OS systémový Python (např. díky Esri
+ArcGIS). V tomto případě doporučujeme postup popsaný <a class="reference internal" href="#exec"><span class="std std-ref">níže</span></a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Poznámka</p>
+<p>GRASS v tomto případě spouštíme s mapsetem <span class="mapset">user1</span> v
+lokaci <cite>gismentors</cite>. Pokud bysme tento parametr vynechali, tak
+GRASS spustí skript v posledně navštíveném mapsetu.</p>
+</div>
+<p>Výstup může vypadat následovně:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Starting</span> <span class="n">GRASS</span> <span class="n">GIS</span><span class="o">...</span>
+<span class="n">Cleaning</span> <span class="n">up</span> <span class="n">temporary</span> <span class="n">files</span><span class="o">...</span>
+<span class="n">Executing</span> <span class="o">&lt;/</span><span class="n">home</span><span class="o">/</span><span class="n">martin</span><span class="o">/</span><span class="n">skripty</span><span class="o">/</span><span class="n">rastr_stats</span><span class="o">.</span><span class="n">py</span><span class="o">&gt;</span> <span class="o">...</span>
+ <span class="mi">100</span><span class="o">%</span>
+<span class="n">total</span> <span class="n">null</span> <span class="ow">and</span> <span class="n">non</span><span class="o">-</span><span class="n">null</span> <span class="n">cells</span><span class="p">:</span> <span class="mi">220941666</span>
+<span class="n">total</span> <span class="n">null</span> <span class="n">cells</span><span class="p">:</span> <span class="mi">94752766</span>
+
+<span class="n">Of</span> <span class="n">the</span> <span class="n">non</span><span class="o">-</span><span class="n">null</span> <span class="n">cells</span><span class="p">:</span>
+<span class="o">----------------------</span>
+<span class="n">n</span><span class="p">:</span> <span class="mi">126188900</span>
+<span class="n">minimum</span><span class="p">:</span> <span class="mf">49.3714</span>
+<span class="n">maximum</span><span class="p">:</span> <span class="mf">1580.95</span>
+<span class="nb">range</span><span class="p">:</span> <span class="mf">1531.57</span>
+<span class="n">mean</span><span class="p">:</span> <span class="mf">451.515</span>
+<span class="n">mean</span> <span class="n">of</span> <span class="n">absolute</span> <span class="n">values</span><span class="p">:</span> <span class="mf">451.515</span>
+<span class="n">standard</span> <span class="n">deviation</span><span class="p">:</span> <span class="mf">182.075</span>
+<span class="n">variance</span><span class="p">:</span> <span class="mf">33151.4</span>
+<span class="n">variation</span> <span class="n">coefficient</span><span class="p">:</span> <span class="mf">40.3254</span> <span class="o">%</span>
+<span class="nb">sum</span><span class="p">:</span> <span class="mf">56976182855.044</span>
+<span class="n">Execution</span> <span class="n">of</span> <span class="o">&lt;/</span><span class="n">home</span><span class="o">/</span><span class="n">martin</span><span class="o">/</span><span class="n">skripty</span><span class="o">/</span><span class="n">rastr_stats</span><span class="o">.</span><span class="n">py</span><span class="o">&gt;</span> <span class="n">finished</span><span class="o">.</span>
+<span class="n">Cleaning</span> <span class="n">up</span> <span class="n">default</span> <span class="n">sqlite</span> <span class="n">database</span> <span class="o">...</span>
+<span class="n">Cleaning</span> <span class="n">up</span> <span class="n">temporary</span> <span class="n">files</span><span class="o">...</span>
+</pre></div>
+</div>
+<p>Proměnnou prostředí deaktivujeme pomocí příkazu <strong class="program">unset</strong> (pro
+Linux).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">unset</span><span class="w"> </span>GRASS_BATCH_JOB
+</pre></div>
+</div>
+<p>Pod MS Windows pomůže trik s prázdnout hodnotou:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">set</span><span class="w"> </span><span class="nv">GRASS_BATCH_JOB</span><span class="o">=</span>
+</pre></div>
+</div>
+<p>Poté se GRASS bude chovat po startu již standardně.</p>
+<p id="exec">Od verze GRASS GIS 7.6 lze použít místo proměnné prostředí
+<span class="target" id="index-1"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">GRASS_BATCH_JOB</span></code> elegatnější cestu přes přepínač <code class="docutils literal notranslate"><span class="pre">--exec</span></code>.</p>
+<p>Varianta pro Linux:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>grass78<span class="w"> </span>/opt/grassdata/gismentors/user1<span class="w"> </span>--exec<span class="w"> </span>/home/martin/skripty/rastr_stats.py
+</pre></div>
+</div>
+<p>Varianta pro MS Windows (v <em>OSGeo4W Shell</em>):</p>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>py3_env
+grass78 C:\users\martin\grassdata\gismentors\user1 --exec python3 C:\users\martin\skripty\rastr_stats.py
+</pre></div>
+</div>
+<figure class="align-center" id="id6">
+<img alt="../_images/windows-exec.png" src="../_images/windows-exec.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 7 </span><span class="caption-text">Spuštění skriptu z příkazové řádky OSGeo4W.</span><a class="headerlink" href="#id6" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="spusteni-explicitne">
+<h2>Spuštění explicitně<a class="headerlink" href="#spusteni-explicitne" title="Permalink to this heading">¶</a></h2>
+<p>Ve všech výše zmíněných příkladech vždy systém GRASS spouštíme
+explicitně. To není nutné, stačí ve skriptu nastavit cestu k instalaci
+systému GRASS (proměnná prostředí <span class="target" id="index-2"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">GISBASE</span></code>) a datům
+(tj. lokaci a mapset) - pomocí funkce <code class="docutils literal notranslate"><span class="pre">init()</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GISBASE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/usr/lib/grass78&#39;</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GISBASE&#39;</span><span class="p">],</span> <span class="s1">&#39;etc&#39;</span><span class="p">,</span> <span class="s1">&#39;python&#39;</span><span class="p">))</span>
+<span class="kn">import</span> <span class="nn">grass.script.setup</span> <span class="k">as</span> <span class="nn">gsetup</span>
+
+<span class="n">gsetup</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GISBASE&#39;</span><span class="p">],</span> <span class="s1">&#39;/opt/grassdata&#39;</span><span class="p">,</span> <span class="s1">&#39;gismentors&#39;</span><span class="p">,</span> <span class="s1">&#39;user1&#39;</span><span class="p">)</span>
+
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>Po této úpravě lze skript spustit přímo bez nutnosti spouštět GRASS
+GIS jako takový.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>/home/martin/skripty/rastr_stats.py
+</pre></div>
+</div>
+<p>Pod MS Windows nahraďte defici <code class="docutils literal notranslate"><span class="pre">gisbase</span></code> a cestu k lokaci:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GISBASE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;C:\OSGeo4W64\apps\grass\grass78&#39;</span>
+<span class="o">...</span>
+<span class="n">gsetup</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GISBASE&#39;</span><span class="p">],</span> <span class="sa">r</span><span class="s1">&#39;C:\users\martin\grassdata&#39;</span><span class="p">,</span> <span class="s1">&#39;gismentors&#39;</span><span class="p">,</span> <span class="s1">&#39;user1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Skript je nutné spustit z <em>OSGeo4W Shell</em> (před spustěním skriptu je
+nutné zavolat <code class="docutils literal notranslate"><span class="pre">py3_env</span></code>, který nastaví prostředí pro Python 3):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>py3_env
+python3<span class="w"> </span>C:<span class="se">\u</span>sers<span class="se">\m</span>artin<span class="se">\s</span>kripty<span class="se">\r</span>astr_stats.py
+</pre></div>
+</div>
+<figure class="align-center" id="id7">
+<img alt="../_images/windows-launch.png" src="../_images/windows-launch.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 8 </span><span class="caption-text">Spuštění skriptu z příkazové řádky OSGeo4W.</span><a class="headerlink" href="#id7" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="spusteni-v-textovem-editoru-pycharm-ms-windows">
+<h2>Spuštění v textovém editoru (PyCharm, MS Windows)<a class="headerlink" href="#spusteni-v-textovem-editoru-pycharm-ms-windows" title="Permalink to this heading">¶</a></h2>
+<p>Následuje návod pro textový editor <strong class="program">PyCharm</strong>. Postup
+nastavení editoru pro prostředí OSGeo4W v operačním systému MS Windows
+je součástí školení <a class="reference external" href="http://training.gismentors.eu/geopython-zacatecnik/ruzne/editor.html">GeoPython pro začátečníky</a>.</p>
+<figure class="align-center" id="id8">
+<img alt="../_images/windows-pycharm.png" class="large" src="../_images/windows-pycharm.png" />
+<figcaption>
+<p><span class="caption-number">Obr. 9 </span><span class="caption-text">Spuštění skriptu z textového editoru PyCharm.</span><a class="headerlink" href="#id8" title="Permalink k tomuto obrázku">¶</a></p>
+</figcaption>
+</figure>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Do skriptu, který nastavuje prostředí, můžete přidat definici
+cest pro instalaci GRASS GIS. Po této úpravě již nemusíte ve
+vašich skriptech pro GRASS GIS uvádět následujícící řádky:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GISBASE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;C:\OSGeo4W64\apps\grass\grass78&#39;</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GISBASE&#39;</span><span class="p">],</span> <span class="s1">&#39;etc&#39;</span><span class="p">,</span> <span class="s1">&#39;python&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Otevřete soubor <code class="file docutils literal notranslate"><span class="pre">C:\OSGeo4W64\bin\python-qgis.bat</span></code> (nebo
+<code class="file docutils literal notranslate"><span class="pre">python-qgis-ltr.bat</span></code>) a přidejte na jeho konec dvě následující řádky:</p>
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span><span class="k">set</span> <span class="nv">GISBASE</span><span class="p">=</span><span class="nv">%OSGEO4W_ROOT%</span>\apps\grass\grass78
+<span class="k">set</span> <span class="nv">PYTHONPATH</span><span class="p">=</span><span class="nv">%GISBASE%</span>\etc\python;<span class="nv">%PYTHONPATH%</span>
+</pre></div>
+</div>
+<p>Ideálně uložte toto nastavení mimo soubor
+<code class="file docutils literal notranslate"><span class="pre">python-qgis.bat</span></code>. Vyhnete se tak tomu, že při další
+aktualizaci QGISu o tyto úpravy přijdete.</p>
+</div>
+</section>
+<section id="spusteni-pomoci-bat-souboru-pod-ms-windows">
+<h2>Spuštění pomocí BAT souboru pod MS Windows<a class="headerlink" href="#spusteni-pomoci-bat-souboru-pod-ms-windows" title="Permalink to this heading">¶</a></h2>
+<p>Skript lze spustit i přímo pomocí řídícího BAT souboru, který nastaví
+prostředí nutné pro běh systému GRASS. Minimalistický příklad níže.</p>
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span><span class="p">@</span><span class="k">echo</span> off
+
+<span class="k">set</span> <span class="nv">OSGEO4W_ROOT</span><span class="p">=</span>C:\OSGeo4W64
+
+<span class="k">call</span> <span class="nv">%OSGEO4W_ROOT%</span>\bin\o4w_env.bat
+<span class="k">call</span> <span class="nv">%OSGEO4W_ROOT%</span>\bin\py3_env.bat
+
+<span class="k">set</span> <span class="nv">GISBASE</span><span class="p">=</span><span class="nv">%OSGEO4W_ROOT%</span>\apps\grass\grass78
+<span class="k">set</span> <span class="nv">PYTHONPATH</span><span class="p">=</span><span class="nv">%GISBASE%</span>\etc\python;<span class="nv">%PYTHONPATH%</span>
+
+python rastr_stats.py
+
+<span class="k">pause</span>
+</pre></div>
+</div>
+<p>Ze samotného Python skriptu vypadnou přebytečné dvě řádky:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GISBASE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;C:\OSGeo4W64\apps\grass\grass78&#39;</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GISBASE&#39;</span><span class="p">],</span> <span class="s1">&#39;etc&#39;</span><span class="p">,</span> <span class="s1">&#39;python&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Úvod do skriptování</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Spuštění skriptu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ndvi.html">Ukázka skriptu (NDVI)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pywps/index.html">Publikování WPS procesu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="index.html" title="Úvod do skriptování"
+              >předchozí</a> |
+            <a href="ndvi.html" title="Ukázka skriptu (NDVI)"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

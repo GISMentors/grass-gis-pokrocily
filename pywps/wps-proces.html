@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Vypublikování skriptu jako WPS procesu &#8212; Školení GRASS GIS pro pokročilé</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gismentors.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Rejstřík" href="../genindex.html" />
+    <link rel="search" title="Vyhledávání" href="../search.html" />
+    <link rel="next" title="Hydrologie" href="../hydrologie/index.html" />
+    <link rel="prev" title="Implementace skriptu pro GRASS" href="grass-skript.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="../index.html">Školení GRASS GIS pro pokročilé</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="grass-skript.html" title="Implementace skriptu pro GRASS"
+             accesskey="P">předchozí</a> |
+          <a href="../hydrologie/index.html" title="Hydrologie"
+             accesskey="N">další</a> |
+          <a href="../genindex.html" title="Obecný rejstřík"
+             accesskey="I">rejstřík</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="vypublikovani-skriptu-jako-wps-procesu">
+<h1>Vypublikování skriptu jako WPS procesu<a class="headerlink" href="#vypublikovani-skriptu-jako-wps-procesu" title="Permalink to this heading">¶</a></h1>
+<p>Skript upravíme následovně:</p>
+<ol class="arabic simple">
+<li><p>Vytvoříme třídu <code class="xref py py-class docutils literal notranslate"><span class="pre">ObcePsc</span></code>, která dědí vlastnosti z třídy
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code> (řádky <span class="lcode">11</span> a <span class="lcode">29-39</span>).</p></li>
+<li><p>Definujeme vstupní (řádky <span class="lcode">13-19</span>) a výstupní (řádky
+<span class="lcode">20-27</span>) parametry WPS procesu</p></li>
+<li><p>Implementujeme funkci <code class="docutils literal notranslate"><span class="pre">_handler()</span></code> (<span class="lcode">55</span>), která se vykoná
+v okamžiku, kdy od klienta dorazí na server dotaz typu
+<code class="docutils literal notranslate"><span class="pre">request=execute</span></code>.</p></li>
+<li><p>Vlastní tělo původního skriptu vnoříme do funkce <code class="docutils literal notranslate"><span class="pre">obce_psc()</span></code>
+(<span class="lcode">44</span>).</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="kn">import</span> <span class="nn">os</span>
+<span class="linenos"> 4</span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="linenos"> 5</span><span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="kn">from</span> <span class="nn">grass.pygrass.modules</span> <span class="kn">import</span> <span class="n">Module</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="kn">from</span> <span class="nn">pywps</span> <span class="kn">import</span> <span class="n">Process</span><span class="p">,</span> <span class="n">LiteralInput</span><span class="p">,</span> <span class="n">ComplexOutput</span><span class="p">,</span> <span class="n">LOGGER</span><span class="p">,</span> <span class="n">Format</span>
+<span class="linenos">10</span>
+<span class="hll"><span class="linenos">11</span><span class="k">class</span> <span class="nc">ObcePsc</span><span class="p">(</span><span class="n">Process</span><span class="p">):</span>
+</span><span class="linenos">12</span>     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="hll"><span class="linenos">13</span>          <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span>
+</span><span class="hll"><span class="linenos">14</span>               <span class="n">LiteralInput</span><span class="p">(</span>
+</span><span class="hll"><span class="linenos">15</span>                    <span class="n">identifier</span><span class="o">=</span><span class="s2">&quot;psc&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">16</span>                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Zájmové PSČ&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">17</span>                    <span class="n">data_type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span>
+</span><span class="hll"><span class="linenos">18</span>               <span class="p">)</span>
+</span><span class="hll"><span class="linenos">19</span>          <span class="p">]</span>
+</span><span class="hll"><span class="linenos">20</span>          <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span>
+</span><span class="hll"><span class="linenos">21</span>               <span class="n">ComplexOutput</span><span class="p">(</span>
+</span><span class="hll"><span class="linenos">22</span>                    <span class="n">identifier</span><span class="o">=</span><span class="s2">&quot;output&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">23</span>                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Vystupni GML soubor&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">24</span>                    <span class="n">supported_formats</span><span class="o">=</span><span class="p">[</span><span class="n">Format</span><span class="p">(</span><span class="s1">&#39;application/gml+xml&#39;</span><span class="p">)],</span>
+</span><span class="hll"><span class="linenos">25</span>                    <span class="n">as_reference</span><span class="o">=</span><span class="kc">True</span>
+</span><span class="hll"><span class="linenos">26</span>               <span class="p">)</span>
+</span><span class="hll"><span class="linenos">27</span>          <span class="p">]</span>
+</span><span class="linenos">28</span>
+<span class="hll"><span class="linenos">29</span>          <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+</span><span class="hll"><span class="linenos">30</span>               <span class="bp">self</span><span class="o">.</span><span class="n">_handler</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">31</span>               <span class="n">identifier</span><span class="o">=</span><span class="s2">&quot;obce_psc&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">32</span>               <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">33</span>               <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dotaz na obce dle PSC&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">34</span>               <span class="n">abstract</span><span class="o">=</span><span class="s2">&quot;Testovaci sluzba PyWPS.&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">35</span>               <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">36</span>               <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">37</span>               <span class="n">grass_location</span><span class="o">=</span><span class="s2">&quot;gismentors&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">38</span>               <span class="n">store_supported</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span class="hll"><span class="linenos">39</span>               <span class="n">status_supported</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span class="linenos">40</span>
+<span class="linenos">41</span>          <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GRASS_SKIP_MAPSET_OWNER_CHECK&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+<span class="linenos">42</span>          <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HOME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span> <span class="c1"># needed by G_home()</span>
+<span class="linenos">43</span>
+<span class="hll"><span class="linenos">44</span>     <span class="k">def</span> <span class="nf">obce_psc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psc</span><span class="p">):</span>
+</span><span class="linenos">45</span>          <span class="n">map_name</span> <span class="o">=</span> <span class="s1">&#39;obce_psc_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">psc</span><span class="p">)</span>
+<span class="linenos">46</span>          
+<span class="linenos">47</span>          <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;v.extract&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="s1">&#39;obce&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;obce1&#39;</span><span class="p">,</span>
+<span class="linenos">48</span>                 <span class="n">where</span><span class="o">=</span><span class="s2">&quot;psc = &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">psc</span><span class="p">))</span>
+<span class="linenos">49</span>          <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;v.select&#39;</span><span class="p">,</span> <span class="n">ainput</span><span class="o">=</span><span class="s1">&#39;obce&#39;</span><span class="p">,</span> <span class="n">binput</span><span class="o">=</span><span class="s1">&#39;obce1&#39;</span><span class="p">,</span>
+<span class="linenos">50</span>                 <span class="n">output</span><span class="o">=</span><span class="n">map_name</span><span class="p">,</span>
+<span class="linenos">51</span>                 <span class="n">operator</span><span class="o">=</span><span class="s1">&#39;overlap&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">52</span>
+<span class="linenos">53</span>          <span class="k">return</span> <span class="n">map_name</span>
+<span class="linenos">54</span>          
+<span class="hll"><span class="linenos">55</span>     <span class="k">def</span> <span class="nf">_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+</span><span class="linenos">56</span>          <span class="n">psc</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;psc&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+<span class="linenos">57</span>
+<span class="linenos">58</span>          <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Computation started&quot;</span><span class="p">)</span>
+<span class="linenos">59</span>
+<span class="linenos">60</span>          <span class="n">map_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obce_psc</span><span class="p">(</span><span class="n">psc</span><span class="p">)</span>
+<span class="linenos">61</span>          <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Computation finished&quot;</span><span class="p">)</span>
+<span class="linenos">62</span>
+<span class="linenos">63</span>          <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Export started&quot;</span><span class="p">)</span>
+<span class="linenos">64</span>          <span class="n">Module</span><span class="p">(</span><span class="s1">&#39;v.out.ogr&#39;</span><span class="p">,</span>
+<span class="linenos">65</span>                 <span class="nb">input</span><span class="o">=</span><span class="n">map_name</span><span class="p">,</span>
+<span class="linenos">66</span>                 <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;GML&#39;</span><span class="p">,</span>
+<span class="linenos">67</span>                 <span class="n">output</span><span class="o">=</span><span class="s1">&#39;output.gml&#39;</span><span class="p">,</span>
+<span class="linenos">68</span>                 <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">69</span>          
+<span class="linenos">70</span>          <span class="n">response</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="s2">&quot;output.gml&quot;</span>
+<span class="linenos">71</span>          <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+</div>
+<p>Skript ke stažení <a class="reference external" href="../_static/skripty/obce_psc_wps.py">zde</a>.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../skripty/index.html">Úvod do skriptování</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pygrass/index.html">PyGRASS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Publikování WPS procesu</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="grass-skript.html">Implementace skriptu pro GRASS</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Vypublikování skriptu jako WPS procesu</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../hydrologie/index.html">Hydrologie</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tgrass/index.html">Časoprostorové analýzy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lidar/index.html">Zpracování lidarových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zod/index.html">Zpracování obrazových dat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formaty/index.html">Práce s externími formáty</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3d/index.html">3D</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Vyhledávání</h3>
+            <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="OK" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="grass-skript.html" title="Implementace skriptu pro GRASS"
+              >předchozí</a> |
+            <a href="../hydrologie/index.html" title="Hydrologie"
+              >další</a> |
+            <a href="../genindex.html" title="Obecný rejstřík"
+              >rejstřík</a>
+          </div>
+          <div role="note" aria-label="source link">
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2023 GISMentors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>
